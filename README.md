@@ -1,30 +1,24 @@
-# React + TypeScript + Vite
+# Technologies
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- Vite (bundler)
+- React Konva
+- Typescript
+- State management: Zustand + persistence using LocalStorage
+- UI: MUI
+- Schemas: ZOD
 
-Currently, two official plugins are available:
+## Functionalities
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Fetch album covers, book covers, movie posters, tv show poster or game posters and place them on a board
+- Rate with star system from 0 to 5, in steps of 0.5
+- Everything is draggable and you can connect the covers by arrows by clicking on the direction points when clicking on a cover
+- Drag and drop and edit the texts to 4 different positions around the cover
+- You can use resizable groups to join multiple covers together and also connect them using arrows
+- You can configure the themes, like colors, resize, text positions in a menu
+- You can create multiple pages by URL or via share popup and download the JSON code to be used later
+- You can undo up to 10 actions
 
-## Expanding the ESLint configuration
+## Backend
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+- The app uses a small backend to protect the private API keys and redirect to the respective APIs
+- The backend also uses CORS and rate limiting
