@@ -1,6 +1,6 @@
 import { Rect, Text } from 'react-konva';
 import { Html } from 'react-konva-utils';
-import { CommonTextLabelPopover } from './';
+import { CommonTextLabelPopover } from '.';
 import { PosTypes, buildTitle } from 'types';
 import { useMainStore } from 'store';
 import { RefObject, useEffect, useRef, useState } from 'react';

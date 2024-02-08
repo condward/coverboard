@@ -1,14 +1,14 @@
 import { PosTypes } from './generalTypes';
 
-export const Colors = {
-  YELLOW: 'yellow',
-  RED: 'red',
-  GREEN: 'green',
-  PINK: 'pink',
-  BLUE: 'blue',
-  PURPLE: 'purple',
-  ORANGE: 'orange',
-} as const;
+export enum Colors {
+  YELLOW = 'yellow',
+  RED = 'red',
+  GREEN = 'green',
+  PINK = 'pink',
+  BLUE = 'blue',
+  PURPLE = 'purple',
+  ORANGE = 'orange',
+}
 
 export const colorMap = {
   [Colors.YELLOW]: 'yellow',

@@ -12,7 +12,7 @@ import {
   CoverCountLabel,
   GroupCountLabel,
   Logo,
-} from './';
+} from '.';
 import { flushSync } from 'react-dom';
 import { formatDate } from 'utils';
 import { useMainStore, useUtilsStore } from 'store';

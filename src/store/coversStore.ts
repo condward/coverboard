@@ -87,24 +87,19 @@ export const createCoversSlice: StateCreator<
     }));
   },
   updateCoverStarDir(coverId, dir) {
-    set(({ covers }) => {
-      const coverIdx = covers.findIndex((cov) => cov.id === coverId);
-
-      if (coverIdx > -1) {
-        const cover = covers[coverIdx];
-
-        return {
-          covers: covers.with(coverIdx, {
-            ...cover,
-            star: {
-              ...cover.star,
-              dir,
-            },
-          }),
-        };
-      }
-      return { covers };
-    });
+    set(({ covers }) => ({
+      covers: covers.map((cover) =>
+        cover.id === coverId
+          ? {
+              ...cover,
+              star: {
+                ...cover.star,
+                dir,
+              },
+            }
+          : cover,
+      ),
+    }));
   },
   updateStarCount(coverId, count) {
     set(({ covers }) => ({
