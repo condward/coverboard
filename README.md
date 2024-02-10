@@ -1,3 +1,8 @@
+# Coverboard
+
+_Coverboard is a frontend canvas app where you can create a board to rate and relate your favorite media to each other._
+_Try_ https://condward.github.io/coverboard/
+
 # Technologies
 
 - Vite (bundler)
@@ -7,8 +12,9 @@
 - UI: MUI
 - Schemas: ZOD
 
-## Functionalities
+## Features
 
+- Tablet support and keyboard accessibility
 - Fetch album covers, book covers, movie posters, tv show poster or game posters and place them on a board
 - Rate with star system from 0 to 5, in steps of 0.5
 - Everything is draggable and you can connect the covers by arrows by clicking on the direction points when clicking on a cover
