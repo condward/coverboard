@@ -1,7 +1,9 @@
 import { Snackbar, Alert } from '@mui/material';
+import { FC } from 'react';
+
 import { useToastStore } from 'store';
 
-export const Toast: React.FC = () => {
+export const Toast: FC = () => {
   const toastMessage = useToastStore((state) => state.toastMessage);
   const handleToastMessageClose = useToastStore(
     (state) => state.handleToastMessageClose,
@@ -11,7 +13,7 @@ export const Toast: React.FC = () => {
 
   return (
     <Snackbar
-      open={!!toastMessage}
+      open={Boolean(toastMessage)}
       autoHideDuration={3000}
       onClose={handleToastMessageClose}>
       <Alert severity={toastMessage.type} onClose={handleToastMessageClose}>

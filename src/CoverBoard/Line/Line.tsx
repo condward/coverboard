@@ -1,18 +1,19 @@
-import React, { useMemo } from 'react';
+import { FC, memo } from 'react';
 import { Group } from 'react-konva';
 
-import { LineParams, Lines, PosTypes } from 'types';
-import { LineArrow, LineLabel } from '.';
+import { LineParams, LineSchema, PosTypes } from 'types';
 import { useMainStore } from 'store';
 
+import { LineArrow, LineLabel } from '.';
+
 interface LineProps {
-  id: Lines['id'];
-  dir: Lines['dir'];
-  originId: Lines['origin']['id'];
-  originDir: Lines['origin']['dir'];
-  targetId: Lines['target']['id'];
-  targetDir: Lines['target']['dir'];
-  text: Lines['text'];
+  id: LineSchema['id'];
+  dir: LineSchema['dir'];
+  originId: LineSchema['origin']['id'];
+  originDir: LineSchema['origin']['dir'];
+  targetId: LineSchema['target']['id'];
+  targetDir: LineSchema['target']['dir'];
+  text: LineSchema['text'];
 }
 
 const convertPosToXY = (
@@ -45,15 +46,19 @@ const convertPosToXY = (
   }
 };
 
-export const LineMemo: React.FC<LineProps> = ({
-  id,
-  dir,
+interface UseGetLineParams {
+  originId: LineProps['originId'];
+  originDir: LineProps['originDir'];
+  targetId: LineProps['targetId'];
+  targetDir: LineProps['targetDir'];
+}
+
+const useGetLineParams = ({
   originId,
   originDir,
   targetId,
   targetDir,
-  text,
-}) => {
+}: UseGetLineParams): LineParams | undefined => {
   const originSquareCover = useMainStore((state) =>
     state.covers.find((cov) => cov.id === originId),
   );
@@ -67,7 +72,6 @@ export const LineMemo: React.FC<LineProps> = ({
   const targetSquareGroup = useMainStore((state) =>
     state.groups.find((cov) => cov.id === targetId),
   );
-  const showArrow = useMainStore((state) => state.configs.showArrow);
 
   const origin = originSquareCover ? 'cover' : 'group';
   const target = targetSquareCover ? 'cover' : 'group';
@@ -85,61 +89,66 @@ export const LineMemo: React.FC<LineProps> = ({
     targetSquare && 'scaleY' in targetSquare ? targetSquare.scaleY : 1;
 
   const coverSizeOriginWidth = useMainStore(
-    (state) => state.coverSizeWidth() * scaleOriginX,
+    (state) => state.getCoverSizeWidth() * scaleOriginX,
   );
   const coverSizeOriginHeight = useMainStore(
-    (state) => state.coverSizeHeight() * scaleOriginY,
+    (state) => state.getCoverSizeHeight() * scaleOriginY,
   );
   const coverSizeDistWidth = useMainStore(
-    (state) => state.coverSizeWidth() * scaleDestX,
+    (state) => state.getCoverSizeWidth() * scaleDestX,
   );
   const coverSizeDistHeight = useMainStore(
-    (state) => state.coverSizeHeight() * scaleDestY,
+    (state) => state.getCoverSizeHeight() * scaleDestY,
   );
 
-  const lineParams = useMemo((): LineParams | undefined => {
-    if (originSquare && targetSquare) {
-      const originPos = convertPosToXY(
-        coverSizeOriginWidth,
-        coverSizeOriginHeight,
-        originDir,
-        origin,
-      );
-      const targetPos = convertPosToXY(
-        coverSizeDistWidth,
-        coverSizeDistHeight,
-        targetDir,
-        target,
-      );
+  if (originSquare && targetSquare) {
+    const originPos = convertPosToXY(
+      coverSizeOriginWidth,
+      coverSizeOriginHeight,
+      originDir,
+      origin,
+    );
+    const targetPos = convertPosToXY(
+      coverSizeDistWidth,
+      coverSizeDistHeight,
+      targetDir,
+      target,
+    );
 
-      const points = [
-        originSquare.x + originPos.x,
-        originSquare.y + originPos.y,
-        targetSquare.x + targetPos.x,
-        targetSquare.y + targetPos.y,
-      ];
+    const points = [
+      originSquare.x + originPos.x,
+      originSquare.y + originPos.y,
+      targetSquare.x + targetPos.x,
+      targetSquare.y + targetPos.y,
+    ];
 
-      const midX = (points[0] + points[2]) / 2;
-      const midY = (points[1] + points[3]) / 2;
+    const midX = (points[0] + points[2]) / 2;
+    const midY = (points[1] + points[3]) / 2;
 
-      return {
-        midX,
-        midY,
-        points,
-      };
-    }
-  }, [
-    originSquare,
-    targetSquare,
-    coverSizeOriginWidth,
-    coverSizeOriginHeight,
+    return {
+      midX,
+      midY,
+      points,
+    };
+  }
+};
+
+const LineWithoutMemo: FC<LineProps> = ({
+  id,
+  dir,
+  originId,
+  originDir,
+  targetId,
+  targetDir,
+  text,
+}) => {
+  const showArrow = useMainStore((state) => state.configs.showArrow);
+  const lineParams = useGetLineParams({
+    originId,
     originDir,
-    origin,
-    coverSizeDistWidth,
-    coverSizeDistHeight,
+    targetId,
     targetDir,
-    target,
-  ]);
+  });
 
   if (!lineParams) return null;
 
@@ -155,4 +164,4 @@ export const LineMemo: React.FC<LineProps> = ({
   );
 };
 
-export const Line = React.memo(LineMemo);
+export const Line = memo(LineWithoutMemo);

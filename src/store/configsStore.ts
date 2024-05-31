@@ -1,21 +1,24 @@
+import { StateCreator } from 'zustand';
+
 import {
   Colors,
   BackColors,
   PosTypes,
-  ToolbarConfigParams,
+  ConfigSchema,
   ToolConfigIDs,
   DragLimits,
   colorMap,
   backColorMap,
+  Media,
+  MediaDesc,
+  MediaMap,
 } from 'types';
-import { Media, MediaDesc, MediaMap } from 'types/configTypes';
-import { StateCreator } from 'zustand';
 
 const getSize = () => {
   const size = Math.min(150, Math.max(70, window.innerWidth / 20));
   return Math.ceil(size / 10) * 10;
 };
-export const initialConfigValues = (): ToolbarConfigParams => ({
+export const initialConfigValues = (): ConfigSchema => ({
   size: getSize(),
   title: '',
   color: Colors.YELLOW,
@@ -35,20 +38,20 @@ export const initialConfigValues = (): ToolbarConfigParams => ({
 });
 
 export interface UseConfigsParams {
-  configs: ToolbarConfigParams;
+  configs: ConfigSchema;
   resetConfigs: () => void;
-  updateConfigs: (newConfig: ToolbarConfigParams) => void;
+  updateConfigs: (newConfig: ConfigSchema) => void;
   resetTitle: () => void;
   updateTitle: (title: string) => void;
-  coverSizeWidth: () => number;
-  coverSizeHeight: () => number;
-  toobarIconSize: () => number;
-  fontSize: () => number;
-  circleRadius: () => number;
-  starRadius: () => number;
+  getCoverSizeWidth: () => number;
+  getCoverSizeHeight: () => number;
+  getToobarIconSize: () => number;
+  getFontSize: () => number;
+  getCircleRadius: () => number;
+  getStarRadius: () => number;
   getCurrentY: (index: number) => number;
-  dragLimits: () => DragLimits;
-  toolBarLimits: () => DragLimits;
+  getDragLimits: () => DragLimits;
+  getToolBarLimits: () => DragLimits;
   setWindowSize: () => void;
   getColor: () => string;
   getArrowColor: () => string;
@@ -60,8 +63,8 @@ export interface UseConfigsParams {
     width: number;
     height: number;
   };
-  titleLabel: () => MediaDesc;
-  subTitleLabel: () => MediaDesc;
+  getTitleLabel: () => MediaDesc;
+  getSubTitleLabel: () => MediaDesc;
   setMedia: (media: Media) => void;
 }
 
@@ -72,25 +75,14 @@ export const createConfigsSlice: StateCreator<
   UseConfigsParams
 > = (set, get) => ({
   configs: initialConfigValues(),
-  coverSizeWidth: () => get().configs.size,
-  coverSizeHeight: () =>
-    get().configs.size * MediaMap[get().configs.media].heightRatio,
+  windowSize: {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
   setMedia: (media: Media) => {
     set(({ configs }) => ({
       configs: { ...configs, media },
     }));
-  },
-  getShowStars: () => get().configs.showStars,
-  titleLabel: () => MediaMap[get().configs.media].title,
-  subTitleLabel: () => MediaMap[get().configs.media].subtitle,
-  getColor: () => colorMap[get().configs.color],
-  getArrowColor: () => colorMap[get().configs.arrowColor],
-  getCoverColor: () => colorMap[get().configs.coverColor],
-  getGroupColor: () => colorMap[get().configs.groupColor],
-  getBackColor: () => backColorMap[get().configs.backColor],
-  windowSize: {
-    width: window.innerWidth,
-    height: window.innerHeight,
   },
   setWindowSize: () => {
     set({
@@ -121,24 +113,35 @@ export const createConfigsSlice: StateCreator<
       configs: { ...configs, title },
     }));
   },
-  toobarIconSize: () => get().configs.size / 2.5,
-  fontSize: () => get().configs.size / 7,
-  circleRadius: () => get().configs.size / 7 / 1.5,
-  starRadius: () => get().circleRadius() * 0.8,
-  dragLimits: () => ({
-    x: 2.5 * get().toobarIconSize(),
+  getCoverSizeWidth: () => get().configs.size,
+  getCoverSizeHeight: () =>
+    get().configs.size * MediaMap[get().configs.media].heightRatio,
+  getShowStars: () => get().configs.showStars,
+  getTitleLabel: () => MediaMap[get().configs.media].title,
+  getSubTitleLabel: () => MediaMap[get().configs.media].subtitle,
+  getColor: () => colorMap[get().configs.color],
+  getArrowColor: () => colorMap[get().configs.arrowColor],
+  getCoverColor: () => colorMap[get().configs.coverColor],
+  getGroupColor: () => colorMap[get().configs.groupColor],
+  getBackColor: () => backColorMap[get().configs.backColor],
+  getToobarIconSize: () => get().configs.size / 2.5,
+  getFontSize: () => get().configs.size / 7,
+  getCircleRadius: () => get().configs.size / 7 / 1.5,
+  getStarRadius: () => get().getCircleRadius() * 0.8,
+  getDragLimits: () => ({
+    x: 2.5 * get().getToobarIconSize(),
     y: 0,
-    width: window.innerWidth - 3.5 * get().toobarIconSize(),
-    height: window.innerHeight - 1 * get().toobarIconSize(),
+    width: get().windowSize.width - 3.5 * get().getToobarIconSize(),
+    height: get().windowSize.height - 1 * get().getToobarIconSize(),
   }),
   getCurrentY: (index: number) =>
-    0 + index * (get().toobarIconSize() + get().toobarIconSize() / 2),
-  toolBarLimits: () => ({
+    0 + index * (get().getToobarIconSize() + get().getToobarIconSize() / 2),
+  getToolBarLimits: () => ({
     x: 0,
     y: 0,
-    width: get().toobarIconSize() * 2,
+    width: get().getToobarIconSize() * 2,
     height:
       get().getCurrentY(Object.keys(ToolConfigIDs).length - 1) +
-      2 * get().toobarIconSize(),
+      2 * get().getToobarIconSize(),
   }),
 });

@@ -1,13 +1,15 @@
-import { useMainStore } from 'store';
 import { Text } from 'react-konva';
+import { FC } from 'react';
 
-export const CoverCountLabel: React.FC = () => {
+import { useMainStore } from 'store';
+
+export const CoverCountLabel: FC = () => {
   const pos0 = useMainStore(
     (state) => state.covers.filter((cov) => cov.x === 0 && cov.y === 0).length,
   );
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight());
-  const fontSize = useMainStore((state) => state.fontSize());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
+  const fontSize = useMainStore((state) => state.getFontSize());
 
   return (
     <Text

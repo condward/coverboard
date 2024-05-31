@@ -1,15 +1,26 @@
-import { Lines, Point, PosTypes } from 'types';
 import { v4 as uuidv4 } from 'uuid';
 import { StateCreator } from 'zustand';
 
+import {
+  LineSchema,
+  LinePointSchema,
+  PosTypes,
+  LinesSchema,
+  lineSchemas,
+} from 'types';
+
 export interface UseLinesParams {
-  lines: Array<Lines>;
-  resetLine: (linedId: string) => void;
-  updateLineDir: (linedId: string, dir: PosTypes) => void;
-  updateLineText: (linedId: string, text: string) => void;
-  removeLine: (linedId: string) => void;
-  createLine: (id: string, points: Point, pos: PosTypes) => void;
-  isLine: (lineId: string) => boolean;
+  lines: LinesSchema;
+  isLine: (lineId: LineSchema['id']) => boolean;
+  resetLine: (linedId: LineSchema['id']) => void;
+  updateLineDir: (linedId: LineSchema['id'], dir: PosTypes) => void;
+  updateLineText: (linedId: LineSchema['id'], text: string) => void;
+  removeLine: (linedId: LineSchema['id']) => void;
+  createLine: (
+    id: LineSchema['id'],
+    points: LinePointSchema,
+    pos: PosTypes,
+  ) => void;
   removeConnectedLine: (id1: string, id2: string) => void;
 }
 
@@ -20,13 +31,13 @@ export const createLinesSlice: StateCreator<
   UseLinesParams
 > = (set, get) => ({
   lines: [],
-  isLine: (id) => !!get().lines.find((line) => line.id === id),
+  isLine: (id) => get().lines.some((line) => line.id === id),
   createLine(id, points, dir) {
     set(({ lines }) => {
       const lineCopy = [...lines];
 
       if (
-        lineCopy.find(
+        lineCopy.some(
           (currentLine) => currentLine.target.id === id && points.id === id,
         )
       ) {
@@ -54,17 +65,17 @@ export const createLinesSlice: StateCreator<
       }
 
       return {
-        lines: [
+        lines: lineSchemas.parse([
           ...lineCopy,
           {
-            text: null,
+            text: '',
             dir: PosTypes.BOTTOM,
 
             origin: { ...points },
             target: { id, dir },
             id: uuidv4(),
           },
-        ],
+        ]),
       };
     });
   },

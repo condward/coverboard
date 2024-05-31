@@ -1,25 +1,41 @@
-import React from 'react';
+import { FC } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
 
-import { Covers, GroupCovers, PosTypes, LabelTypes } from 'types';
-import { useUtilsStore } from 'store';
+import { CoverSchema, GroupSchema, PosTypes, LabelTypes } from 'types';
+import {
+  editingTextAtom,
+  pointsAtom,
+  useIsCurrentTextSelected,
+  useIsSelected,
+} from 'store';
+
 import { CommonTextLabel } from '.';
 
 interface CommonLabelProps {
-  id: Covers['id'] | GroupCovers['id'];
+  id: CoverSchema['id'] | GroupSchema['id'];
   coverLabel: LabelTypes;
   text: string | null;
   fontStyle?: 'bold';
-  scaleX?: GroupCovers['scaleX'];
-  scaleY?: GroupCovers['scaleY'];
+  scaleX?: GroupSchema['scaleX'];
+  scaleY?: GroupSchema['scaleY'];
   dir: PosTypes;
   color: string;
-  updateLabel: (coverId: string, coverLabel: LabelTypes, label: string) => void;
+  updateLabel: (label: string) => void;
   x: number;
   y: number;
   width: number;
 }
 
-export const CommonLabel: React.FC<CommonLabelProps> = ({
+export const CommonLabel: FC<CommonLabelProps> = (props) => {
+  const editLines = useAtomValue(pointsAtom);
+  const isSelected = useIsSelected(props.id);
+
+  if (editLines || isSelected) return null;
+
+  return <CommonLabelChild {...props} />;
+};
+
+const CommonLabelChild: FC<CommonLabelProps> = ({
   id,
   coverLabel,
   text,
@@ -31,13 +47,11 @@ export const CommonLabel: React.FC<CommonLabelProps> = ({
   y,
   width,
 }) => {
-  const editLines = useUtilsStore((state) => state.points);
-  const selected = useUtilsStore((state) => state.selected);
-  const isSelected = !!selected && selected.id === id;
-  const setEditingText = useUtilsStore((state) => state.setEditingText);
-  const isCurrentTextSelected = useUtilsStore((state) =>
-    state.isCurrentTextSelected({ id, text: coverLabel }),
-  );
+  const setEditingText = useSetAtom(editingTextAtom);
+  const isCurrentTextSelected = useIsCurrentTextSelected({
+    id,
+    text: coverLabel,
+  });
 
   const handleSetOpen = (open: boolean) => {
     open ? setEditingText({ id, text: coverLabel }) : setEditingText(null);
@@ -52,8 +66,6 @@ export const CommonLabel: React.FC<CommonLabelProps> = ({
     return '';
   };
 
-  if (editLines || isSelected) return null;
-
   return (
     <CommonTextLabel
       title={coverLabel}
@@ -65,9 +77,7 @@ export const CommonLabel: React.FC<CommonLabelProps> = ({
       editable={true}
       label={getTitleText()}
       onReset={() => void 0}
-      setLabel={(label) => {
-        updateLabel(id, coverLabel, label);
-      }}
+      setLabel={(label) => updateLabel(label)}
       x={x}
       y={y}
       width={width}

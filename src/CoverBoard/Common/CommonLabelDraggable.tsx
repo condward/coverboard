@@ -1,25 +1,69 @@
 import { Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useMemo, useState } from 'react';
-import { Covers, GroupCovers, PosTypes } from 'types';
+import { useState, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useShallow } from 'zustand/react/shallow';
+
+import { CoverSchema, GroupSchema, PosTypes } from 'types';
 import { getClientPosition } from 'utils';
 import { useMainStore } from 'store';
-import { shallow } from 'zustand/shallow';
 
 interface CommonLabelDraggableProps {
-  children: React.ReactNode;
-  id: Covers['id'] | GroupCovers['id'];
-  x: Covers['x'] | GroupCovers['x'];
-  y: Covers['y'] | GroupCovers['y'];
+  children: ReactNode;
+  x: CoverSchema['x'] | GroupSchema['x'];
+  y: CoverSchema['y'] | GroupSchema['y'];
   dir: PosTypes;
-  scaleX?: GroupCovers['scaleX'];
-  scaleY?: GroupCovers['scaleY'];
-  updateDir: (coverId: string, dir: PosTypes) => void;
+  scaleX?: GroupSchema['scaleX'];
+  scaleY?: GroupSchema['scaleY'];
+  updateDir: (dir: PosTypes) => void;
 }
 
+interface UseGetNewPos {
+  dir: CommonLabelDraggableProps['dir'];
+  scaleX: NonNullable<CommonLabelDraggableProps['scaleX']>;
+  scaleY: NonNullable<CommonLabelDraggableProps['scaleY']>;
+}
+
+const useGetNewPos = ({ dir, scaleX, scaleY }: UseGetNewPos) => {
+  const fontSize = useMainStore((state) => state.getFontSize());
+  const coverSizeWidth =
+    useMainStore((state) => state.getCoverSizeWidth()) * scaleX;
+  const coverSizeHeight =
+    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
+
+  if (dir === PosTypes.BOTTOM) {
+    return {
+      x: 0,
+      y: fontSize / 2,
+    };
+  } else if (dir === PosTypes.TOP) {
+    return {
+      x: 0,
+      y: -coverSizeHeight - 2 * fontSize,
+    };
+  } else if (dir === PosTypes.RIGHT) {
+    return {
+      x: 2 * coverSizeWidth + fontSize,
+      y: -coverSizeHeight / 2 - fontSize,
+    };
+  } else {
+    return {
+      x: -2 * coverSizeWidth - fontSize,
+      y: -coverSizeHeight / 2 - fontSize,
+    };
+  }
+};
+
+const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
+  e.cancelBubble = true;
+  const container = e.target.getStage()?.container();
+
+  if (container) {
+    container.style.cursor = 'grab';
+  }
+};
+
 export const CommonLabelDraggable = ({
-  id,
   x,
   y,
   dir,
@@ -28,22 +72,12 @@ export const CommonLabelDraggable = ({
   scaleY = 1,
   updateDir,
 }: CommonLabelDraggableProps) => {
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
-  const fontSize = useMainStore((state) => state.fontSize());
-  const coverSizeWidth =
-    useMainStore((state) => state.coverSizeWidth()) * scaleX;
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
   const coverSizeHeight =
-    useMainStore((state) => state.coverSizeHeight()) * scaleY;
+    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
   const [randId, setId] = useState(uuidv4());
 
-  const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
-    e.cancelBubble = true;
-    const container = e.target.getStage()?.container();
-
-    if (container) {
-      container.style.cursor = 'grab';
-    }
-  };
+  const newPos = useGetNewPos({ dir, scaleX, scaleY });
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent | TouchEvent>) => {
     e.cancelBubble = true;
@@ -67,32 +101,8 @@ export const CommonLabelDraggable = ({
     }
 
     setId(uuidv4());
-    updateDir(id, newDir);
+    updateDir(newDir);
   };
-
-  const newPos = useMemo(() => {
-    if (dir === PosTypes.BOTTOM) {
-      return {
-        x: 0,
-        y: fontSize / 2,
-      };
-    } else if (dir === PosTypes.TOP) {
-      return {
-        x: 0,
-        y: -coverSizeHeight - 2 * fontSize,
-      };
-    } else if (dir === PosTypes.RIGHT) {
-      return {
-        x: 2 * coverSizeWidth + fontSize,
-        y: -coverSizeHeight / 2 - fontSize,
-      };
-    } else {
-      return {
-        x: -2 * coverSizeWidth - fontSize,
-        y: -coverSizeHeight / 2 - fontSize,
-      };
-    }
-  }, [coverSizeHeight, coverSizeWidth, dir, fontSize]);
 
   return (
     <Group

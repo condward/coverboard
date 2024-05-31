@@ -1,5 +1,18 @@
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
-import { useMainStore, useToolbarStore, useUtilsStore } from 'store';
+import { useStore } from 'zustand';
+
+import {
+  configAtom,
+  editTitleAtom,
+  editingTextAtom,
+  pointsAtom,
+  searchAtom,
+  selectedAtom,
+  shareAtom,
+  useIsPopOpen,
+  useMainStore,
+} from 'store';
 
 interface UseEventListener {
   createGroup: () => void;
@@ -10,26 +23,7 @@ export const useKeysListener = ({
   createGroup,
   takeScreenshot,
 }: UseEventListener) => {
-  const undoAction = useMainStore((state) => state.undoAction);
-
-  const openPopup = useToolbarStore((state) => state.isPopupOpen());
-
-  const setOpenConfig = useToolbarStore((state) => state.setOpenConfig);
-  const setOpenSearch = useToolbarStore((state) => state.setOpenSearch);
-  const setOpenShare = useToolbarStore((state) => state.setOpenShare);
-
-  const points = useUtilsStore((state) => state.points);
-  const selected = useUtilsStore((state) => state.selected);
-  const isContextModalOpen = useUtilsStore((state) =>
-    state.isContextModalOpen(),
-  );
-  const isTextSelected = useUtilsStore((state) => state.isTextSelected());
-
-  const setSelected = useUtilsStore((state) => state.setSelected);
-  const hasMode = useUtilsStore((state) => state.hasMode());
-  const editTitle = useUtilsStore((state) => state.editTitle);
-  const setEditTitle = useUtilsStore((state) => state.setEditTitle);
-
+  const { undo: undoAction } = useStore(useMainStore.temporal);
   const covers = useMainStore((state) => state.covers);
   const groups = useMainStore((state) => state.groups);
   const lines = useMainStore((state) => state.lines);
@@ -46,6 +40,20 @@ export const useKeysListener = ({
   );
   const removeLine = useMainStore((state) => state.removeLine);
 
+  const openPopup = useIsPopOpen();
+
+  const setOpenConfig = useSetAtom(configAtom);
+  const setOpenSearch = useSetAtom(searchAtom);
+  const setOpenShare = useSetAtom(shareAtom);
+
+  const points = useAtomValue(pointsAtom);
+
+  const [selected, setSelected] = useAtom(selectedAtom);
+  const [editTitle, setEditTitle] = useAtom(editTitleAtom);
+
+  const isContextModalOpen = !!selected?.open;
+  const isTextSelected = !!useAtomValue(editingTextAtom);
+  const hasMode = !!points || !!selected || editTitle || !!isTextSelected;
   const preventKeys = openPopup || isContextModalOpen || isTextSelected;
 
   useEffect(() => {
@@ -119,7 +127,7 @@ export const useKeysListener = ({
             const currentIndex = covers.findIndex(
               (cov) => cov.id === selected.id,
             );
-            if (currentIndex > -1 && covers[currentIndex - 1]) {
+            if (currentIndex > -1 && Boolean(covers[currentIndex - 1])) {
               setSelected({
                 id: covers[currentIndex - 1].id,
                 open: false,
@@ -142,7 +150,7 @@ export const useKeysListener = ({
             const currentIndex = groups.findIndex(
               (cov) => cov.id === selected.id,
             );
-            if (currentIndex > -1 && groups[currentIndex - 1]) {
+            if (currentIndex > -1 && Boolean(groups[currentIndex - 1])) {
               setSelected({
                 id: groups[currentIndex - 1].id,
                 open: false,
@@ -167,7 +175,7 @@ export const useKeysListener = ({
             const currentIndex = covers.findIndex(
               (cov) => cov.id === selected.id,
             );
-            if (currentIndex > -1 && covers[currentIndex + 1]) {
+            if (currentIndex > -1 && Boolean(covers[currentIndex + 1])) {
               setSelected({
                 id: covers[currentIndex + 1].id,
                 open: false,
@@ -181,7 +189,7 @@ export const useKeysListener = ({
             const currentIndex = groups.findIndex(
               (cov) => cov.id === selected.id,
             );
-            if (currentIndex > -1 && groups[currentIndex + 1]) {
+            if (currentIndex > -1 && Boolean(groups[currentIndex + 1])) {
               setSelected({
                 id: groups[currentIndex + 1].id,
                 open: false,

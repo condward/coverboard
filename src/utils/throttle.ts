@@ -1,4 +1,4 @@
-export const throttle = (func: () => void, delay: number) => {
+export const throttle = (function_: () => void, delay: number) => {
   let inProgress = false;
   return () => {
     if (inProgress) {
@@ -6,7 +6,7 @@ export const throttle = (func: () => void, delay: number) => {
     }
     inProgress = true;
     setTimeout(() => {
-      func();
+      function_();
       inProgress = false;
     }, delay);
   };

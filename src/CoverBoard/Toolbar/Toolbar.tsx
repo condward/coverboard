@@ -1,87 +1,95 @@
-import {
-  ToolbarSearch,
-  ToolbarShare,
-  ToolbarConfig,
-  ToolbarIcon,
-  ToolbarTooltip,
-} from '.';
+import { FC, memo } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { useAtom, useAtomValue } from 'jotai';
+import { useStore } from 'zustand';
+import { ZodError } from 'zod';
+
 import { colorMap, Colors, ToolConfig, ToolConfigIDs } from 'types';
 import { haxPrefix } from 'utils';
-import { useUtilsStore, useMainStore, useToolbarStore } from 'store';
-import React, { useCallback, useMemo } from 'react';
-import { shallow } from 'zustand/shallow';
-import { v4 as uuidv4 } from 'uuid';
+
+import {
+  useMainStore,
+  configAtom,
+  searchAtom,
+  shareAtom,
+  pointsAtom,
+  selectedAtom,
+  useToastStore,
+} from 'store';
 import { useKeysListener } from 'CoverBoard';
+
+import { ToolbarIcon, ToolbarTooltip } from '.';
 
 interface ToolbarProps {
   takeScreenshot: () => void;
   showTooltips: boolean;
 }
 
-const ToolbarActionIcon: React.FC = () => {
-  const actionsLength = useMainStore((state) => state.actions.length);
-  const undoAction = useMainStore((state) => state.undoAction);
+const ToolbarActionIcon: FC = () => {
+  const { undo: undoAction, pastStates } = useStore(useMainStore.temporal);
+  const actionsLength = pastStates.length;
 
-  const actionConfig = useMemo<ToolConfig>(
-    () => ({
-      id: ToolConfigIDs.UNDO,
-      tooltip: `Undo (moves: ${actionsLength}/10)`,
-      color: colorMap[Colors.PINK],
-      emoji: '↩️',
-      value: actionsLength < 1,
-      valueModifier: undoAction,
-      badge: actionsLength,
-      enabled: true,
-      shortcut: 'U',
-    }),
-    [actionsLength, undoAction],
-  );
+  const actionConfig: ToolConfig = {
+    id: ToolConfigIDs.UNDO,
+    tooltip: `Undo (moves: ${actionsLength}/10)`,
+    color: colorMap[Colors.PINK],
+    emoji: '↩️',
+    value: actionsLength < 1,
+    valueModifier: () => undoAction(),
+    badge: actionsLength,
+    enabled: true,
+    shortcut: 'U',
+  };
 
   return <ToolbarIcon config={actionConfig} index={6} />;
 };
 
-export const ToolbarMemo: React.FC<ToolbarProps> = ({
+const ToolbarWithoutMemo: FC<ToolbarProps> = ({
   takeScreenshot,
   showTooltips,
 }) => {
-  const editLines = useUtilsStore((state) => state.points);
-  const [openConfig, setOpenConfig] = useToolbarStore(
-    (state) => [state.openConfig, state.setOpenConfig],
-    shallow,
-  );
-  const [openSearch, setOpenSearch] = useToolbarStore(
-    (state) => [state.openSearch, state.setOpenSearch],
-    shallow,
-  );
-  const [openShare, setOpenShare] = useToolbarStore(
-    (state) => [state.openShare, state.setOpenShare],
-    shallow,
-  );
-  const setSelected = useUtilsStore((state) => state.setSelected);
-
-  const selected = useUtilsStore((state) => state.selected);
+  const editLines = useAtomValue(pointsAtom);
+  const [openConfig, setOpenConfig] = useAtom(configAtom);
+  const [openSearch, setOpenSearch] = useAtom(searchAtom);
+  const [openShare, setOpenShare] = useAtom(shareAtom);
+  const [selected, setSelected] = useAtom(selectedAtom);
   const coversLength = useMainStore((state) => state.covers.length);
   const groupsLength = useMainStore((state) => state.groups.length);
   const linesLength = useMainStore((state) => state.lines.length);
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
   const addGroups = useMainStore((state) => state.addGroups);
   const groupDir = useMainStore((state) => state.configs.groupDir);
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
-  const createGroup = useCallback(() => {
+  const createGroup = () => {
     const id = uuidv4();
-    addGroups([
-      {
-        id,
-        x: 0,
-        y: 0,
-        title: { text: null, dir: groupDir },
-        subtitle: { text: null, dir: groupDir },
-        scaleX: 3,
-        scaleY: 3,
-      },
-    ]);
-    setSelected({ id, open: false });
-  }, [addGroups, groupDir, setSelected]);
+    try {
+      addGroups([
+        {
+          id,
+          x: 0,
+          y: 0,
+          title: { text: '', dir: groupDir },
+          subtitle: { text: '', dir: groupDir },
+          scaleX: 3,
+          scaleY: 3,
+        },
+      ]);
+      setSelected({ id, open: false });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const tooBig = error.issues.find((msg) => msg.code === 'too_big');
+
+        if (tooBig) {
+          showErrorMessage(tooBig.message);
+          return;
+        }
+        showErrorMessage('Bad formatted group');
+        return;
+      }
+      throw error;
+    }
+  };
 
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
@@ -105,7 +113,7 @@ export const ToolbarMemo: React.FC<ToolbarProps> = ({
   };
 
   const removeLine = useMainStore((state) => state.removeLine);
-  const deleteElem = useCallback(() => {
+  const deleteElem = () => {
     if (!selected) return;
 
     if (isGroup(selected.id)) {
@@ -115,15 +123,8 @@ export const ToolbarMemo: React.FC<ToolbarProps> = ({
     } else if (isLine(selected.id)) {
       removeLine(selected.id);
     }
-  }, [
-    isCover,
-    isGroup,
-    isLine,
-    removeCoverAndRelatedLines,
-    removeGroupAndRelatedLines,
-    removeLine,
-    selected,
-  ]);
+    setSelected(null);
+  };
 
   const savesNumber = Object.keys(window.localStorage).filter((key) =>
     haxPrefix(key),
@@ -205,9 +206,6 @@ export const ToolbarMemo: React.FC<ToolbarProps> = ({
 
   return (
     <>
-      {openSearch && <ToolbarSearch />}
-      {openConfig && <ToolbarConfig />}
-      {openShare && <ToolbarShare />}
       {configTools.map((config, index) => (
         <ToolbarIcon config={config} key={config.id} index={index} />
       ))}
@@ -217,4 +215,4 @@ export const ToolbarMemo: React.FC<ToolbarProps> = ({
   );
 };
 
-export const Toolbar = React.memo(ToolbarMemo);
+export const Toolbar = memo(ToolbarWithoutMemo);

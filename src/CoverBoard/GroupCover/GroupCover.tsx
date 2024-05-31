@@ -1,36 +1,35 @@
-import React from 'react';
-
-import { GroupCovers, LabelTypes, PosTypes } from 'types';
-
-import { useMainStore, useUtilsStore } from 'store';
-import { shallow } from 'zustand/shallow';
+import { FC, memo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { Group } from 'react-konva';
+import { useSetAtom } from 'jotai';
+
+import { GroupSchema, LabelTypes, PosTypes } from 'types';
+import { selectedAtom, useIsSelected, useMainStore } from 'store';
 import {
   CommonDraggable,
   CommonDrawLine,
   CommonLabelDraggable,
   CommonLabel,
 } from 'CoverBoard/Common';
+
 import { GroupSquare } from './GroupSquare';
-import { GroupCoverPopover } from '.';
-import { Html } from 'react-konva-utils';
 
 interface CoverImageProps {
-  id: GroupCovers['id'];
-  title: string | null;
-  subtitle: string | null;
-  x: GroupCovers['x'];
-  y: GroupCovers['y'];
-  dir: PosTypes;
-  subDir: PosTypes;
-  scaleX: GroupCovers['scaleX'];
-  scaleY: GroupCovers['scaleY'];
+  id: GroupSchema['id'];
+  titleText: GroupSchema['title']['text'];
+  subtitleText: GroupSchema['subtitle']['text'];
+  x: GroupSchema['x'];
+  y: GroupSchema['y'];
+  dir: GroupSchema['title']['dir'];
+  subDir: GroupSchema['subtitle']['dir'];
+  scaleX: GroupSchema['scaleX'];
+  scaleY: GroupSchema['scaleY'];
 }
 
-const GroupCoverMemo: React.FC<CoverImageProps> = ({
+const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
   id,
-  title,
-  subtitle,
+  titleText,
+  subtitleText,
   x,
   y,
   dir,
@@ -39,37 +38,30 @@ const GroupCoverMemo: React.FC<CoverImageProps> = ({
   scaleY,
 }) => {
   const color = useMainStore((state) => state.getGroupColor());
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
-  const fontSize = useMainStore((state) => state.fontSize());
-  const toobarIconSize = useMainStore((state) => state.toobarIconSize());
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const fontSize = useMainStore((state) => state.getFontSize());
+  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
   const windowSize = useMainStore((state) => state.windowSize);
-  const setSelected = useUtilsStore((state) => state.setSelected);
-  const updateGroupLabel = useMainStore((state) => state.updateGroupLabel);
+  const setSelected = useSetAtom(selectedAtom);
+  const updateGroup = useMainStore((state) => state.updateGroup);
   const updateGroupPosition = useMainStore(
     (state) => state.updateGroupPosition,
   );
-  const updateGroupDir = useMainStore((state) => state.updateGroupDir);
-  const updateGroupSubDir = useMainStore((state) => state.updateGroupSubDir);
-
   const removeGroupAndRelatedLines = useMainStore(
     (state) => state.removeGroupAndRelatedLines,
   );
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
 
+  const offSetSubTitle =
+    subtitleText && dir === subDir && dir !== PosTypes.BOTTOM ? -fontSize : 0;
   const offset1 =
-    dir === subDir && subtitle && dir === PosTypes.TOP
+    dir === subDir && subtitleText && dir === PosTypes.TOP
       ? -fontSize * 1.5
-      : subtitle && dir === subDir && dir !== PosTypes.BOTTOM
-      ? -fontSize
-      : 0;
-  const offset2 = dir === subDir && title ? offset1 + fontSize * 1.5 : 0;
+      : offSetSubTitle;
+  const offset2 = dir === subDir && titleText ? offset1 + fontSize * 1.5 : 0;
 
-  const isSelected = useUtilsStore((state) => state.isSelected({ id }));
-
-  const isSelectedModalOpen = useUtilsStore((state) =>
-    state.isSelectedModalOpen({ id }),
-  );
+  const isSelected = useIsSelected(id);
 
   const refreshGroups = useMainStore((state) => state.refreshGroups);
   const handlesSelect = () => {
@@ -108,8 +100,7 @@ const GroupCoverMemo: React.FC<CoverImageProps> = ({
             <GroupSquare id={id} scaleX={scaleX} scaleY={scaleY} />
           </Group>
           <CommonLabelDraggable
-            updateDir={updateGroupDir}
-            id={id}
+            updateDir={(dir) => updateGroup(id, { title: { dir } })}
             x={x}
             y={y}
             dir={dir}
@@ -119,8 +110,8 @@ const GroupCoverMemo: React.FC<CoverImageProps> = ({
               color={color}
               dir={dir}
               coverLabel={LabelTypes.TITLE}
-              updateLabel={updateGroupLabel}
-              text={title}
+              updateLabel={(text) => updateGroup(id, { title: { text } })}
+              text={titleText}
               id={id}
               fontStyle="bold"
               scaleX={scaleX}
@@ -131,10 +122,9 @@ const GroupCoverMemo: React.FC<CoverImageProps> = ({
             />
           </CommonLabelDraggable>
 
-          {subtitle && (
+          {subtitleText && (
             <CommonLabelDraggable
-              updateDir={updateGroupSubDir}
-              id={id}
+              updateDir={(dir) => updateGroup(id, { subtitle: { dir } })}
               x={x}
               y={y}
               dir={subDir}
@@ -144,8 +134,8 @@ const GroupCoverMemo: React.FC<CoverImageProps> = ({
                 color={color}
                 dir={subDir}
                 coverLabel={LabelTypes.SUBTITLE}
-                updateLabel={updateGroupLabel}
-                text={subtitle}
+                updateLabel={(text) => updateGroup(id, { subtitle: { text } })}
+                text={subtitleText}
                 id={id}
                 fontStyle="bold"
                 scaleX={scaleX}
@@ -158,24 +148,8 @@ const GroupCoverMemo: React.FC<CoverImageProps> = ({
           )}
         </>
       </CommonDraggable>
-      {isSelectedModalOpen && (
-        <Html>
-          <GroupCoverPopover
-            scaleX={scaleX}
-            scaleY={scaleY}
-            id={id}
-            open={isSelectedModalOpen}
-            values={{
-              title: title ?? '',
-              subtitle: subtitle ?? '',
-              titleDir: dir,
-              subTitleDir: subDir,
-            }}
-          />
-        </Html>
-      )}
     </>
   );
 };
 
-export const GroupCover = React.memo(GroupCoverMemo);
+export const GroupCover = memo(GroupCoverWithoutMemo);

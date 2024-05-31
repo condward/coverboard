@@ -1,26 +1,74 @@
-import { Tooltip } from 'components';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
-import React from 'react';
-import { useMemo, useState } from 'react';
+import { FC, memo, useState } from 'react';
 import { Arrow, Group } from 'react-konva';
+import { useShallow } from 'zustand/react/shallow';
+
 import { useMainStore } from 'store';
-import { Covers, GroupCovers } from 'types';
-import { shallow } from 'zustand/shallow';
+import { CoverSchema, GroupSchema } from 'types';
+import { Tooltip } from 'components';
 
 interface BoundaryArrowProps {
-  id: Covers['id'] | GroupCovers['id'];
-  title: string;
-  x: Covers['x'] | GroupCovers['x'];
-  y: Covers['y'] | GroupCovers['y'];
-  scaleX?: GroupCovers['x'];
-  scaleY?: GroupCovers['y'];
+  id: CoverSchema['id'] | GroupSchema['id'];
+  title: CoverSchema['title']['text'] | GroupSchema['title']['text'];
+  x: CoverSchema['x'] | GroupSchema['x'];
+  y: CoverSchema['y'] | GroupSchema['y'];
+  scaleX?: GroupSchema['x'];
+  scaleY?: GroupSchema['y'];
   updatePosition: (coverId: string, { x, y }: Vector2d) => void;
   removeCascade: (id: string) => void;
   color: string;
 }
 
-export const BoundaryArrowMemo: React.FC<BoundaryArrowProps> = ({
+interface UseGetPoints {
+  x: BoundaryArrowProps['x'];
+  y: BoundaryArrowProps['y'];
+  scaleX: NonNullable<BoundaryArrowProps['scaleX']>;
+  scaleY: NonNullable<BoundaryArrowProps['scaleY']>;
+}
+
+const useGetPoints = ({
+  x,
+  y,
+  scaleX,
+  scaleY,
+}: UseGetPoints): [number, number, number, number] => {
+  const fontSize = useMainStore((state) => state.getFontSize());
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const coverSizeWidth =
+    useMainStore((state) => state.getCoverSizeWidth()) * scaleX;
+  const coverSizeHeight =
+    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
+  if (
+    x > dragLimits.width - coverSizeWidth &&
+    y > dragLimits.height - coverSizeHeight
+  ) {
+    return [
+      dragLimits.width - 1.8 * fontSize,
+      dragLimits.height - 1.8 * fontSize,
+      dragLimits.width - fontSize,
+      dragLimits.height - fontSize,
+    ];
+  } else if (
+    x > dragLimits.width - coverSizeWidth &&
+    y < dragLimits.height - coverSizeHeight
+  ) {
+    return [
+      dragLimits.width - 2 * fontSize,
+      y + coverSizeHeight / 2,
+      dragLimits.width - fontSize,
+      y + coverSizeHeight / 2,
+    ];
+  }
+  return [
+    x + coverSizeWidth / 2,
+    dragLimits.height - 2 * fontSize,
+    x + coverSizeWidth / 2,
+    dragLimits.height - fontSize,
+  ];
+};
+
+const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
   id,
   title,
   x,
@@ -31,51 +79,14 @@ export const BoundaryArrowMemo: React.FC<BoundaryArrowProps> = ({
   color,
 }) => {
   const coverSizeWidth =
-    useMainStore((state) => state.coverSizeWidth()) * scaleX;
+    useMainStore((state) => state.getCoverSizeWidth()) * scaleX;
   const coverSizeHeight =
-    useMainStore((state) => state.coverSizeHeight()) * scaleY;
-  const fontSize = useMainStore((state) => state.fontSize());
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
+    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
+  const fontSize = useMainStore((state) => state.getFontSize());
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
 
   const [tooltip, setTooltip] = useState(false);
-
-  const points: [number, number, number, number] = useMemo(() => {
-    if (
-      x > dragLimits.width - coverSizeWidth &&
-      y > dragLimits.height - coverSizeHeight
-    ) {
-      return [
-        dragLimits.width - 1.8 * fontSize,
-        dragLimits.height - 1.8 * fontSize,
-        dragLimits.width - fontSize,
-        dragLimits.height - fontSize,
-      ];
-    } else if (
-      x > dragLimits.width - coverSizeWidth &&
-      y < dragLimits.height - coverSizeHeight
-    ) {
-      return [
-        dragLimits.width - 2 * fontSize,
-        y + coverSizeHeight / 2,
-        dragLimits.width - fontSize,
-        y + coverSizeHeight / 2,
-      ];
-    }
-    return [
-      x + coverSizeWidth / 2,
-      dragLimits.height - 2 * fontSize,
-      x + coverSizeWidth / 2,
-      dragLimits.height - fontSize,
-    ];
-  }, [
-    x,
-    dragLimits.width,
-    dragLimits.height,
-    coverSizeWidth,
-    y,
-    coverSizeHeight,
-    fontSize,
-  ]);
+  const points = useGetPoints({ x, y, scaleX, scaleY });
 
   const handleBringIntoView = () => {
     const newPos: Vector2d = { x, y };
@@ -125,4 +136,4 @@ export const BoundaryArrowMemo: React.FC<BoundaryArrowProps> = ({
   );
 };
 
-export const BoundaryArrow = React.memo(BoundaryArrowMemo);
+export const BoundaryArrow = memo(BoundaryArrowWithoutMemo);

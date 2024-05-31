@@ -1,9 +1,11 @@
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Group, Rect, Text } from 'react-konva';
+import { FC } from 'react';
+import { useSetAtom } from 'jotai';
 
 import { ToolConfig } from 'types';
 import { clearHash } from 'utils';
-import { useMainStore, useToolbarStore, useUtilsStore } from 'store';
+import { pointsAtom, tooltipAtom, useMainStore } from 'store';
 
 const MIN_OPACITY = 0.3;
 
@@ -12,19 +14,11 @@ interface ToolbarIconProps {
   index: number;
 }
 
-export const ToolbarIcon: React.FC<ToolbarIconProps> = ({ config, index }) => {
-  const setPoints = useUtilsStore((state) => state.setPoints);
-  const toobarIconSize = useMainStore((state) => state.toobarIconSize());
+export const ToolbarIcon: FC<ToolbarIconProps> = ({ config, index }) => {
+  const setPoints = useSetAtom(pointsAtom);
+  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
   const getCurrentY = useMainStore((state) => state.getCurrentY);
-  const setTooltip = useToolbarStore((state) => state.setTooltip);
-
-  const handleMouseMove = (evt: KonvaEventObject<MouseEvent>, tip: string) => {
-    setTooltip({
-      text: tip,
-      x: evt.evt.clientX,
-      y: evt.evt.clientY,
-    });
-  };
+  const setTooltip = useSetAtom(tooltipAtom);
 
   const handleClick = () => {
     setPoints(null);
@@ -44,7 +38,11 @@ export const ToolbarIcon: React.FC<ToolbarIconProps> = ({ config, index }) => {
       onTap={handleClick}
       onClick={handleClick}
       onMouseMove={(evt: KonvaEventObject<MouseEvent>) => {
-        handleMouseMove(evt, config.tooltip);
+        setTooltip({
+          text: config.tooltip,
+          x: evt.evt.clientX,
+          y: evt.evt.clientY,
+        });
         evt.currentTarget.opacity(0.5);
         const container = evt.target.getStage()?.container();
 
@@ -86,7 +84,7 @@ export const ToolbarIcon: React.FC<ToolbarIconProps> = ({ config, index }) => {
         align="right"
         fontStyle="bold"
         fill={config.color === 'yellow' ? 'gray' : 'white'}
-        text={config.badge ? String(config.badge) : ''}
+        text={config.badge === null ? '' : String(config.badge)}
         fontSize={toobarIconSize / 4}
       />
       {config.enabled && (

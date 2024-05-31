@@ -1,15 +1,13 @@
-import React from 'react';
+import { FC } from 'react';
 import { Arrow } from 'react-konva';
 
 import { LineParams } from 'types';
 import { useMainStore } from 'store';
 
-interface LineProps {
+export const LineArrow: FC<{
   lineParams: LineParams;
-}
-
-export const LineArrow: React.FC<LineProps> = ({ lineParams }) => {
-  const fontSize = useMainStore((state) => state.fontSize());
+}> = ({ lineParams }) => {
+  const fontSize = useMainStore((state) => state.getFontSize());
   const color = useMainStore((state) => state.getArrowColor());
 
   return (

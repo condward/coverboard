@@ -1,13 +1,16 @@
-import { useMainStore } from 'store';
 import { Text } from 'react-konva';
+import { FC } from 'react';
 
-export const GroupCountLabel: React.FC = () => {
+import { useMainStore } from 'store';
+
+export const GroupCountLabel: FC = () => {
   const pos0 = useMainStore(
     (state) => state.groups.filter((cov) => cov.x === 0 && cov.y === 0).length,
   );
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth()) * 3;
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight()) * 3;
-  const fontSize = useMainStore((state) => state.fontSize());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth()) * 3;
+  const coverSizeHeight =
+    useMainStore((state) => state.getCoverSizeHeight()) * 3;
+  const fontSize = useMainStore((state) => state.getFontSize());
 
   return (
     <Text

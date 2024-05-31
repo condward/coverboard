@@ -1,36 +1,37 @@
-import React from 'react';
+import { FC, memo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { Group } from 'react-konva';
+import { useSetAtom } from 'jotai';
 
-import { Covers, LabelTypes, PosTypes } from 'types';
-import { CoverPopover, CoverLoadImage, CoverStar, CoverStarDraggable } from '.';
+import { selectedAtom, useIsSelected, useMainStore } from 'store';
 import {
   CommonDraggable,
   CommonDrawLine,
   CommonLabelDraggable,
   CommonLabel,
 } from 'CoverBoard/Common';
-import { useMainStore, useUtilsStore } from 'store';
-import { shallow } from 'zustand/shallow';
-import { Html } from 'react-konva-utils';
-import { Group } from 'react-konva';
+import { CoverSchema, LabelTypes, PosTypes } from 'types';
+
+import { CoverLoadImage, CoverStar, CoverStarDraggable } from '.';
 
 interface CoverImageProps {
-  id: Covers['id'];
-  title: string | null;
-  subtitle: string | null;
-  x: Covers['x'];
-  y: Covers['y'];
-  titleDir: PosTypes;
-  subTitleDir: PosTypes;
-  starDir: PosTypes;
-  starCount: number;
-  link: Covers['link'];
+  id: CoverSchema['id'];
+  titleText: CoverSchema['title']['text'];
+  subtitleText: CoverSchema['subtitle']['text'];
+  x: CoverSchema['x'];
+  y: CoverSchema['y'];
+  titleDir: CoverSchema['title']['dir'];
+  subTitleDir: CoverSchema['subtitle']['dir'];
+  starDir: CoverSchema['star']['dir'];
+  starCount: CoverSchema['star']['count'];
+  link: CoverSchema['link'];
   renderTime: number;
 }
 
-const CoverMemo: React.FC<CoverImageProps> = ({
+const CoverWithoutMemo: FC<CoverImageProps> = ({
   id,
-  title,
-  subtitle,
+  titleText,
+  subtitleText,
   x,
   y,
   titleDir,
@@ -43,37 +44,31 @@ const CoverMemo: React.FC<CoverImageProps> = ({
   const color = useMainStore((state) => state.getCoverColor());
   const showTitle = useMainStore((state) => state.configs.showTitle);
   const showSubtitle = useMainStore((state) => state.configs.showSubtitle);
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
-  const fontSize = useMainStore((state) => state.fontSize());
-  const toobarIconSize = useMainStore((state) => state.toobarIconSize());
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const fontSize = useMainStore((state) => state.getFontSize());
+  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
   const windowSize = useMainStore((state) => state.windowSize);
-  const updateCoverLabel = useMainStore((state) => state.updateCoverLabel);
   const showStars = useMainStore((state) => state.getShowStars());
-  const setSelected = useUtilsStore((state) => state.setSelected);
+  const setSelected = useSetAtom(selectedAtom);
   const updateCoverPosition = useMainStore(
     (state) => state.updateCoverPosition,
   );
-  const updateCoverTitleDir = useMainStore(
-    (state) => state.updateCoverTitleDir,
-  );
-  const updateCoverSubtitleDir = useMainStore(
-    (state) => state.updateCoverSubtitleDir,
-  );
+  const updateCover = useMainStore((state) => state.updateCover);
 
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
   );
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
 
   let titleOffset = 0;
   let subtitleOffset = 0;
   let starOffset = 0;
 
   if (
-    title &&
+    titleText &&
     showTitle &&
-    subtitle &&
+    subtitleText &&
     showSubtitle &&
     titleDir === subTitleDir &&
     showStars &&
@@ -84,9 +79,9 @@ const CoverMemo: React.FC<CoverImageProps> = ({
     subtitleOffset = titleOffset + fontSize * 1.5;
     starOffset = subtitleOffset + fontSize * 1.5;
   } else if (
-    title &&
+    titleText &&
     showTitle &&
-    subtitle &&
+    subtitleText &&
     showSubtitle &&
     titleDir === subTitleDir &&
     (!showStars || starDir !== titleDir)
@@ -94,29 +89,26 @@ const CoverMemo: React.FC<CoverImageProps> = ({
     titleOffset = titleDir === PosTypes.TOP ? -fontSize * 1.5 : 0;
     subtitleOffset = titleOffset + fontSize * 1.5;
   } else if (
-    title &&
+    titleText &&
     showTitle &&
     showStars &&
     starDir === titleDir &&
-    (!subtitle || !showSubtitle || titleDir !== subTitleDir)
+    (!subtitleText || !showSubtitle || titleDir !== subTitleDir)
   ) {
     titleOffset = starDir === PosTypes.TOP ? -fontSize * 1.5 : 0;
     starOffset = titleOffset + fontSize * 1.5;
   } else if (
-    subtitle &&
+    subtitleText &&
     showSubtitle &&
     showStars &&
     starDir === subTitleDir &&
-    (!title || !showTitle || titleDir !== subTitleDir)
+    (!titleText || !showTitle || titleDir !== subTitleDir)
   ) {
     subtitleOffset = starDir === PosTypes.TOP ? -fontSize * 1.5 : 0;
     starOffset = subtitleOffset + fontSize * 1.5;
   }
 
-  const isSelected = useUtilsStore((state) => state.isSelected({ id }));
-  const isSelectedModalOpen = useUtilsStore((state) =>
-    state.isSelectedModalOpen({ id }),
-  );
+  const isSelected = useIsSelected(id);
 
   const refreshCovers = useMainStore((state) => state.refreshCovers);
   const handleSelect = () => {
@@ -147,18 +139,17 @@ const CoverMemo: React.FC<CoverImageProps> = ({
             <CoverLoadImage link={link} renderTime={renderTime} />
           </Group>
 
-          {showTitle && title && (
+          {showTitle && titleText && (
             <CommonLabelDraggable
-              updateDir={updateCoverTitleDir}
-              id={id}
+              updateDir={(dir) => updateCover(id, { title: { dir } })}
               x={x}
               y={y}
               dir={titleDir}>
               <CommonLabel
-                updateLabel={updateCoverLabel}
+                updateLabel={(text) => updateCover(id, { title: { text } })}
                 dir={titleDir}
                 coverLabel={LabelTypes.TITLE}
-                text={title}
+                text={titleText}
                 id={id}
                 fontStyle="bold"
                 color={color}
@@ -169,18 +160,17 @@ const CoverMemo: React.FC<CoverImageProps> = ({
             </CommonLabelDraggable>
           )}
 
-          {showSubtitle && subtitle && (
+          {showSubtitle && subtitleText && (
             <CommonLabelDraggable
-              updateDir={updateCoverSubtitleDir}
-              id={id}
+              updateDir={(dir) => updateCover(id, { subtitle: { dir } })}
               x={x}
               y={y}
               dir={subTitleDir}>
               <CommonLabel
-                updateLabel={updateCoverLabel}
+                updateLabel={(text) => updateCover(id, { subtitle: { text } })}
                 dir={subTitleDir}
                 coverLabel={LabelTypes.SUBTITLE}
-                text={subtitle}
+                text={subtitleText}
                 id={id}
                 color={color}
                 x={-coverSizeWidth}
@@ -197,24 +187,8 @@ const CoverMemo: React.FC<CoverImageProps> = ({
           )}
         </Group>
       </CommonDraggable>
-      {isSelectedModalOpen && (
-        <Html>
-          <CoverPopover
-            starDir={starDir}
-            starCount={starCount}
-            id={id}
-            open={isSelectedModalOpen}
-            values={{
-              title: title ?? '',
-              subtitle: subtitle ?? '',
-              titleDir,
-              subTitleDir,
-            }}
-          />
-        </Html>
-      )}
     </>
   );
 };
 
-export const Cover = React.memo(CoverMemo);
+export const Cover = memo(CoverWithoutMemo);

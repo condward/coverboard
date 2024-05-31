@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Rect, Text } from 'react-konva';
-
-import { Covers } from 'types';
-import { useMainStore } from 'store';
-import { CoverImage } from '.';
 import { KonvaEventObject } from 'konva/lib/Node';
 
+import { CoverSchema } from 'types';
+import { useMainStore } from 'store';
+
+import { CoverImage } from '.';
+
 interface CoverImageProps {
-  link: Covers['link'];
+  link: CoverSchema['link'];
   renderTime: number;
 }
 
-export const CoverLoadImage: React.FC<CoverImageProps> = ({
-  link,
-  renderTime,
-}) => {
+export const CoverLoadImage: FC<CoverImageProps> = ({ link, renderTime }) => {
   const color = useMainStore((state) => state.getColor());
   const backColor = useMainStore((state) => state.getBackColor());
 
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight());
-  const fontSize = useMainStore((state) => state.fontSize());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
+  const fontSize = useMainStore((state) => state.getFontSize());
 
   const [shouldRender, setShouldRender] = useState(false);
   const [hasRetries, setHasRetries] = useState(false);

@@ -1,40 +1,67 @@
 import { Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useMemo, useState } from 'react';
-import { LineParams, Lines, PosTypes } from 'types';
+import { useState, ReactNode, FC } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useShallow } from 'zustand/react/shallow';
+
+import { LineParams, LineSchema, PosTypes } from 'types';
 import { getClientPosition } from 'utils';
 import { useMainStore } from 'store';
-import { shallow } from 'zustand/shallow';
 
 interface DraggableGroupProps {
-  children: React.ReactNode;
-  dir: Lines['dir'];
+  children: ReactNode;
+  dir: LineSchema['dir'];
   setUpdate: (dir: PosTypes) => void;
   lineParams: LineParams;
 }
 
-export const LineLabelDraggable: React.FC<DraggableGroupProps> = ({
+const useGetNewPos = (dir: DraggableGroupProps['dir']) => {
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const circleRadius = useMainStore((state) => state.getCircleRadius());
+
+  if (dir === PosTypes.BOTTOM) {
+    return {
+      x: 0,
+      y: 0,
+    };
+  } else if (dir === PosTypes.TOP) {
+    return {
+      x: 0,
+      y: -1.5 * 4 * circleRadius,
+    };
+  } else if (dir === PosTypes.RIGHT) {
+    return {
+      x: coverSizeWidth + 3 * circleRadius,
+      y: -1.5 * 2 * circleRadius,
+    };
+  } else {
+    return {
+      x: -coverSizeWidth - 3 * circleRadius,
+      y: -1.5 * 2 * circleRadius,
+    };
+  }
+};
+
+const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
+  e.cancelBubble = true;
+  e.currentTarget.opacity(0.5);
+  const container = e.target.getStage()?.container();
+
+  if (container) {
+    container.style.cursor = 'grab';
+  }
+};
+
+export const LineLabelDraggable: FC<DraggableGroupProps> = ({
   dir,
   lineParams,
   setUpdate,
   children,
 }) => {
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const fontSize = useMainStore((state) => state.fontSize());
-  const circleRadius = useMainStore((state) => state.circleRadius());
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
+  const fontSize = useMainStore((state) => state.getFontSize());
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
   const [id, setId] = useState(uuidv4());
-
-  const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
-    e.cancelBubble = true;
-    e.currentTarget.opacity(0.5);
-    const container = e.target.getStage()?.container();
-
-    if (container) {
-      container.style.cursor = 'grab';
-    }
-  };
+  const newPos = useGetNewPos(dir);
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent>) => {
     e.currentTarget.opacity(1);
@@ -60,30 +87,6 @@ export const LineLabelDraggable: React.FC<DraggableGroupProps> = ({
     setId(uuidv4());
     setUpdate(dir);
   };
-
-  const newPos = useMemo(() => {
-    if (dir === PosTypes.BOTTOM) {
-      return {
-        x: 0,
-        y: 0,
-      };
-    } else if (dir === PosTypes.TOP) {
-      return {
-        x: 0,
-        y: -1.5 * 4 * circleRadius,
-      };
-    } else if (dir === PosTypes.RIGHT) {
-      return {
-        x: coverSizeWidth + 3 * circleRadius,
-        y: -1.5 * 2 * circleRadius,
-      };
-    } else {
-      return {
-        x: -coverSizeWidth - 3 * circleRadius,
-        y: -1.5 * 2 * circleRadius,
-      };
-    }
-  }, [circleRadius, coverSizeWidth, dir]);
 
   return (
     <Group

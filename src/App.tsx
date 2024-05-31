@@ -1,23 +1,28 @@
+import { useEffect, FC } from 'react';
+import { Box } from '@mui/material';
+
 import { Toast } from 'components';
 import { CoverBoard } from 'CoverBoard';
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import { useMainStore } from 'store';
-import { DEFAULT_KEY } from 'types';
-import { throttle } from 'utils';
-
-function App() {
-  const { saveId = DEFAULT_KEY } = useParams();
-  const setDefaultLocalStoreValues = useMainStore(
-    (state) => state.setDefaultLocalStoreValues,
-  );
-  const toobarIconSize = useMainStore((state) => state.toobarIconSize());
+import { addPrefix, throttle, useSaveId } from 'utils';
+import { Popovers } from 'components/Popovers';
+export const App: FC = () => {
+  const saveId = useSaveId();
+  const resetStoreValues = useMainStore((state) => state.resetStoreValues);
+  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
   const backColor = useMainStore((state) => state.getBackColor());
   const setWindowSize = useMainStore((state) => state.setWindowSize);
 
   useEffect(() => {
-    setDefaultLocalStoreValues(saveId);
-  }, [saveId, setDefaultLocalStoreValues]);
+    if (!window.localStorage.getItem(addPrefix(saveId))) {
+      resetStoreValues();
+    }
+
+    useMainStore.persist.setOptions({
+      name: addPrefix(saveId),
+    });
+    void useMainStore.persist.rehydrate();
+  }, [resetStoreValues, saveId]);
 
   useEffect(() => {
     const throttleResize = throttle(() => {
@@ -31,15 +36,18 @@ function App() {
   }, [setWindowSize]);
 
   return (
-    <div
-      className="App"
-      style={{
-        backgroundColor: backColor,
-        padding: toobarIconSize / 2 + 'px',
-      }}>
-      <CoverBoard />
-      <Toast />
-    </div>
+    <main>
+      <Box
+        className="App"
+        sx={{
+          backgroundColor: backColor,
+          padding: `${toobarIconSize / 2}px`,
+        }}>
+        <CoverBoard />
+        <Toast />
+      </Box>
+      <Popovers />
+    </main>
   );
-}
+};
 export default App;

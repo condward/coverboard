@@ -1,9 +1,11 @@
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Group, Image, Text } from 'react-konva';
+import { FC, memo } from 'react';
+import useImage from 'use-image';
+import { useShallow } from 'zustand/react/shallow';
+
 import { useMainStore } from 'store';
 import { Media } from 'types';
-import useImage from 'use-image';
-import { shallow } from 'zustand/shallow';
 
 const getURL = (media: Media) => {
   if (media === Media.MUSIC) {
@@ -17,11 +19,11 @@ const getURL = (media: Media) => {
   }
 };
 
-export const Logo: React.FC = () => {
+const LogoWithoutMemo: FC = () => {
   const media = useMainStore((state) => state.configs.media);
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
-  const toobarIconSize = useMainStore((state) => state.toobarIconSize());
-  const fontSize = useMainStore((state) => state.fontSize());
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
+  const fontSize = useMainStore((state) => state.getFontSize());
   const [image] = useImage(getURL(media));
 
   if (media === Media.MUSIC) {
@@ -156,3 +158,5 @@ export const Logo: React.FC = () => {
     />
   );
 };
+
+export const Logo = memo(LogoWithoutMemo);

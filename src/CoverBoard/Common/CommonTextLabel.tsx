@@ -1,11 +1,13 @@
 import { Rect, Text } from 'react-konva';
 import { Html } from 'react-konva-utils';
-import { CommonTextLabelPopover } from '.';
-import { PosTypes, buildTitle } from 'types';
-import { useMainStore } from 'store';
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState, FC } from 'react';
 import Konva from 'konva';
-import { getAlign } from 'utils';
+
+import { PosTypes } from 'types';
+import { useMainStore } from 'store';
+import { getAlign, useSaveId } from 'utils';
+
+import { CommonTextLabelPopover } from 'components/Popovers/CommonTextLabelPopover';
 
 interface TitleTexProps {
   label: string;
@@ -26,7 +28,7 @@ interface TitleTexProps {
   color: string;
 }
 
-export const CommonTextLabel: React.FC<TitleTexProps> = ({
+export const CommonTextLabel: FC<TitleTexProps> = ({
   label,
   setLabel,
   x,
@@ -44,11 +46,11 @@ export const CommonTextLabel: React.FC<TitleTexProps> = ({
   color,
   fontStyle,
 }) => {
-  const fontSize = useMainStore((state) => state.fontSize());
+  const fontSize = useMainStore((state) => state.getFontSize());
   const backColor = useMainStore((state) => state.getBackColor());
   const textRef: RefObject<Konva.Text> = useRef(null);
   const [textWidth, setTextWidth] = useState(0);
-  const saveId = useMainStore((state) => state.saveId);
+  const saveId = useSaveId();
   const align = getAlign(dir);
 
   const handleSubmit = (text: string) => {
@@ -75,7 +77,7 @@ export const CommonTextLabel: React.FC<TitleTexProps> = ({
     open &&
     (label === '<add title>' ||
       label === '<add text>' ||
-      label === buildTitle(saveId))
+      label === `<edit ${saveId} title>`)
       ? ''
       : label;
 

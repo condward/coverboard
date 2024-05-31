@@ -1,26 +1,37 @@
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Group, Rect, Star } from 'react-konva';
-import { useMainStore, useUtilsStore } from 'store';
-import { Covers } from 'types';
+import { FC } from 'react';
+import { useAtomValue } from 'jotai';
+
+import { pointsAtom, useIsSelected, useMainStore } from 'store';
+import { CoverSchema } from 'types';
 
 interface CoverStarProps {
-  id: Covers['id'];
+  id: CoverSchema['id'];
   offset?: number;
-  starCount: number;
+  starCount: CoverSchema['star']['count'];
 }
 
-export const CoverStar: React.FC<CoverStarProps> = ({
+export const CoverStar: FC<CoverStarProps> = (props) => {
+  const editLines = useAtomValue(pointsAtom);
+  const isSelected = useIsSelected(props.id);
+
+  if (editLines || isSelected) return null;
+
+  return <CoverStarChild {...props} />;
+};
+
+export const CoverStarChild: FC<CoverStarProps> = ({
   id,
   offset = 0,
   starCount,
 }) => {
-  const starRadius = useMainStore((state) => state.starRadius());
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight());
+  const starRadius = useMainStore((state) => state.getStarRadius());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
   const color = useMainStore((state) => state.getCoverColor());
   const backColor = useMainStore((state) => state.getBackColor());
-  const updateStarCount = useMainStore((state) => state.updateStarCount);
-  const editLines = useUtilsStore((state) => state.points);
+  const updateCover = useMainStore((state) => state.updateCover);
 
   const handleClick = (
     evt: KonvaEventObject<MouseEvent | Event>,
@@ -30,23 +41,22 @@ export const CoverStar: React.FC<CoverStarProps> = ({
 
     if (index < 0 || index > 5) return;
 
+    let starCount = 0;
     if (index === starCount) {
-      updateStarCount(id, index - 1);
+      starCount = index - 1;
     } else if (index - 0.5 === starCount) {
-      updateStarCount(id, index);
+      starCount = index;
     } else {
-      updateStarCount(id, index - 0.5);
+      starCount = index - 0.5;
     }
+    updateCover(id, { star: { count: starCount } });
   };
 
   const totalWidth = 4 * starRadius * 3;
-  const isSelected = useUtilsStore((state) => state.isSelected({ id }));
-
-  if (editLines || isSelected) return null;
 
   return (
     <Group opacity={starCount ? 1 : 0.3} y={coverSizeHeight + offset}>
-      {[...Array(5)].map((_, index) => (
+      {[0, 1, 2, 3, 4].map((index) => (
         <Group
           key={index}
           x={coverSizeWidth / 2 + index * starRadius * 3 - totalWidth / 2}

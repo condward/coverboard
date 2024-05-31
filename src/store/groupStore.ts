@@ -1,23 +1,17 @@
-import { GroupCovers, PosTypes } from 'types';
 import { StateCreator } from 'zustand';
+import { DeepPartial } from 'react-hook-form';
+
+import { GroupSchema, GroupsSchema, PosTypes, groupsSchema } from 'types';
 
 export interface UseGrouspParams {
-  groups: Array<GroupCovers>;
+  groups: GroupsSchema;
+  isGroup: (groupId: GroupSchema['id']) => boolean;
+  updateGroup: (
+    groupdId: GroupSchema['id'],
+    partial: DeepPartial<GroupSchema>,
+  ) => void;
   updateAllGroupsDir: (dir: PosTypes) => void;
-  updateGroupDir: (groupId: string, dir: PosTypes) => void;
-  updateGroupSubDir: (groupId: string, dir: PosTypes) => void;
-  updateGroupsText: (
-    groupId: string,
-    titleText: string,
-    subtitleText: string,
-  ) => void;
-  addGroups: (filteredResults: Array<GroupCovers>) => void;
-  updateGroupLabel: (
-    groupId: string,
-    coverLabel: 'title' | 'subtitle',
-    label: string,
-  ) => void;
-  isGroup: (groupId: string) => boolean;
+  addGroups: (filteredResults: GroupsSchema) => void;
 }
 
 export const createGroupsSlice: StateCreator<
@@ -27,7 +21,27 @@ export const createGroupsSlice: StateCreator<
   UseGrouspParams
 > = (set, get) => ({
   groups: [],
-  isGroup: (id) => !!get().groups.find((group) => group.id === id),
+  isGroup: (id) => get().groups.some((group) => group.id === id),
+  updateGroup(groupId, partialGroup) {
+    set(({ groups }) => {
+      const groupIdx = groups.findIndex((grp) => grp.id === groupId);
+
+      if (groupIdx) {
+        const groupCopy = [...groups];
+        const group = groupCopy[groupIdx];
+
+        groupCopy[groupIdx] = {
+          ...group,
+          ...partialGroup,
+          title: { ...group.title, ...partialGroup.title },
+          subtitle: { ...group.subtitle, ...partialGroup.subtitle },
+        };
+
+        return { groups: groupCopy };
+      }
+      return { groups };
+    });
+  },
   updateAllGroupsDir(dir) {
     set(({ groups }) => ({
       groups: groups.map((group) => ({
@@ -43,73 +57,9 @@ export const createGroupsSlice: StateCreator<
       })),
     }));
   },
-  updateGroupDir(coverId, dir) {
-    set(({ groups }) => ({
-      groups: groups.map((group) =>
-        group.id === coverId
-          ? {
-              ...group,
-              title: {
-                ...group.title,
-                dir,
-              },
-            }
-          : group,
-      ),
-    }));
-  },
-  updateGroupSubDir(coverId, dir) {
-    set(({ groups }) => ({
-      groups: groups.map((group) =>
-        group.id === coverId
-          ? {
-              ...group,
-              subtitle: {
-                ...group.subtitle,
-                dir,
-              },
-            }
-          : group,
-      ),
-    }));
-  },
-  updateGroupsText(coverId, titleText, subtitleText) {
-    set(({ groups }) => ({
-      groups: groups.map((group) =>
-        coverId === group.id
-          ? {
-              ...group,
-              title: {
-                ...group.title,
-                text: titleText,
-              },
-              subtitle: {
-                ...group.subtitle,
-                text: subtitleText,
-              },
-            }
-          : group,
-      ),
-    }));
-  },
-  updateGroupLabel(coverId, groupLabel, text) {
-    set(({ groups }) => ({
-      groups: groups.map((group) => {
-        return coverId === group.id
-          ? {
-              ...group,
-              [groupLabel]: {
-                ...group[groupLabel],
-                text,
-              },
-            }
-          : group;
-      }),
-    }));
-  },
   addGroups(filteredResults) {
     set(({ groups }) => ({
-      groups: [...groups, ...filteredResults],
+      groups: groupsSchema.parse([...groups, ...filteredResults]),
     }));
   },
 });

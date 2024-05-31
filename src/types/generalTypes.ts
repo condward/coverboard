@@ -12,14 +12,11 @@ export interface DragLimits {
   height: number;
 }
 
-export const NAME_SPACE = 'coverboard';
-
-export const DEFAULT_KEY = 'default';
-
-export enum Modes {
-  ARROW = '<Create arrow mode>',
+export enum LabelTypes {
+  TITLE = 'title',
+  SUBTITLE = 'subtitle',
 }
 
-export const buildTitle = (saveId: string) => {
-  return `<edit ${saveId} title>`;
-};
+export enum TextTypes {
+  LINELABEL = 'linelabel',
+}

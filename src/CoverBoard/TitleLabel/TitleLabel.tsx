@@ -1,25 +1,24 @@
-import React, { useMemo } from 'react';
+import { FC, memo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { useAtom } from 'jotai';
 
-import { PosTypes, buildTitle } from 'types';
-import { useMainStore, useUtilsStore } from 'store';
-import { shallow } from 'zustand/shallow';
+import { PosTypes } from 'types';
+import { editTitleAtom, useMainStore } from 'store';
 import { CommonTextLabel } from 'CoverBoard/Common';
+import { useSaveId } from 'utils';
 
-export const TitleLabel: React.FC = () => {
+const TitleLabelWithoutMemo: FC = () => {
   const updateTitle = useMainStore((state) => state.updateTitle);
   const resetTitle = useMainStore((state) => state.resetTitle);
   const title = useMainStore((state) => state.configs.title);
   const showMainTitle = useMainStore((state) => state.configs.showMainTitle);
-  const saveId = useMainStore((state) => state.saveId);
+  const saveId = useSaveId();
   const color = useMainStore((state) => state.getColor());
 
-  const toobarIconSize = useMainStore((state) => state.toobarIconSize());
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
+  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
 
-  const [open, setOpen] = useUtilsStore((state) => [
-    state.editTitle,
-    state.setEditTitle,
-  ]);
+  const [open, setOpen] = useAtom(editTitleAtom);
 
   const handleReset = () => {
     resetTitle();
@@ -29,14 +28,7 @@ export const TitleLabel: React.FC = () => {
     updateTitle(text);
   };
 
-  const titleMode = useMemo(() => {
-    if (!showMainTitle) {
-      return '';
-    } else if (!title) {
-      return buildTitle(saveId);
-    }
-    return title;
-  }, [saveId, showMainTitle, title]);
+  const titleMode = showMainTitle ? title || `<edit ${saveId} title>` : '';
 
   return (
     <CommonTextLabel
@@ -55,3 +47,5 @@ export const TitleLabel: React.FC = () => {
     />
   );
 };
+
+export const TitleLabel = memo(TitleLabelWithoutMemo);

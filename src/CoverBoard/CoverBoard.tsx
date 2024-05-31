@@ -1,5 +1,13 @@
-import React, { RefObject, useCallback, useRef, useState } from 'react';
+import { FC, RefObject, memo, useRef, useState } from 'react';
 import { Stage, Layer, Group, Rect } from 'react-konva';
+import { flushSync } from 'react-dom';
+import { useShallow } from 'zustand/react/shallow';
+import Konva from 'konva';
+import { KonvaEventObject } from 'konva/lib/Node';
+import { useSetAtom } from 'jotai';
+
+import { pointsAtom, selectedAtom, useMainStore } from 'store';
+import { formatDate, useSaveId } from 'utils';
 
 import {
   Covers,
@@ -12,42 +20,35 @@ import {
   CoverCountLabel,
   GroupCountLabel,
   Logo,
-} from '.';
-import { flushSync } from 'react-dom';
-import { formatDate } from 'utils';
-import { useMainStore, useUtilsStore } from 'store';
-import { shallow } from 'zustand/shallow';
-import Konva from 'konva';
-import { KonvaEventObject } from 'konva/lib/Node';
+} from './';
 
-export const CoverBoard: React.FC = () => {
+export const CoverBoardWithoutMemo: FC = () => {
   const color = useMainStore((state) => state.getColor());
   const backColor = useMainStore((state) => state.getBackColor());
-  const saveId = useMainStore((state) => state.saveId);
+  const saveId = useSaveId();
 
-  const toolBarLimits = useMainStore((state) => state.toolBarLimits(), shallow);
-  const toobarIconSize = useMainStore((state) => state.toobarIconSize());
+  const toolBarLimits = useMainStore(
+    useShallow((state) => state.getToolBarLimits()),
+  );
+  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
   const windowSize = useMainStore((state) => state.windowSize);
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
 
   const stageRef: RefObject<Konva.Stage> = useRef(null);
   const [screenshotUrl, setScreenshotUrl] = useState('');
   const [showLogo, setShowLogo] = useState(true);
 
-  const setSelected = useUtilsStore((state) => state.setSelected);
-  const setPoints = useUtilsStore((state) => state.setPoints);
-  const checkDeselect = useCallback(
-    (e: KonvaEventObject<MouseEvent | Event>) => {
-      const clickedOnEmpty = e.target === e.target.getStage();
-      if (clickedOnEmpty) {
-        setSelected(null);
-        setPoints(null);
-      }
-    },
-    [setPoints, setSelected],
-  );
+  const setSelected = useSetAtom(selectedAtom);
+  const setPoints = useSetAtom(pointsAtom);
+  const checkDeselect = (e: KonvaEventObject<MouseEvent | Event>) => {
+    const clickedOnEmpty = e.target === e.target.getStage();
+    if (clickedOnEmpty) {
+      setSelected(null);
+      setPoints(null);
+    }
+  };
 
-  const takeScreenshot = useCallback(() => {
+  const takeScreenshot = () => {
     const stage = stageRef.current;
 
     flushSync(() => {
@@ -71,7 +72,7 @@ export const CoverBoard: React.FC = () => {
         setShowLogo(true);
       });
     }
-  }, [dragLimits, saveId]);
+  };
 
   return (
     <>
@@ -136,3 +137,5 @@ export const CoverBoard: React.FC = () => {
     </>
   );
 };
+
+export const CoverBoard = memo(CoverBoardWithoutMemo);

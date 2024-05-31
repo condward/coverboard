@@ -1,16 +1,17 @@
 import { Group, Line } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
-import { Covers, GroupCovers } from 'types';
-import { useState } from 'react';
+import { useState, ReactNode, FC } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+
+import { CoverSchema, GroupSchema } from 'types';
 import { useMainStore } from 'store';
-import { shallow } from 'zustand/shallow';
 
 interface CommonDraggableProps {
-  children: React.ReactNode;
-  id: Covers['id'] | GroupCovers['id'];
-  x: Covers['x'] | GroupCovers['x'];
-  y: Covers['y'] | GroupCovers['y'];
+  children: ReactNode;
+  id: CoverSchema['id'] | GroupSchema['id'];
+  x: CoverSchema['x'] | GroupSchema['x'];
+  y: CoverSchema['y'] | GroupSchema['y'];
   min: {
     x: number;
     y: number;
@@ -23,7 +24,7 @@ interface CommonDraggableProps {
   onDelete?: (id: string) => void;
 }
 
-export const CommonDraggable: React.FC<CommonDraggableProps> = ({
+export const CommonDraggable: FC<CommonDraggableProps> = ({
   id,
   x,
   y,
@@ -36,9 +37,12 @@ export const CommonDraggable: React.FC<CommonDraggableProps> = ({
   const groups = useMainStore((state) => state.groups);
   const color = useMainStore((state) => state.getColor());
 
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
   const [hintLines, setHintLines] = useState<
-    [Covers | GroupCovers | undefined, Covers | GroupCovers | undefined]
+    [
+      CoverSchema | GroupSchema | undefined,
+      CoverSchema | GroupSchema | undefined,
+    ]
   >([undefined, undefined]);
 
   const handleDragBound = (pos: Vector2d) => {
@@ -63,9 +67,9 @@ export const CommonDraggable: React.FC<CommonDraggableProps> = ({
     e.cancelBubble = true;
     e.currentTarget.opacity(0.5);
 
-    if (covers.find((cov) => cov.id === id)) {
+    if (covers.some((cov) => cov.id === id)) {
       refreshCovers(id);
-    } else if (groups.find((group) => group.id === id)) {
+    } else if (groups.some((group) => group.id === id)) {
       refreshGroups(id);
     }
 
@@ -89,13 +93,13 @@ export const CommonDraggable: React.FC<CommonDraggableProps> = ({
       groups.find((group) => group.id !== id && group.x === targetX);
 
     if (
-      (typeof hintLines[0] === 'undefined' && foundY) ||
-      (typeof hintLines[1] === 'undefined' && foundX)
+      (hintLines[0] === undefined && foundY) ||
+      (hintLines[1] === undefined && foundX)
     ) {
       setHintLines([foundY, foundX]);
     } else if (
-      (typeof hintLines[0] !== 'undefined' && !foundY) ||
-      (typeof hintLines[1] !== 'undefined' && !foundX)
+      (hintLines[0] !== undefined && !foundY) ||
+      (hintLines[1] !== undefined && !foundX)
     ) {
       setHintLines([undefined, undefined]);
     }

@@ -1,0 +1,152 @@
+import { FC, useState } from 'react';
+import { Chip, Stack, Box, FormControl, FormLabel } from '@mui/material';
+import { Close as CloseIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+
+import { ToolConfigIDs, AppSchema, Media, MediaMap } from 'types';
+import {
+  addPrefix,
+  DEFAULT_KEY,
+  DEFAULT_STORAGE,
+  haxPrefix,
+  removePrefix,
+  useSaveId,
+} from 'utils';
+import { useMainStore, useToastStore } from 'store';
+import { SPACING_GAP } from 'components';
+
+const getMediaFromStorage = (storageString: string) => {
+  try {
+    const item = window.localStorage.getItem(storageString);
+    if (item) {
+      const curentData: { state: AppSchema } = JSON.parse(item);
+
+      if (Object.values(Media).includes(curentData.state.configs.media)) {
+        return curentData.state.configs.media;
+      }
+    }
+
+    return Media.MUSIC;
+  } catch {
+    console.error('Could not parse media type');
+    return Media.MUSIC;
+  }
+};
+
+interface ToolbarShareProps {
+  onClose: () => void;
+  setJsonData: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export const ToolbarSharePages: FC<ToolbarShareProps> = ({
+  onClose,
+  setJsonData,
+}) => {
+  const navigate = useNavigate();
+  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
+  const saveId = useSaveId();
+  const resetStoreValues = useMainStore((state) => state.resetStoreValues);
+
+  const [keyList, setKeyList] = useState([
+    DEFAULT_KEY,
+    ...Object.keys(window.localStorage).filter(
+      (key) => key !== addPrefix(DEFAULT_KEY) && haxPrefix(key),
+    ),
+  ]);
+  const hasDefault = !!window.localStorage.getItem(addPrefix(DEFAULT_KEY));
+
+  const handleDeleteElements = () => {
+    resetStoreValues();
+    showSuccessMessage('All elements on screen were cleaned');
+  };
+
+  return (
+    <>
+      <FormControl component="fieldset">
+        <FormLabel component="legend" id="chip-group-label">
+          Pick a page:
+        </FormLabel>
+        <Stack
+          direction="row"
+          flexWrap="wrap"
+          gap={SPACING_GAP / 2}
+          role="radiogroup"
+          aria-labelledby="chip-group-label">
+          {keyList.map((currentSaveWithPrefix) => {
+            const currentSave = removePrefix(currentSaveWithPrefix);
+            const showDelete =
+              currentSave !== DEFAULT_KEY ||
+              (currentSave === saveId && hasDefault);
+
+            const currentMedia = getMediaFromStorage(currentSaveWithPrefix);
+
+            return (
+              <Chip
+                role="radio"
+                aria-checked={saveId === currentSave}
+                key={currentSave}
+                label={`${MediaMap[currentMedia].emoji} ${currentSave}`}
+                color={saveId === currentSave ? 'primary' : 'default'}
+                onClick={() => {
+                  navigate(`/${currentSave}#${ToolConfigIDs.SHARE}`);
+                  const data = window.localStorage.getItem(
+                    addPrefix(currentSave),
+                  );
+                  if (data) {
+                    setJsonData(
+                      JSON.stringify(JSON.parse(data).state, null, 4),
+                    );
+                  }
+                }}
+                onDelete={
+                  showDelete
+                    ? (evt) => {
+                        evt.preventDefault();
+
+                        if (saveId === DEFAULT_KEY && currentSave === saveId) {
+                          handleDeleteElements();
+                          onClose();
+                          return;
+                        }
+
+                        window.localStorage.removeItem(addPrefix(currentSave));
+                        setKeyList((keys) =>
+                          keys.filter(
+                            (currentKey) =>
+                              currentKey !== addPrefix(currentSave),
+                          ),
+                        );
+
+                        if (saveId === currentSave) {
+                          navigate(`/${DEFAULT_KEY}#${ToolConfigIDs.SHARE}`);
+
+                          const defaultData =
+                            window.localStorage.getItem(DEFAULT_STORAGE);
+                          if (defaultData) {
+                            setJsonData(
+                              JSON.stringify(
+                                JSON.parse(defaultData).state,
+                                null,
+                                4,
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    : undefined
+                }
+                deleteIcon={
+                  showDelete ? (
+                    <Box sx={{ display: 'flex' }} title="delete page">
+                      <CloseIcon />
+                    </Box>
+                  ) : undefined
+                }
+              />
+            );
+          })}
+        </Stack>
+      </FormControl>
+    </>
+  );
+};

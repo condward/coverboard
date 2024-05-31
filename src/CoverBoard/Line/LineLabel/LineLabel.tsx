@@ -1,38 +1,37 @@
-import React from 'react';
+import { FC } from 'react';
+import { useSetAtom } from 'jotai';
 
-import { LineParams, Lines, PosTypes, TextTypes } from 'types';
-import { LineCircle, LineLabelDraggable, LinePopover } from '.';
-import { useMainStore, useUtilsStore } from 'store';
-import { Html } from 'react-konva-utils';
+import { LineParams, LineSchema, TextTypes } from 'types';
+import {
+  editingTextAtom,
+  useIsCurrentTextSelected,
+  useIsSelected,
+  useMainStore,
+} from 'store';
 import { CommonTextLabel } from 'CoverBoard/Common';
 
+import { LineCircle, LineLabelDraggable } from '.';
+
 interface LineProps {
-  id: Lines['id'];
-  dir: Lines['dir'];
+  id: LineSchema['id'];
+  dir: LineSchema['dir'];
+  text: LineSchema['text'];
   lineParams: LineParams;
-  text: Lines['text'];
 }
 
-export const LineLabel: React.FC<LineProps> = ({
-  id,
-  dir,
-  lineParams,
-  text,
-}) => {
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const fontSize = useMainStore((state) => state.fontSize());
+export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const fontSize = useMainStore((state) => state.getFontSize());
   const color = useMainStore((state) => state.getArrowColor());
   const updateLineDir = useMainStore((state) => state.updateLineDir);
   const updateLineText = useMainStore((state) => state.updateLineText);
 
-  const isSelectedModalOpen = useUtilsStore((state) =>
-    state.isSelectedModalOpen({ id }),
-  );
-
-  const setEditingText = useUtilsStore((state) => state.setEditingText);
-  const isCurrentTextSelected = useUtilsStore((state) =>
-    state.isCurrentTextSelected({ id, text: TextTypes.LINELABEL }),
-  );
+  const selected = useIsSelected(id);
+  const setEditingText = useSetAtom(editingTextAtom);
+  const isCurrentTextSelected = useIsCurrentTextSelected({
+    id,
+    text: TextTypes.LINELABEL,
+  });
 
   const handleSetOpen = (open: boolean) => {
     setEditingText(open ? { id, text: TextTypes.LINELABEL } : null);
@@ -41,14 +40,10 @@ export const LineLabel: React.FC<LineProps> = ({
   const getLabel = () => {
     if (text) {
       return text;
-    } else if (text === null) {
+    } else if (selected && text === '') {
       return '<add text>';
     }
     return '';
-  };
-
-  const handleUpdateDir = (dir: PosTypes) => {
-    updateLineDir(id, dir);
   };
 
   return (
@@ -56,7 +51,7 @@ export const LineLabel: React.FC<LineProps> = ({
       <LineLabelDraggable
         dir={dir}
         lineParams={lineParams}
-        setUpdate={handleUpdateDir}>
+        setUpdate={(dir) => updateLineDir(id, dir)}>
         <CommonTextLabel
           label={getLabel()}
           color={color}
@@ -73,18 +68,6 @@ export const LineLabel: React.FC<LineProps> = ({
         />
       </LineLabelDraggable>
       <LineCircle id={id} />
-      {isSelectedModalOpen && (
-        <Html>
-          <LinePopover
-            id={id}
-            open={isSelectedModalOpen}
-            values={{
-              text: text ?? '',
-              dir,
-            }}
-          />
-        </Html>
-      )}
     </>
   );
 };

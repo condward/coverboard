@@ -1,28 +1,22 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { Group, Rect } from 'react-konva';
-
-import { Covers, PosTypes } from 'types';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useUtilsStore, useMainStore } from 'store';
+import { useAtom, useAtomValue } from 'jotai';
+import { ZodError } from 'zod';
+
+import { CoverSchema, PosTypes } from 'types';
+import { useMainStore, pointsAtom, useIsSelected, useToastStore } from 'store';
 
 interface CommonDrawLineProps {
-  id: Covers['id'];
+  id: CoverSchema['id'];
   scaleX?: number;
   scaleY?: number;
 }
 
-export const CommonDrawLine: React.FC<CommonDrawLineProps> = ({
-  id,
-  scaleX = 1,
-  scaleY = 1,
-}) => {
-  const points = useUtilsStore((state) => state.points);
-  const setPoints = useUtilsStore((state) => state.setPoints);
-  const createLine = useMainStore((state) => state.createLine);
-  const isSelected = useUtilsStore((state) => state.isSelected({ id }));
-
-  const groups = useMainStore((state) => state.groups);
+const useShowArrow = (id: CommonDrawLineProps['id']) => {
   const covers = useMainStore((state) => state.covers);
+  const points = useAtomValue(pointsAtom);
+  const groups = useMainStore((state) => state.groups);
   const getGroupsOfCover = useMainStore((state) => state.getGroupsOfCover);
   const getGroupsOfGroup = useMainStore((state) => state.getGroupsOfGroup);
   const getGroupsInsideGroup = useMainStore(
@@ -32,38 +26,52 @@ export const CommonDrawLine: React.FC<CommonDrawLineProps> = ({
     (state) => state.getCoversInsideGroup,
   );
 
-  const showArrow = useMemo(() => {
-    if (points) {
-      const cover = covers.find((cover) => cover.id === points.id);
-      if (cover) {
-        return !getGroupsOfCover(cover.id).find((val) => val.id === id);
-      }
-
-      const group = groups.find((group) => group.id === points.id);
-      if (group) {
-        return !(
-          !!getGroupsOfGroup(group.id).find((val) => val.id === id) ||
-          !!getGroupsInsideGroup(group.id).find((val) => val.id === id) ||
-          !!getCoversInsideGroup(group.id).find((val) => val.id === id)
-        );
-      }
+  if (points) {
+    const cover = covers.find((cover) => cover.id === points.id);
+    if (cover) {
+      return !getGroupsOfCover(cover.id).some((val) => val.id === id);
     }
-    return true;
-  }, [
-    covers,
-    getCoversInsideGroup,
-    getGroupsInsideGroup,
-    getGroupsOfCover,
-    getGroupsOfGroup,
-    groups,
-    id,
-    points,
-  ]);
+
+    const group = groups.find((group) => group.id === points.id);
+    if (group) {
+      return !(
+        getGroupsOfGroup(group.id).some((val) => val.id === id) ||
+        getGroupsInsideGroup(group.id).some((val) => val.id === id) ||
+        getCoversInsideGroup(group.id).some((val) => val.id === id)
+      );
+    }
+  }
+  return true;
+};
+
+export const CommonDrawLine: FC<CommonDrawLineProps> = ({
+  id,
+  scaleX = 1,
+  scaleY = 1,
+}) => {
+  const points = useAtomValue(pointsAtom);
+  const isSelected = useIsSelected(id);
+  const showArrow = useShowArrow(id);
+
+  if ((!points && !isSelected) || !showArrow) return null;
+
+  return <CommonDrawLineChild id={id} scaleX={scaleX} scaleY={scaleY} />;
+};
+
+const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
+  id,
+  scaleX = 1,
+  scaleY = 1,
+}) => {
+  const [points, setPoints] = useAtom(pointsAtom);
+  const isSelected = useIsSelected(id);
+  const createLine = useMainStore((state) => state.createLine);
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
   const coverSizeWidth =
-    useMainStore((state) => state.coverSizeWidth()) * scaleX;
+    useMainStore((state) => state.getCoverSizeWidth()) * scaleX;
   const coverSizeHeight =
-    useMainStore((state) => state.coverSizeHeight()) * scaleY;
+    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
   const selection: PosTypes | null = points?.id === id ? points.dir : null;
 
   const square = 25 + coverSizeWidth / 20;
@@ -73,13 +81,27 @@ export const CommonDrawLine: React.FC<CommonDrawLineProps> = ({
       if (!points) {
         setPoints({ id, dir });
       } else if (points.id !== id) {
-        createLine(id, points, dir);
-        setPoints(null);
+        try {
+          createLine(id, points, dir);
+          setPoints(null);
+        } catch (error) {
+          if (error instanceof ZodError) {
+            const tooBig = error.issues.find((msg) => msg.code === 'too_big');
+
+            if (tooBig) {
+              showErrorMessage(tooBig.message);
+              return;
+            }
+            showErrorMessage('Bad formatted line');
+            return;
+          }
+          throw error;
+        }
       } else if (points.id === id) {
         setPoints(null);
       }
     },
-    [createLine, points, setPoints],
+    [createLine, points, setPoints, showErrorMessage],
   );
 
   const posArray = [
@@ -138,8 +160,6 @@ export const CommonDrawLine: React.FC<CommonDrawLineProps> = ({
 
     return () => document.removeEventListener('keydown', keyFn);
   }, [handleDrawLine, id, isSelected, setPoints]);
-
-  if ((!points && !isSelected) || !showArrow) return null;
 
   return (
     <Group>

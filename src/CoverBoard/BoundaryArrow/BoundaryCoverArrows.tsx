@@ -1,8 +1,10 @@
-import React from 'react';
+import { FC, memo } from 'react';
+
 import { useMainStore } from 'store';
+
 import { BoundaryArrow } from './BoundaryArrow';
 
-export const BoundaryCoverArrows: React.FC = () => {
+export const BoundaryCoverArrowsWithoutMemo: FC = () => {
   const offLimitCovers = useMainStore((state) => state.offLimitCovers());
   const updateCoverPosition = useMainStore(
     (state) => state.updateCoverPosition,
@@ -22,10 +24,12 @@ export const BoundaryCoverArrows: React.FC = () => {
           id={cover.id}
           x={cover.x}
           y={cover.y}
-          title={cover.subtitle.text ?? ''}
+          title={cover.subtitle.text}
           key={cover.id}
         />
       ))}
     </>
   );
 };
+
+export const BoundaryCoverArrows = memo(BoundaryCoverArrowsWithoutMemo);

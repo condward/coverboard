@@ -1,13 +1,15 @@
-import React from 'react';
+import { FC } from 'react';
 import { Circle, Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
+import { useSetAtom } from 'jotai';
 
-import { useMainStore, useUtilsStore } from 'store';
+import { selectedAtom, useIsSelected, useMainStore } from 'store';
+import { LineSchema } from 'types';
 
-export const LineCircle: React.FC<{ id: string }> = ({ id }) => {
-  const circleRadius = useMainStore((state) => state.circleRadius());
-  const isSelected = useUtilsStore((state) => state.isSelected({ id }));
-  const setSelected = useUtilsStore((state) => state.setSelected);
+export const LineCircle: FC<{ id: LineSchema['id'] }> = ({ id }) => {
+  const circleRadius = useMainStore((state) => state.getCircleRadius());
+  const isSelected = useIsSelected(id);
+  const setSelected = useSetAtom(selectedAtom);
   const color = useMainStore((state) => state.getArrowColor());
 
   const handleSelect = () => {

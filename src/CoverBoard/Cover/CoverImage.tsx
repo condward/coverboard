@@ -1,22 +1,22 @@
-import React from 'react';
+import { FC } from 'react';
 import { Image, Text } from 'react-konva';
-
-import { Covers } from 'types';
 import { useImage } from 'react-konva-utils';
 import { KonvaEventObject } from 'konva/lib/Node';
+
+import { CoverSchema } from 'types';
 import { useMainStore } from 'store';
 
 interface CoverImageProps {
-  link: Covers['link'];
+  link: CoverSchema['link'];
   onRetry: (evt: KonvaEventObject<MouseEvent>) => void;
 }
 
-export const CoverImage: React.FC<CoverImageProps> = ({ link, onRetry }) => {
+export const CoverImage: FC<CoverImageProps> = ({ link, onRetry }) => {
   const color = useMainStore((state) => state.getColor());
 
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight());
-  const fontSize = useMainStore((state) => state.fontSize());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
+  const fontSize = useMainStore((state) => state.getFontSize());
 
   const [image, status] = useImage(link, 'anonymous');
 

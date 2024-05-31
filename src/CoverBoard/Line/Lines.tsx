@@ -1,8 +1,11 @@
 import { Group } from 'react-konva';
+import { FC, memo } from 'react';
+
 import { useMainStore } from 'store';
+
 import { Line } from './Line';
 
-export const Lines: React.FC = () => {
+export const LinesWithoutMemo: FC = () => {
   const lines = useMainStore((state) => state.lines);
 
   return (
@@ -24,3 +27,5 @@ export const Lines: React.FC = () => {
     </>
   );
 };
+
+export const Lines = memo(LinesWithoutMemo);

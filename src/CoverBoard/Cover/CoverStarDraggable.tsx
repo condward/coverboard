@@ -1,19 +1,58 @@
 import { Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useMemo, useState } from 'react';
-import { Covers, PosTypes } from 'types';
+import { useState, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useShallow } from 'zustand/react/shallow';
+
+import { CoverSchema, PosTypes } from 'types';
 import { getClientPosition } from 'utils';
 import { useMainStore } from 'store';
-import { shallow } from 'zustand/shallow';
 
 interface DraggableGroupProps {
-  children: React.ReactNode;
-  id: Covers['id'];
-  x: Covers['x'];
-  y: Covers['y'];
-  starDir: PosTypes;
+  children: ReactNode;
+  id: CoverSchema['id'];
+  x: CoverSchema['x'];
+  y: CoverSchema['y'];
+  starDir: CoverSchema['star']['dir'];
 }
+
+const useGetNewPos = (starDir: DraggableGroupProps['starDir']) => {
+  const starRadius = useMainStore((state) => state.getStarRadius());
+  const totalWidth = 4 * starRadius * 3;
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
+
+  if (starDir === PosTypes.BOTTOM) {
+    return {
+      x: 0,
+      y: starRadius * 2,
+    };
+  } else if (starDir === PosTypes.TOP) {
+    return {
+      x: 0,
+      y: -coverSizeHeight - 2 * starRadius,
+    };
+  } else if (starDir === PosTypes.RIGHT) {
+    return {
+      x: coverSizeWidth + starRadius * 2.5,
+      y: -coverSizeHeight / 2 - starRadius,
+    };
+  } else {
+    return {
+      x: -totalWidth - starRadius * 3.5,
+      y: -coverSizeHeight / 2 - starRadius,
+    };
+  }
+};
+
+const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
+  e.cancelBubble = true;
+  const container = e.target.getStage()?.container();
+
+  if (container) {
+    container.style.cursor = 'grab';
+  }
+};
 
 export const CoverStarDraggable = ({
   id,
@@ -22,21 +61,10 @@ export const CoverStarDraggable = ({
   starDir,
   children,
 }: DraggableGroupProps) => {
-  const updateCoverStarDir = useMainStore((state) => state.updateCoverStarDir);
-  const dragLimits = useMainStore((state) => state.dragLimits(), shallow);
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight());
+  const updateCover = useMainStore((state) => state.updateCover);
+  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
   const [randId, setId] = useState(uuidv4());
-  const starRadius = useMainStore((state) => state.starRadius());
-
-  const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
-    e.cancelBubble = true;
-    const container = e.target.getStage()?.container();
-
-    if (container) {
-      container.style.cursor = 'grab';
-    }
-  };
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent | TouchEvent>) => {
     e.cancelBubble = true;
@@ -60,34 +88,10 @@ export const CoverStarDraggable = ({
     }
 
     setId(uuidv4());
-    updateCoverStarDir(id, newDir);
+    updateCover(id, { star: { dir: newDir } });
   };
 
-  const totalWidth = 4 * starRadius * 3;
-
-  const newPos = useMemo(() => {
-    if (starDir === PosTypes.BOTTOM) {
-      return {
-        x: 0,
-        y: starRadius * 2,
-      };
-    } else if (starDir === PosTypes.TOP) {
-      return {
-        x: 0,
-        y: -coverSizeHeight - 2 * starRadius,
-      };
-    } else if (starDir === PosTypes.RIGHT) {
-      return {
-        x: coverSizeWidth + starRadius * 2.5,
-        y: -coverSizeHeight / 2 - starRadius,
-      };
-    } else {
-      return {
-        x: -totalWidth - starRadius * 3.5,
-        y: -coverSizeHeight / 2 - starRadius,
-      };
-    }
-  }, [coverSizeHeight, coverSizeWidth, starDir, starRadius, totalWidth]);
+  const newPos = useGetNewPos(starDir);
 
   return (
     <Group

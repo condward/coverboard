@@ -1,5 +1,5 @@
-function padTo2Digits(num: number) {
-  return num.toString().padStart(2, '0');
+function padTo2Digits(number: number) {
+  return number.toString().padStart(2, '0');
 }
 
 export const formatDate = (date: Date) => {

@@ -1,22 +1,19 @@
-import React, { useRef } from 'react';
+import { FC, useRef, useEffect } from 'react';
 import { Rect, Transformer } from 'react-konva';
-
-import { GroupCovers } from 'types';
-import { useMainStore, useUtilsStore } from 'store';
 import Konva from 'konva';
+import { useAtomValue } from 'jotai';
+
+import { GroupSchema } from 'types';
+import { useMainStore, selectedAtom } from 'store';
 
 interface CoverImageProps {
-  id: GroupCovers['id'];
-  scaleX: number;
-  scaleY: number;
+  id: GroupSchema['id'];
+  scaleX: GroupSchema['scaleX'];
+  scaleY: GroupSchema['scaleY'];
 }
 
-export const GroupSquare: React.FC<CoverImageProps> = ({
-  id,
-  scaleX,
-  scaleY,
-}) => {
-  const selected = useUtilsStore((state) => state.selected);
+export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
+  const selected = useAtomValue(selectedAtom);
   const color = useMainStore((state) => state.getGroupColor());
   const backColor = useMainStore((state) => state.getBackColor());
 
@@ -24,8 +21,8 @@ export const GroupSquare: React.FC<CoverImageProps> = ({
 
   const updateGroupScale = useMainStore((state) => state.updateGroupScale);
 
-  const coverSizeWidth = useMainStore((state) => state.coverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.coverSizeHeight());
+  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
+  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
   const coverSizeWidthScaled = coverSizeWidth * scaleX;
   const coverSizeHeightScaled = coverSizeHeight * scaleY;
 
@@ -36,7 +33,7 @@ export const GroupSquare: React.FC<CoverImageProps> = ({
   const rectRef = useRef<Konva.Rect>(null);
   const trRef = useRef<Konva.Transformer>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (trRef.current && rectRef.current && selected && selected.id === id) {
       trRef.current.nodes([rectRef.current]);
     }

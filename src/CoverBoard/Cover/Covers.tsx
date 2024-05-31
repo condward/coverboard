@@ -1,7 +1,10 @@
+import { FC, memo } from 'react';
+
 import { useMainStore } from 'store';
+
 import { Cover } from './Cover';
 
-export const Covers: React.FC = () => {
+export const CoversWithoutMemo: FC = () => {
   const covers = useMainStore((state) => state.covers);
 
   return (
@@ -10,8 +13,8 @@ export const Covers: React.FC = () => {
         <Cover
           key={cover.id}
           id={cover.id}
-          title={cover.title.text}
-          subtitle={cover.subtitle.text}
+          titleText={cover.title.text}
+          subtitleText={cover.subtitle.text}
           x={cover.x}
           y={cover.y}
           titleDir={cover.title.dir}
@@ -25,3 +28,5 @@ export const Covers: React.FC = () => {
     </>
   );
 };
+
+export const Covers = memo(CoversWithoutMemo);
