@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { StateCreator } from 'zustand';
+import { DeepPartial } from 'react-hook-form';
 
 import {
   LineSchema,
@@ -13,8 +14,10 @@ export interface UseLinesParams {
   lines: LinesSchema;
   isLine: (lineId: LineSchema['id']) => boolean;
   resetLine: (linedId: LineSchema['id']) => void;
-  updateLineDir: (linedId: LineSchema['id'], dir: PosTypes) => void;
-  updateLineText: (linedId: LineSchema['id'], text: string) => void;
+  updateLine: (
+    linedId: LineSchema['id'],
+    value: DeepPartial<LineSchema>,
+  ) => void;
   removeLine: (linedId: LineSchema['id']) => void;
   createLine: (
     id: LineSchema['id'],
@@ -79,6 +82,26 @@ export const createLinesSlice: StateCreator<
       };
     });
   },
+  updateLine(lineId, partialLine) {
+    set(({ lines }) => {
+      const lineIdx = lines.findIndex((line) => line.id === lineId);
+
+      if (lineIdx > -1) {
+        const lineCopy = [...lines];
+        const line = lineCopy[lineIdx];
+
+        lineCopy[lineIdx] = {
+          ...line,
+          ...partialLine,
+          origin: { ...line.origin, ...partialLine.origin },
+          target: { ...line.target, ...partialLine.target },
+        };
+
+        return { lines: lineCopy };
+      }
+      return { lines };
+    });
+  },
   resetLine(linedId) {
     set(({ lines }) => ({
       lines: lines.map((currentLine) => {
@@ -86,32 +109,6 @@ export const createLinesSlice: StateCreator<
           return {
             ...currentLine,
             dir: PosTypes.BOTTOM,
-          };
-        }
-        return currentLine;
-      }),
-    }));
-  },
-  updateLineDir(linedId, dir) {
-    set(({ lines }) => ({
-      lines: lines.map((currentLine) => {
-        if (currentLine.id === linedId) {
-          return {
-            ...currentLine,
-            dir,
-          };
-        }
-        return currentLine;
-      }),
-    }));
-  },
-  updateLineText(linedId, text) {
-    set(({ lines }) => ({
-      lines: lines.map((currentLine) => {
-        if (currentLine.id === linedId) {
-          return {
-            ...currentLine,
-            text,
           };
         }
         return currentLine;

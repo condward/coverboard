@@ -4,8 +4,9 @@ import { FC } from 'react';
 import { useSetAtom } from 'jotai';
 
 import { ToolConfig } from 'types';
-import { clearHash } from 'utils';
-import { pointsAtom, tooltipAtom, useMainStore } from 'store';
+import { clearHash, useIsLandscape } from 'utils';
+import { pointsAtom, tooltipAtom } from 'store';
+import { useGetSizesContext } from 'providers';
 
 const MIN_OPACITY = 0.3;
 
@@ -16,9 +17,9 @@ interface ToolbarIconProps {
 
 export const ToolbarIcon: FC<ToolbarIconProps> = ({ config, index }) => {
   const setPoints = useSetAtom(pointsAtom);
-  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
-  const getCurrentY = useMainStore((state) => state.getCurrentY);
+  const { toolbarIconSize, getCurrentY } = useGetSizesContext();
   const setTooltip = useSetAtom(tooltipAtom);
+  const isLandscape = useIsLandscape();
 
   const handleClick = () => {
     setPoints(null);
@@ -32,8 +33,16 @@ export const ToolbarIcon: FC<ToolbarIconProps> = ({ config, index }) => {
   return (
     <Group
       key={config.id}
-      x={toobarIconSize / 2}
-      y={getCurrentY(index) + toobarIconSize / 2}
+      x={
+        isLandscape
+          ? toolbarIconSize / 2
+          : getCurrentY(index) + toolbarIconSize / 2
+      }
+      y={
+        isLandscape
+          ? getCurrentY(index) + toolbarIconSize / 2
+          : toolbarIconSize / 2
+      }
       listening={config.enabled}
       onTap={handleClick}
       onClick={handleClick}
@@ -60,44 +69,44 @@ export const ToolbarIcon: FC<ToolbarIconProps> = ({ config, index }) => {
         }
       }}>
       <Rect
-        width={toobarIconSize}
-        height={toobarIconSize}
+        width={toolbarIconSize}
+        height={toolbarIconSize}
         fill={config.color}
         opacity={config.value ? MIN_OPACITY : 1}
       />
       <Text
         x={1}
-        y={toobarIconSize / 3.5}
-        width={toobarIconSize}
-        height={toobarIconSize}
+        y={toolbarIconSize / 3.5}
+        width={toolbarIconSize}
+        height={toolbarIconSize}
         align="center"
         text={config.emoji}
-        fontSize={toobarIconSize / 2}
+        fontSize={toolbarIconSize / 2}
         fill="black"
         opacity={config.value ? MIN_OPACITY : 1}
       />
       <Text
-        x={toobarIconSize / 2 - 1}
-        y={toobarIconSize - toobarIconSize / 4 - 1}
-        width={toobarIconSize / 2}
-        height={toobarIconSize / 2}
+        x={toolbarIconSize / 2 - 1}
+        y={toolbarIconSize - toolbarIconSize / 4 - 1}
+        width={toolbarIconSize / 2}
+        height={toolbarIconSize / 2}
         align="right"
         fontStyle="bold"
         fill={config.color === 'yellow' ? 'gray' : 'white'}
         text={config.badge === null ? '' : String(config.badge)}
-        fontSize={toobarIconSize / 4}
+        fontSize={toolbarIconSize / 4}
       />
       {config.enabled && (
         <Text
           x={1}
           y={1}
-          width={toobarIconSize / 2}
-          height={toobarIconSize / 2}
+          width={toolbarIconSize / 2}
+          height={toolbarIconSize / 2}
           align="left"
           fontStyle="bold"
           fill={config.color === 'yellow' ? 'gray' : 'white'}
           text={config.shortcut}
-          fontSize={toobarIconSize / 4}
+          fontSize={toolbarIconSize / 4}
         />
       )}
     </Group>

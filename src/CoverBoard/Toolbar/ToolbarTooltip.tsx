@@ -2,10 +2,11 @@ import { FC } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Tooltip } from 'components';
-import { tooltipAtom, useMainStore } from 'store';
+import { tooltipAtom } from 'store';
+import { useGetSizesContext } from 'providers';
 
 export const ToolbarTooltip: FC = () => {
-  const fontSize = useMainStore((state) => state.getFontSize());
+  const { fontSize } = useGetSizesContext();
   const tooltip = useAtomValue(tooltipAtom);
 
   if (!tooltip) return null;

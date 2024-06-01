@@ -2,11 +2,11 @@ import { Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useState, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useShallow } from 'zustand/react/shallow';
 
 import { CoverSchema, PosTypes } from 'types';
 import { getClientPosition } from 'utils';
 import { useMainStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 interface DraggableGroupProps {
   children: ReactNode;
@@ -17,10 +17,8 @@ interface DraggableGroupProps {
 }
 
 const useGetNewPos = (starDir: DraggableGroupProps['starDir']) => {
-  const starRadius = useMainStore((state) => state.getStarRadius());
+  const { starRadius, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const totalWidth = 4 * starRadius * 3;
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
 
   if (starDir === PosTypes.BOTTOM) {
     return {
@@ -62,8 +60,7 @@ export const CoverStarDraggable = ({
   children,
 }: DraggableGroupProps) => {
   const updateCover = useMainStore((state) => state.updateCover);
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
-  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
+  const { dragLimits, coverSizeHeight } = useGetSizesContext();
   const [randId, setId] = useState(uuidv4());
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent | TouchEvent>) => {

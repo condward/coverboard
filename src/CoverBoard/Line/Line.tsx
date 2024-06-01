@@ -3,6 +3,7 @@ import { Group } from 'react-konva';
 
 import { LineParams, LineSchema, PosTypes } from 'types';
 import { useMainStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 import { LineArrow, LineLabel } from '.';
 
@@ -59,6 +60,8 @@ const useGetLineParams = ({
   targetId,
   targetDir,
 }: UseGetLineParams): LineParams | undefined => {
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
   const originSquareCover = useMainStore((state) =>
     state.covers.find((cov) => cov.id === originId),
   );
@@ -88,18 +91,10 @@ const useGetLineParams = ({
   const scaleDestY =
     targetSquare && 'scaleY' in targetSquare ? targetSquare.scaleY : 1;
 
-  const coverSizeOriginWidth = useMainStore(
-    (state) => state.getCoverSizeWidth() * scaleOriginX,
-  );
-  const coverSizeOriginHeight = useMainStore(
-    (state) => state.getCoverSizeHeight() * scaleOriginY,
-  );
-  const coverSizeDistWidth = useMainStore(
-    (state) => state.getCoverSizeWidth() * scaleDestX,
-  );
-  const coverSizeDistHeight = useMainStore(
-    (state) => state.getCoverSizeHeight() * scaleDestY,
-  );
+  const coverSizeOriginWidth = coverSizeWidth * scaleOriginX;
+  const coverSizeOriginHeight = coverSizeHeight * scaleOriginY;
+  const coverSizeDistWidth = coverSizeWidth * scaleDestX;
+  const coverSizeDistHeight = coverSizeHeight * scaleDestY;
 
   if (originSquare && targetSquare) {
     const originPos = convertPosToXY(

@@ -4,10 +4,11 @@ import {
   Radio,
   FormLabel,
   FormControl,
+  Stack,
 } from '@mui/material';
 import { FC, ChangeEvent } from 'react';
 
-import { PosTypes } from 'types';
+import { PosTypes, SPACING_GAP } from 'types';
 
 interface DirectionRadioProps {
   value: PosTypes;
@@ -26,37 +27,43 @@ export const DirectionRadio: FC<DirectionRadioProps> = ({
 }) => {
   return (
     <FormControl component="fieldset">
-      <FormLabel component="legend" id={id}>
-        {label}
-      </FormLabel>
-      <RadioGroup
-        row
-        aria-label="position"
-        aria-labelledby={id}
-        name={name}
-        value={value}
-        onChange={onChange}>
-        <FormControlLabel
-          value={PosTypes.LEFT}
-          control={<Radio />}
-          label={PosTypes.LEFT}
-        />
-        <FormControlLabel
-          value={PosTypes.TOP}
-          control={<Radio />}
-          label={PosTypes.TOP}
-        />
-        <FormControlLabel
-          value={PosTypes.BOTTOM}
-          control={<Radio />}
-          label={PosTypes.BOTTOM}
-        />
-        <FormControlLabel
-          value={PosTypes.RIGHT}
-          control={<Radio />}
-          label={PosTypes.RIGHT}
-        />
-      </RadioGroup>
+      <Stack
+        direction="row"
+        alignItems="center"
+        gap={SPACING_GAP}
+        flexWrap="wrap">
+        <FormLabel component="legend" id={id}>
+          {label}:
+        </FormLabel>
+        <RadioGroup
+          row
+          aria-label="position"
+          aria-labelledby={id}
+          name={name}
+          value={value}
+          onChange={onChange}>
+          <FormControlLabel
+            value={PosTypes.LEFT}
+            control={<Radio />}
+            label={PosTypes.LEFT}
+          />
+          <FormControlLabel
+            value={PosTypes.TOP}
+            control={<Radio />}
+            label={PosTypes.TOP}
+          />
+          <FormControlLabel
+            value={PosTypes.BOTTOM}
+            control={<Radio />}
+            label={PosTypes.BOTTOM}
+          />
+          <FormControlLabel
+            value={PosTypes.RIGHT}
+            control={<Radio />}
+            label={PosTypes.RIGHT}
+          />
+        </RadioGroup>
+      </Stack>
     </FormControl>
   );
 };

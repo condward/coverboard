@@ -2,10 +2,10 @@ import { Group, Line } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
 import { useState, ReactNode, FC } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
 import { CoverSchema, GroupSchema } from 'types';
 import { useMainStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 interface CommonDraggableProps {
   children: ReactNode;
@@ -37,7 +37,7 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
   const groups = useMainStore((state) => state.groups);
   const color = useMainStore((state) => state.getColor());
 
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const { dragLimits } = useGetSizesContext();
   const [hintLines, setHintLines] = useState<
     [
       CoverSchema | GroupSchema | undefined,

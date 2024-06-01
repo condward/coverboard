@@ -117,7 +117,7 @@ export const getGames = async (
   movieTitles: CoverLabelValues,
   apiKey?: string,
 ): Promise<SearchResults> => {
-  const posters = await Promise.allSettled(
+  const games = await Promise.allSettled(
     movieTitles.map((game) => {
       return axios.get(`${BASE_URL}/api/get-game`, {
         params: {
@@ -129,19 +129,19 @@ export const getGames = async (
     }),
   );
 
-  return posters
-    .filter(isFulfilled)
-    .map(({ value }) => rawgApiSchema.parse(value))
-    .flatMap(({ data }) => {
+  return games.flatMap((result, index) => {
+    if (isFulfilled(result)) {
+      const { data } = rawgApiSchema.parse(result.value);
       if (data.length > 0 && data[0].background_image) {
         const link = data[0].background_image;
         return {
           link,
           title: data[0].name,
           subtitle: data[0].released?.slice(0, 4) ?? '',
+          index,
         };
       }
-
-      return [];
-    });
+    }
+    return [];
+  });
 };

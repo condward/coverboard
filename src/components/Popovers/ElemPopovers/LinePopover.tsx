@@ -4,16 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useSetAtom } from 'jotai';
 
-import { LineSchema, LineSchemaOutput, lineSchema } from 'types';
-import { CommonDialog, DirectionRadio, SPACING_GAP } from 'components';
-import { selectedAtom, useMainStore } from 'store';
+import { LineSchema, LineSchemaOutput, lineSchema, SPACING_GAP } from 'types';
+import { CommonDialog, DirectionRadio, FieldSet } from 'components';
+import { selectedAtom, useMainStore, useToastStore } from 'store';
 
 export const LinePopover: FC<{
   line: LineSchema;
 }> = ({ line }) => {
-  const updateLineDir = useMainStore((state) => state.updateLineDir);
-  const updateLineText = useMainStore((state) => state.updateLineText);
+  const updateLine = useMainStore((state) => state.updateLine);
   const setSelected = useSetAtom(selectedAtom);
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
   const {
     control,
@@ -24,11 +24,24 @@ export const LinePopover: FC<{
     defaultValues: line,
   });
 
-  const onSubmit = handleSubmit((values) => {
-    updateLineText(line.id, values.text);
-    updateLineDir(line.id, values.dir);
-    setSelected(null);
-  });
+  const onSubmit = handleSubmit(
+    (values) => {
+      updateLine(line.id, {
+        text: values.text,
+        dir: values.dir,
+        origin: { dir: values.origin.dir },
+        target: { dir: values.target.dir },
+      });
+      setSelected(null);
+    },
+    (error) => {
+      const errorMessage = Object.values(error).map((err) => err.message)[0];
+
+      if (errorMessage) {
+        showErrorMessage(errorMessage);
+      }
+    },
+  );
 
   const removeLine = useMainStore((state) => state.removeLine);
   const handleDelete = () => {
@@ -36,40 +49,77 @@ export const LinePopover: FC<{
     setSelected(null);
   };
 
+  const handleSwapDirection = () => {
+    updateLine(line.id, {
+      origin: { id: line.target.id, dir: line.target.dir },
+      target: { id: line.origin.id, dir: line.origin.dir },
+    });
+    setSelected(null);
+  };
+
   return (
     <CommonDialog
-      open
       onClose={() => setSelected({ id: line.id, open: false })}
       title="Edit labels"
       onSubmit={onSubmit}
       content={
         <Stack direction="column" gap={SPACING_GAP}>
-          <Controller
-            name="text"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                autoFocus
-                label="line label"
-                fullWidth
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          <Controller
-            name="dir"
-            control={control}
-            render={({ field }) => (
-              <DirectionRadio
-                label="Position"
-                id="line-position"
-                name="lineRadio"
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
+          <FieldSet direction="column" label="Label">
+            <Controller
+              name="text"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  autoFocus
+                  label="text"
+                  fullWidth
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <Controller
+              name="dir"
+              control={control}
+              render={({ field }) => (
+                <DirectionRadio
+                  label="Position"
+                  id="line-position"
+                  name="lineRadio"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </FieldSet>
+          <FieldSet direction="column" label="Arrow Position">
+            <Controller
+              name="origin.dir"
+              control={control}
+              render={({ field }) => (
+                <DirectionRadio
+                  label="Start Position"
+                  id="start-position"
+                  name="startLineRadio"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <Controller
+              name="target.dir"
+              control={control}
+              render={({ field }) => (
+                <DirectionRadio
+                  label="End Position"
+                  id="end-position"
+                  name="endLineRadio"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </FieldSet>
         </Stack>
       }
       actions={
@@ -80,6 +130,13 @@ export const LinePopover: FC<{
             type="button"
             onClick={handleDelete}>
             Delete
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            type="button"
+            onClick={handleSwapDirection}>
+            Swap Direction
           </Button>
           <Button
             disabled={!isDirty}

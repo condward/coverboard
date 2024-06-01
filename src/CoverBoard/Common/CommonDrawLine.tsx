@@ -6,6 +6,7 @@ import { ZodError } from 'zod';
 
 import { CoverSchema, PosTypes } from 'types';
 import { useMainStore, pointsAtom, useIsSelected, useToastStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 interface CommonDrawLineProps {
   id: CoverSchema['id'];
@@ -68,13 +69,10 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
   const createLine = useMainStore((state) => state.createLine);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
-  const coverSizeWidth =
-    useMainStore((state) => state.getCoverSizeWidth()) * scaleX;
-  const coverSizeHeight =
-    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const selection: PosTypes | null = points?.id === id ? points.dir : null;
 
-  const square = 25 + coverSizeWidth / 20;
+  const square = 25 + (coverSizeWidth * scaleX) / 20;
 
   const handleDrawLine = useCallback(
     (id: string, dir: PosTypes) => {
@@ -107,29 +105,29 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
   const posArray = [
     {
       dir: PosTypes.TOP,
-      x: coverSizeWidth / 2,
+      x: (coverSizeWidth * scaleX) / 2,
       y: -square / 1.5,
       width: square,
       height: square,
     },
     {
       dir: PosTypes.RIGHT,
-      x: coverSizeWidth,
-      y: coverSizeHeight / 2 - square / 1.5,
+      x: coverSizeWidth * scaleX,
+      y: (coverSizeHeight * scaleY) / 2 - square / 1.5,
       width: square,
       height: square,
     },
     {
       dir: PosTypes.LEFT,
       x: 0,
-      y: coverSizeHeight / 2 - square / 1.5,
+      y: (coverSizeHeight * scaleY) / 2 - square / 1.5,
       width: square,
       height: square,
     },
     {
       dir: PosTypes.BOTTOM,
-      x: coverSizeWidth / 2,
-      y: coverSizeHeight - square / 1.5,
+      x: (coverSizeWidth * scaleX) / 2,
+      y: coverSizeHeight * scaleY - square / 1.5,
       width: square,
       height: square,
     },

@@ -1,5 +1,4 @@
 import { FC, memo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { Group } from 'react-konva';
 import { useSetAtom } from 'jotai';
 
@@ -11,6 +10,8 @@ import {
   CommonLabelDraggable,
   CommonLabel,
 } from 'CoverBoard/Common';
+import { useGetSizesContext } from 'providers';
+import { useIsLandscape } from 'utils';
 
 import { GroupSquare } from './GroupSquare';
 
@@ -37,11 +38,10 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
   scaleX,
   scaleY,
 }) => {
+  const isLandscape = useIsLandscape();
   const color = useMainStore((state) => state.getGroupColor());
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
-  const fontSize = useMainStore((state) => state.getFontSize());
-  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
-  const windowSize = useMainStore((state) => state.windowSize);
+  const { fontSize, dragLimits, coverSizeWidth, coverSizeHeight } =
+    useGetSizesContext();
   const setSelected = useSetAtom(selectedAtom);
   const updateGroup = useMainStore((state) => state.updateGroup);
   const updateGroupPosition = useMainStore(
@@ -50,8 +50,6 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
   const removeGroupAndRelatedLines = useMainStore(
     (state) => state.removeGroupAndRelatedLines,
   );
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
 
   const offSetSubTitle =
     subtitleText && dir === subDir && dir !== PosTypes.BOTTOM ? -fontSize : 0;
@@ -91,8 +89,12 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
           y: dragLimits.y,
         }}
         max={{
-          x: windowSize.width - 3.5 * toobarIconSize,
-          y: windowSize.height - 3.5 * toobarIconSize,
+          x: isLandscape
+            ? dragLimits.width - coverSizeWidth * scaleX + coverSizeWidth
+            : dragLimits.width - coverSizeWidth * scaleX,
+          y: isLandscape
+            ? dragLimits.height - coverSizeHeight * scaleY
+            : dragLimits.height + dragLimits.y - coverSizeHeight * scaleY,
         }}>
         <CommonDrawLine id={id} scaleX={scaleX} scaleY={scaleY} />
         <>

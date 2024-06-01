@@ -9,6 +9,7 @@ import {
   useMainStore,
 } from 'store';
 import { CommonTextLabel } from 'CoverBoard/Common';
+import { useGetSizesContext } from 'providers';
 
 import { LineCircle, LineLabelDraggable } from '.';
 
@@ -20,11 +21,9 @@ interface LineProps {
 }
 
 export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const fontSize = useMainStore((state) => state.getFontSize());
+  const { fontSize, coverSizeWidth } = useGetSizesContext();
   const color = useMainStore((state) => state.getArrowColor());
-  const updateLineDir = useMainStore((state) => state.updateLineDir);
-  const updateLineText = useMainStore((state) => state.updateLineText);
+  const updateLine = useMainStore((state) => state.updateLine);
 
   const selected = useIsSelected(id);
   const setEditingText = useSetAtom(editingTextAtom);
@@ -51,7 +50,7 @@ export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
       <LineLabelDraggable
         dir={dir}
         lineParams={lineParams}
-        setUpdate={(dir) => updateLineDir(id, dir)}>
+        setUpdate={(dir) => updateLine(id, { dir })}>
         <CommonTextLabel
           label={getLabel()}
           color={color}
@@ -59,7 +58,7 @@ export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
           editable={true}
           setOpen={handleSetOpen}
           onReset={() => void 0}
-          setLabel={(text) => updateLineText(id, text)}
+          setLabel={(text) => updateLine(id, { text })}
           x={-coverSizeWidth}
           y={fontSize * 1.5}
           width={coverSizeWidth * 2}

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { MediaMap } from 'types';
+import { mediaMap } from 'types';
 import { useGetApiKey, useMainStore } from 'store';
 
 import { ToolbarApiKeyPopover } from './ToolbarApiKeyPopover';
@@ -10,7 +10,7 @@ export const ToolbarSearch: FC<{
   onClose: () => void;
 }> = ({ onClose }) => {
   const media = useMainStore((state) => state.configs.media);
-  const apiName = MediaMap[media].apiName;
+  const apiName = mediaMap[media].apiName;
   const apiKey = useGetApiKey(apiName);
 
   if (apiName === null || apiKey) {

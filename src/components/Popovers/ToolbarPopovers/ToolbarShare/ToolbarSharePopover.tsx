@@ -9,8 +9,15 @@ import {
 import { ZodError } from 'zod';
 import { useNavigate } from 'react-router-dom';
 
-import { AppSchema, ToolConfigIDs, appSchema } from 'types';
-import { CommonDialog, POPOVER_BACK_COLOR, SPACING_GAP } from 'components';
+import {
+  AppSchema,
+  ToolConfigIDs,
+  appSchema,
+  POPOVER_BACK_COLOR,
+  SPACING_GAP,
+} from 'types';
+import { CommonDialog, FieldSet } from 'components';
+import { DEFAULT_KEY, addPrefix, haxPrefix, useSaveId } from 'utils';
 
 import { useMainStore, useToastStore } from 'store';
 
@@ -27,8 +34,15 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
   const defaultJsonData = useMainStore((state) =>
     JSON.stringify(state.getStoreValues(), null, 4),
   );
+  const saveId = useSaveId();
   const [jsonData, setJsonData] = useState(defaultJsonData);
   const [newSave, setNewSave] = useState('');
+  const pages = [
+    DEFAULT_KEY,
+    ...Object.keys(window.localStorage).filter(
+      (key) => key !== addPrefix(DEFAULT_KEY) && haxPrefix(key),
+    ),
+  ];
 
   const handleImport = (evt: FormEvent) => {
     evt.preventDefault();
@@ -61,34 +75,40 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
     <CommonDialog
       onClose={onClose}
       onSubmit={(evt) => handleImport(evt)}
-      open
       title="Share and save"
       hash={ToolConfigIDs.SHARE}
       content={
         <Stack direction="column" gap={SPACING_GAP}>
-          <ToolbarSharePages onClose={onClose} setJsonData={setJsonData} />
           <TextField
             fullWidth
-            label="Add new page"
+            disabled={pages.length > 15}
+            label={pages.length > 15 ? 'Only 15 pages allowed' : 'Add new page'}
             onChange={(evt) => setNewSave(evt.target.value.trim())}
             value={newSave}
             autoFocus
           />
-          <FormControl style={{ width: '100%' }}>
-            <FormLabel htmlFor="jsonInput">{'JSON for: {saveId}'}</FormLabel>
-            <TextareaAutosize
-              id="jsonInput"
-              minRows={2}
-              maxRows={20}
-              value={jsonData}
-              style={{
-                resize: 'none',
-                width: '95%',
-                backgroundColor: POPOVER_BACK_COLOR,
-              }}
-              onChange={(event) => setJsonData(event.target.value)}
+          <FieldSet direction="row" label="Pick a page">
+            <ToolbarSharePages
+              onClose={onClose}
+              setJsonData={setJsonData}
+              pages={pages}
             />
-          </FormControl>
+            <FormControl style={{ width: '100%' }}>
+              <FormLabel htmlFor="jsonInput">{`JSON for: ${saveId}`}</FormLabel>
+              <TextareaAutosize
+                id="jsonInput"
+                minRows={2}
+                maxRows={20}
+                value={jsonData}
+                style={{
+                  resize: 'none',
+                  width: '95%',
+                  backgroundColor: POPOVER_BACK_COLOR,
+                }}
+                onChange={(event) => setJsonData(event.target.value)}
+              />
+            </FormControl>
+          </FieldSet>
         </Stack>
       }
       actions={

@@ -5,14 +5,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Controller, useForm } from 'react-hook-form';
 
-import { CoverSchemaOutput, CoverSchema, Media, coverSchema } from 'types';
+import {
+  CoverSchemaOutput,
+  CoverSchema,
+  Media,
+  coverSchema,
+  SPACING_GAP,
+} from 'types';
+
 import {
   CommonDialog,
   DirectionRadio,
-  SPACING_GAP,
+  FieldSet,
   SliderField,
 } from 'components';
-import { selectedAtom, useMainStore } from 'store';
+import { selectedAtom, useMainStore, useToastStore } from 'store';
 
 const getButtons = (media: Media, currentCover: CoverSchema) => {
   if (media === Media.MUSIC) {
@@ -80,10 +87,6 @@ const getButtons = (media: Media, currentCover: CoverSchema) => {
       name: 'Steam',
       href: `https://store.steampowered.com/search/?term=${currentCover.title.search}`,
     },
-    {
-      name: 'Nintendo',
-      href: `https://www.nintendo.com/us/search/#q=${currentCover.title.search}`,
-    },
   ];
 };
 
@@ -96,6 +99,7 @@ export const CoverPopover: FC<{
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
   );
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const resetCoverLabels = useMainStore((state) => state.resetCoverLabels);
   const updateCover = useMainStore((state) => state.updateCover);
   const setSelected = useSetAtom(selectedAtom);
@@ -112,24 +116,34 @@ export const CoverPopover: FC<{
     defaultValues: cover,
   });
 
-  const onSubmit = handleSubmit((values) => {
-    updateCover(cover.id, {
-      title: {
-        text: values.title.text.trim(),
-        dir: values.title.dir,
-      },
-      subtitle: {
-        text: values.subtitle.text.trim(),
-        dir: values.subtitle.dir,
-      },
-      star: {
-        count: values.star.count,
-        dir: values.star.dir,
-      },
-      link: values.link,
-    });
-    setSelected(null);
-  });
+  const onSubmit = handleSubmit(
+    (values) => {
+      updateCover(cover.id, {
+        title: {
+          text: values.title.text.trim(),
+          dir: values.title.dir,
+        },
+        subtitle: {
+          text: values.subtitle.text.trim(),
+          dir: values.subtitle.dir,
+        },
+        star: {
+          count: values.star.count,
+          dir: values.star.dir,
+        },
+        x: values.x,
+        y: values.y,
+      });
+      setSelected(null);
+    },
+    (error) => {
+      const errorMessage = Object.values(error).map((err) => err.message)[0];
+
+      if (errorMessage) {
+        showErrorMessage(errorMessage);
+      }
+    },
+  );
 
   const handleReset = () => {
     resetCoverLabels(cover.id);
@@ -144,105 +158,145 @@ export const CoverPopover: FC<{
 
   return (
     <CommonDialog
-      open
       onClose={() => setSelected({ id: cover.id, open: false })}
       title="Edit labels"
       content={
         <Stack direction="column" gap={SPACING_GAP}>
-          <Controller
-            name="title.text"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label={titleLabel}
-                autoFocus
-                fullWidth
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          <Controller
-            name="title.dir"
-            control={control}
-            render={({ field }) => (
-              <DirectionRadio
-                label="Position"
-                id="cover-title"
-                name="titleRadio"
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          <Controller
-            name="subtitle.text"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label={subTitleLabel}
-                autoFocus
-                fullWidth
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          <Controller
-            name="subtitle.dir"
-            control={control}
-            render={({ field }) => (
-              <DirectionRadio
-                label="Position"
-                id="cover-subtitle"
-                name="subtitleRadio"
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          <Controller
-            name="star.count"
-            control={control}
-            render={({ field }) => (
-              <SliderField
-                label="Rating"
-                id="star-rating"
-                name="starSlider"
-                value={field.value}
-                onChange={field.onChange}
-                min={0}
-                max={5}
-                step={0.5}
-              />
-            )}
-          />
-          <Controller
-            name="star.dir"
-            control={control}
-            render={({ field }) => (
-              <DirectionRadio
-                label="Position"
-                id="star-rating"
-                name="starRadio"
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          <Controller
-            name="link"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="Image link"
-                autoFocus
-                fullWidth
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
+          <FieldSet
+            label={
+              cover.title.search
+                ? `${titleLabel} (searched: ${cover.title.search})`
+                : titleLabel
+            }
+            direction="row">
+            <Controller
+              name="title.text"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label={`text`}
+                  autoFocus
+                  fullWidth
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <Controller
+              name="title.dir"
+              control={control}
+              render={({ field }) => (
+                <DirectionRadio
+                  label="Position"
+                  id="cover-title"
+                  name="titleRadio"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </FieldSet>
+          <FieldSet
+            label={
+              cover.subtitle.search
+                ? `${subTitleLabel} (searched: ${cover.subtitle.search})`
+                : subTitleLabel
+            }
+            direction="row">
+            <Controller
+              name="subtitle.text"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="text"
+                  autoFocus
+                  fullWidth
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <Controller
+              name="subtitle.dir"
+              control={control}
+              render={({ field }) => (
+                <DirectionRadio
+                  label="Position"
+                  id="cover-subtitle"
+                  name="subtitleRadio"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </FieldSet>
+          <FieldSet label="Rating" direction="column">
+            <Controller
+              name="star.count"
+              control={control}
+              render={({ field }) => (
+                <SliderField
+                  label="Rating"
+                  id="star-rating"
+                  name="starSlider"
+                  value={field.value}
+                  onChange={field.onChange}
+                  min={0}
+                  max={5}
+                  step={0.5}
+                />
+              )}
+            />
+            <Controller
+              name="star.dir"
+              control={control}
+              render={({ field }) => (
+                <DirectionRadio
+                  label="Position"
+                  id="star-rating"
+                  name="starRadio"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </FieldSet>
+          <FieldSet
+            direction="row"
+            label="Position"
+            gap={SPACING_GAP / 2}
+            flexWrap="nowrap">
+            <Controller
+              name="x"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="X"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <Controller
+              name="y"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Y"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </FieldSet>
+        </Stack>
+      }
+      actions={
+        <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
           <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
             {buttons.map((button) => (
               <Button
@@ -256,10 +310,6 @@ export const CoverPopover: FC<{
               </Button>
             ))}
           </Stack>
-        </Stack>
-      }
-      actions={
-        <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
           <Button
             variant="outlined"
             color="error"

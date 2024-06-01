@@ -6,6 +6,7 @@ import {
   configAtom,
   editTitleAtom,
   editingTextAtom,
+  hideToolbarAtom,
   pointsAtom,
   searchAtom,
   selectedAtom,
@@ -32,6 +33,8 @@ export const useKeysListener = ({
   const isGroup = useMainStore((state) => state.isGroup);
   const isLine = useMainStore((state) => state.isLine);
 
+  const fitToScreen = useMainStore((state) => state.configs.fitToScreen);
+  const updateConfigs = useMainStore((state) => state.updateConfigs);
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
   );
@@ -45,6 +48,7 @@ export const useKeysListener = ({
   const setOpenConfig = useSetAtom(configAtom);
   const setOpenSearch = useSetAtom(searchAtom);
   const setOpenShare = useSetAtom(shareAtom);
+  const setHideToolBar = useSetAtom(hideToolbarAtom);
 
   const points = useAtomValue(pointsAtom);
 
@@ -98,6 +102,12 @@ export const useKeysListener = ({
           e.preventDefault();
         } else if (e.key === 'e') {
           setEditTitle(true);
+          e.preventDefault();
+        } else if (e.key === 'h') {
+          setHideToolBar((prev) => !prev);
+          e.preventDefault();
+        } else if (e.key === 'f') {
+          updateConfigs({ fitToScreen: !fitToScreen });
           e.preventDefault();
         }
       }
@@ -226,11 +236,14 @@ export const useKeysListener = ({
     removeLine,
     selected,
     setEditTitle,
+    setHideToolBar,
     setOpenConfig,
     setOpenSearch,
     setOpenShare,
     setSelected,
     takeScreenshot,
     undoAction,
+    fitToScreen,
+    updateConfigs,
   ]);
 };

@@ -2,18 +2,19 @@ import { FC } from 'react';
 import { Provider } from 'jotai';
 
 import App from 'App';
-import { ReactQueryProvider } from 'providers/ReactQueryProvider';
 import { store } from 'store';
-import { MuiThemeProvider } from 'providers/ThemeProvider';
+import { MuiThemeProvider, SizesProvider, ReactQueryProvider } from 'providers';
 
 export const AppWrapper: FC = () => {
   return (
     <Provider store={store}>
-      <MuiThemeProvider>
-        <ReactQueryProvider>
-          <App />
-        </ReactQueryProvider>
-      </MuiThemeProvider>
+      <SizesProvider>
+        <MuiThemeProvider>
+          <ReactQueryProvider>
+            <App />
+          </ReactQueryProvider>
+        </MuiThemeProvider>
+      </SizesProvider>
     </Provider>
   );
 };

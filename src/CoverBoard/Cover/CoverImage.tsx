@@ -5,6 +5,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 
 import { CoverSchema } from 'types';
 import { useMainStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 interface CoverImageProps {
   link: CoverSchema['link'];
@@ -14,10 +15,29 @@ interface CoverImageProps {
 export const CoverImage: FC<CoverImageProps> = ({ link, onRetry }) => {
   const color = useMainStore((state) => state.getColor());
 
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
-  const fontSize = useMainStore((state) => state.getFontSize());
+  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
+  if (link === '') {
+    return (
+      <Text
+        fontSize={fontSize * 1.2}
+        x={0}
+        y={coverSizeHeight / 2 - (fontSize * 1.2) / 2}
+        width={coverSizeWidth}
+        align="center"
+        fill={color}
+        text=""
+      />
+    );
+  }
+
+  return <CoverImageChild link={link} onRetry={onRetry} />;
+};
+
+const CoverImageChild: FC<CoverImageProps> = ({ link, onRetry }) => {
+  const color = useMainStore((state) => state.getColor());
+
+  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const [image, status] = useImage(link, 'anonymous');
 
   return (

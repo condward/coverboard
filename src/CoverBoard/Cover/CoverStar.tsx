@@ -5,6 +5,7 @@ import { useAtomValue } from 'jotai';
 
 import { pointsAtom, useIsSelected, useMainStore } from 'store';
 import { CoverSchema } from 'types';
+import { useGetSizesContext } from 'providers';
 
 interface CoverStarProps {
   id: CoverSchema['id'];
@@ -26,9 +27,7 @@ export const CoverStarChild: FC<CoverStarProps> = ({
   offset = 0,
   starCount,
 }) => {
-  const starRadius = useMainStore((state) => state.getStarRadius());
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
+  const { starRadius, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const color = useMainStore((state) => state.getCoverColor());
   const backColor = useMainStore((state) => state.getBackColor());
   const updateCover = useMainStore((state) => state.updateCover);

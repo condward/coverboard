@@ -15,12 +15,9 @@ import { useEffect, ReactNode, FormEvent, FC } from 'react';
 
 import { selectedAtom } from 'store';
 import { clearHash, setHash } from 'utils';
-import { backColorMap, BackColors } from 'types';
-
-import { SPACING_GAP } from './constants';
+import { backColorMap, BackColors, SPACING_GAP } from 'types';
 
 interface CommonDialogProps {
-  open: boolean;
   onClose: () => void;
   onSubmit: (e: FormEvent) => void;
   content: ReactNode;
@@ -31,7 +28,6 @@ interface CommonDialogProps {
 }
 
 export const CommonDialog: FC<CommonDialogProps> = ({
-  open,
   onClose,
   onSubmit,
   content,
@@ -53,11 +49,15 @@ export const CommonDialog: FC<CommonDialogProps> = ({
     return clearHash;
   }, [hash, setSelected]);
 
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
     <Dialog
       fullScreen={fullScreen}
-      open={open}
-      onClose={onClose}
+      open
+      onClose={handleClose}
       component={isForm ? 'form' : undefined}
       onSubmit={isForm ? onSubmit : undefined}
       PaperProps={{
@@ -67,12 +67,12 @@ export const CommonDialog: FC<CommonDialogProps> = ({
         },
       }}>
       <DialogTitle color={backColorMap[BackColors.DARKER]}>
-        <Stack gap={SPACING_GAP}>
+        <Stack gap={SPACING_GAP} style={{ textTransform: 'uppercase' }}>
           {title}
           <IconButton
             aria-label="close"
             color="inherit"
-            onClick={onClose}
+            onClick={handleClose}
             sx={{
               position: 'absolute',
               right: 8,

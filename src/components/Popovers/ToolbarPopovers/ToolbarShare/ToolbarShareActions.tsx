@@ -4,8 +4,7 @@ import { ZodError } from 'zod';
 
 import { useToastStore } from 'store';
 import { useSaveId } from 'utils';
-import { SPACING_GAP } from 'components';
-import { BackColors, Colors, Media, appSchema } from 'types';
+import { BackColors, Colors, Media, appSchema, SPACING_GAP } from 'types';
 
 const isValidJSONFn = (jsonData: string) => {
   try {

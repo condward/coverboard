@@ -26,7 +26,7 @@ export const createGroupsSlice: StateCreator<
     set(({ groups }) => {
       const groupIdx = groups.findIndex((grp) => grp.id === groupId);
 
-      if (groupIdx) {
+      if (groupIdx > -1) {
         const groupCopy = [...groups];
         const group = groupCopy[groupIdx];
 

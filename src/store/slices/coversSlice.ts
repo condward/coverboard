@@ -29,7 +29,7 @@ export const createCoversSlice: StateCreator<
     set(({ covers }) => {
       const coverIdx = covers.findIndex((cov) => cov.id === coverId);
 
-      if (coverIdx) {
+      if (coverIdx > -1) {
         const coverCopy = [...covers];
         const cover = coverCopy[coverIdx];
 

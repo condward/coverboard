@@ -80,8 +80,6 @@ export const useSearchValues = () => {
             ? 'Result not found'
             : 'Result already exists on the board',
         );
-
-        throw new Error('NOT_FOUND');
       }
     },
     onError(error) {

@@ -6,8 +6,8 @@ import Konva from 'konva';
 import { PosTypes } from 'types';
 import { useMainStore } from 'store';
 import { getAlign, useSaveId } from 'utils';
-
 import { CommonTextLabelPopover } from 'components/Popovers/CommonTextLabelPopover';
+import { useGetSizesContext } from 'providers';
 
 interface TitleTexProps {
   label: string;
@@ -46,7 +46,7 @@ export const CommonTextLabel: FC<TitleTexProps> = ({
   color,
   fontStyle,
 }) => {
-  const fontSize = useMainStore((state) => state.getFontSize());
+  const { fontSize } = useGetSizesContext();
   const backColor = useMainStore((state) => state.getBackColor());
   const textRef: RefObject<Konva.Text> = useRef(null);
   const [textWidth, setTextWidth] = useState(0);

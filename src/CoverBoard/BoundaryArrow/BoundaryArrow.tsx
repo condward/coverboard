@@ -2,11 +2,10 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
 import { FC, memo, useState } from 'react';
 import { Arrow, Group } from 'react-konva';
-import { useShallow } from 'zustand/react/shallow';
 
-import { useMainStore } from 'store';
 import { CoverSchema, GroupSchema } from 'types';
 import { Tooltip } from 'components';
+import { useGetSizesContext } from 'providers';
 
 interface BoundaryArrowProps {
   id: CoverSchema['id'] | GroupSchema['id'];
@@ -33,15 +32,12 @@ const useGetPoints = ({
   scaleX,
   scaleY,
 }: UseGetPoints): [number, number, number, number] => {
-  const fontSize = useMainStore((state) => state.getFontSize());
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
-  const coverSizeWidth =
-    useMainStore((state) => state.getCoverSizeWidth()) * scaleX;
-  const coverSizeHeight =
-    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
+  const { coverSizeWidth, coverSizeHeight, fontSize, dragLimits } =
+    useGetSizesContext();
+
   if (
-    x > dragLimits.width - coverSizeWidth &&
-    y > dragLimits.height - coverSizeHeight
+    x > dragLimits.width - coverSizeWidth * scaleX &&
+    y > dragLimits.height - coverSizeHeight * scaleY
   ) {
     return [
       dragLimits.width - 1.8 * fontSize,
@@ -50,20 +46,20 @@ const useGetPoints = ({
       dragLimits.height - fontSize,
     ];
   } else if (
-    x > dragLimits.width - coverSizeWidth &&
-    y < dragLimits.height - coverSizeHeight
+    x > dragLimits.width - coverSizeWidth * scaleX &&
+    y < dragLimits.height - coverSizeHeight * scaleY
   ) {
     return [
       dragLimits.width - 2 * fontSize,
-      y + coverSizeHeight / 2,
+      y + (coverSizeHeight * scaleY) / 2,
       dragLimits.width - fontSize,
-      y + coverSizeHeight / 2,
+      y + (coverSizeHeight * scaleY) / 2,
     ];
   }
   return [
-    x + coverSizeWidth / 2,
+    x + (coverSizeWidth * scaleX) / 2,
     dragLimits.height - 2 * fontSize,
-    x + coverSizeWidth / 2,
+    x + (coverSizeWidth * scaleX) / 2,
     dragLimits.height - fontSize,
   ];
 };
@@ -78,12 +74,8 @@ const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
   updatePosition,
   color,
 }) => {
-  const coverSizeWidth =
-    useMainStore((state) => state.getCoverSizeWidth()) * scaleX;
-  const coverSizeHeight =
-    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
-  const fontSize = useMainStore((state) => state.getFontSize());
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const { coverSizeWidth, coverSizeHeight, fontSize, dragLimits } =
+    useGetSizesContext();
 
   const [tooltip, setTooltip] = useState(false);
   const points = useGetPoints({ x, y, scaleX, scaleY });
@@ -91,10 +83,10 @@ const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
   const handleBringIntoView = () => {
     const newPos: Vector2d = { x, y };
     if (newPos.x > dragLimits.width) {
-      newPos.x = dragLimits.width - coverSizeWidth;
+      newPos.x = dragLimits.width - coverSizeWidth * scaleX;
     }
     if (newPos.y > dragLimits.height) {
-      newPos.y = dragLimits.height - coverSizeHeight;
+      newPos.y = dragLimits.height - coverSizeHeight * scaleY;
     }
 
     updatePosition(id, newPos);
@@ -127,7 +119,7 @@ const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
       {tooltip && (
         <Tooltip
           text={title}
-          x={points[0] - 2 * coverSizeWidth - fontSize}
+          x={points[0] - 2 * coverSizeWidth * scaleX - fontSize}
           y={points[1] - fontSize}
           align="right"
         />

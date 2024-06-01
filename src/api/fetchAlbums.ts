@@ -78,18 +78,18 @@ export const getLastFMAlbums = async (
     }),
   );
 
-  return albums
-    .filter(isFulfilled)
-    .map(({ value }) => lastFmApiSchema.parse(value))
-    .flatMap(({ data }) => {
+  return albums.flatMap((result, index) => {
+    if (isFulfilled(result)) {
+      const { data } = lastFmApiSchema.parse(result.value);
       if (data.album.image[2]['#text']) {
         return {
           link: data.album.image[2]['#text'],
           title: data.album.name,
           subtitle: data.album.artist,
+          index,
         };
       }
-
-      return [];
-    });
+    }
+    return [];
+  });
 };

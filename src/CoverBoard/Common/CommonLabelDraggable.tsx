@@ -2,11 +2,10 @@ import { Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useState, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useShallow } from 'zustand/react/shallow';
 
 import { CoverSchema, GroupSchema, PosTypes } from 'types';
 import { getClientPosition } from 'utils';
-import { useMainStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 interface CommonLabelDraggableProps {
   children: ReactNode;
@@ -25,11 +24,7 @@ interface UseGetNewPos {
 }
 
 const useGetNewPos = ({ dir, scaleX, scaleY }: UseGetNewPos) => {
-  const fontSize = useMainStore((state) => state.getFontSize());
-  const coverSizeWidth =
-    useMainStore((state) => state.getCoverSizeWidth()) * scaleX;
-  const coverSizeHeight =
-    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
+  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
   if (dir === PosTypes.BOTTOM) {
     return {
@@ -39,17 +34,17 @@ const useGetNewPos = ({ dir, scaleX, scaleY }: UseGetNewPos) => {
   } else if (dir === PosTypes.TOP) {
     return {
       x: 0,
-      y: -coverSizeHeight - 2 * fontSize,
+      y: -coverSizeHeight * scaleY - 2 * fontSize,
     };
   } else if (dir === PosTypes.RIGHT) {
     return {
-      x: 2 * coverSizeWidth + fontSize,
-      y: -coverSizeHeight / 2 - fontSize,
+      x: 2 * coverSizeWidth * scaleX + fontSize,
+      y: (-coverSizeHeight * scaleY) / 2 - fontSize,
     };
   } else {
     return {
-      x: -2 * coverSizeWidth - fontSize,
-      y: -coverSizeHeight / 2 - fontSize,
+      x: -2 * coverSizeWidth * scaleX - fontSize,
+      y: (-coverSizeHeight * scaleY) / 2 - fontSize,
     };
   }
 };
@@ -72,9 +67,7 @@ export const CommonLabelDraggable = ({
   scaleY = 1,
   updateDir,
 }: CommonLabelDraggableProps) => {
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
-  const coverSizeHeight =
-    useMainStore((state) => state.getCoverSizeHeight()) * scaleY;
+  const { dragLimits, coverSizeHeight } = useGetSizesContext();
   const [randId, setId] = useState(uuidv4());
 
   const newPos = useGetNewPos({ dir, scaleX, scaleY });
@@ -90,7 +83,7 @@ export const CommonLabelDraggable = ({
     const { x: xAbs, y: yAbs } = getClientPosition(e);
 
     let newDir: PosTypes;
-    if (yAbs > dragLimits.y + y + coverSizeHeight) {
+    if (yAbs > dragLimits.y + y + coverSizeHeight * scaleY) {
       newDir = PosTypes.BOTTOM;
     } else if (yAbs < y + dragLimits.y) {
       newDir = PosTypes.TOP;

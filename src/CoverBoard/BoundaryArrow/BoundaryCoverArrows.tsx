@@ -1,11 +1,26 @@
 import { FC, memo } from 'react';
 
 import { useMainStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 import { BoundaryArrow } from './BoundaryArrow';
 
 export const BoundaryCoverArrowsWithoutMemo: FC = () => {
-  const offLimitCovers = useMainStore((state) => state.offLimitCovers());
+  const { dragLimits } = useGetSizesContext();
+  const covers = useMainStore((state) => state.covers);
+  const size = useMainStore((state) => state.configs.size);
+
+  const offLimitCovers = covers.flatMap((covers) => {
+    if (
+      (covers.x > dragLimits.width && dragLimits.width > size) ||
+      (covers.y > dragLimits.height && dragLimits.height > size)
+    ) {
+      return covers;
+    }
+
+    return [];
+  });
+
   const updateCoverPosition = useMainStore(
     (state) => state.updateCoverPosition,
   );

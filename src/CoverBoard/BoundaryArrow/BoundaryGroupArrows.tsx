@@ -1,11 +1,25 @@
 import { FC } from 'react';
 
 import { useMainStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 import { BoundaryArrow } from './BoundaryArrow';
 
 export const BoundaryGroupArrows: FC = () => {
-  const offLimitGroups = useMainStore((state) => state.offLimitGroups());
+  const { dragLimits } = useGetSizesContext();
+  const groups = useMainStore((state) => state.groups);
+  const size = useMainStore((state) => state.configs.size);
+
+  const offLimitGroups = groups.flatMap((group) => {
+    if (
+      (group.x > dragLimits.width && dragLimits.width > size) ||
+      (group.y > dragLimits.height && dragLimits.height > size)
+    ) {
+      return group;
+    }
+
+    return [];
+  });
   const updateGroupPosition = useMainStore(
     (state) => state.updateGroupPosition,
   );

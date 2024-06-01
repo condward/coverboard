@@ -2,11 +2,10 @@ import { Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useState, ReactNode, FC } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useShallow } from 'zustand/react/shallow';
 
 import { LineParams, LineSchema, PosTypes } from 'types';
 import { getClientPosition } from 'utils';
-import { useMainStore } from 'store';
+import { useGetSizesContext } from 'providers';
 
 interface DraggableGroupProps {
   children: ReactNode;
@@ -16,8 +15,7 @@ interface DraggableGroupProps {
 }
 
 const useGetNewPos = (dir: DraggableGroupProps['dir']) => {
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const circleRadius = useMainStore((state) => state.getCircleRadius());
+  const { coverSizeWidth, circleRadius } = useGetSizesContext();
 
   if (dir === PosTypes.BOTTOM) {
     return {
@@ -58,8 +56,7 @@ export const LineLabelDraggable: FC<DraggableGroupProps> = ({
   setUpdate,
   children,
 }) => {
-  const fontSize = useMainStore((state) => state.getFontSize());
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const { fontSize, dragLimits } = useGetSizesContext();
   const [id, setId] = useState(uuidv4());
   const newPos = useGetNewPos(dir);
 

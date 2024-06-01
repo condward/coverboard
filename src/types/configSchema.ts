@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { PosTypes } from './generalTypes';
+import { MAX_BOUNDARY } from './constants';
 
 export enum Media {
   MUSIC = 'music',
@@ -53,6 +54,27 @@ export const configSchema = z.object(
       })
       .min(50, 'configs:size must be a number higher than 50')
       .max(150, 'configs:size must be a number lower than 150'),
+    fitToScreen: z.boolean(),
+    width: z.coerce
+      .number({
+        invalid_type_error: 'configs:width must be a number',
+        required_error: 'configs:width is required',
+      })
+      .min(500, 'configs:size must be a number higher than 500')
+      .max(
+        MAX_BOUNDARY,
+        `configs:size must be a number lower than ${MAX_BOUNDARY}`,
+      ),
+    height: z.coerce
+      .number({
+        invalid_type_error: 'configs:height must be a number',
+        required_error: 'configs:height is required',
+      })
+      .min(500, 'configs:size must be a number higher than 500')
+      .max(
+        MAX_BOUNDARY,
+        `configs:size must be a number lower than ${MAX_BOUNDARY}`,
+      ),
     media: z.nativeEnum(Media, {
       errorMap: () => {
         return {

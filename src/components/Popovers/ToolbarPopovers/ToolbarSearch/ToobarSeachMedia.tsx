@@ -8,15 +8,15 @@ import {
   FormControl,
   FormLabel,
 } from '@mui/material';
-import { useShallow } from 'zustand/react/shallow';
 
-import { Media, MediaMap } from 'types';
+import { Media, mediaMap } from 'types';
 import { useMainStore } from 'store';
 
-export const ToolbarSearchMedia: FC = () => {
-  const [media, setMedia] = useMainStore(
-    useShallow((state) => [state.configs.media, state.setMedia]),
-  );
+export const ToolbarSearchMedia: FC<{ onReset?: () => void }> = ({
+  onReset,
+}) => {
+  const media = useMainStore((state) => state.configs.media);
+  const updateConfigs = useMainStore((state) => state.updateConfigs);
   const coversLength = useMainStore((state) => state.covers.length);
 
   return (
@@ -31,7 +31,7 @@ export const ToolbarSearchMedia: FC = () => {
             </>
           }>
           <Button sx={{ textTransform: 'capitalize' }}>
-            {MediaMap[media].emoji} {media} (change ℹ️ )
+            {mediaMap[media].emoji} {media} (change ℹ️ )
           </Button>
         </Tooltip>
       ) : (
@@ -45,7 +45,10 @@ export const ToolbarSearchMedia: FC = () => {
               aria-labelledby="pick-media"
               name="media"
               value={media}
-              onChange={(evt) => setMedia(evt.target.value as Media)}>
+              onChange={(evt) => {
+                updateConfigs({ media: evt.target.value as Media });
+                onReset?.();
+              }}>
               <FormControlLabel
                 disabled={!!coversLength}
                 value={Media.MUSIC}

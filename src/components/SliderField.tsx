@@ -27,6 +27,7 @@ export const SliderField: FC<SliderFieldProps> = ({
     <FormGroup>
       <FormLabel id={id}>{label}</FormLabel>
       <Slider
+        aria-labelledby={id}
         min={min}
         max={max}
         step={step}

@@ -44,23 +44,23 @@ export const getMoviePosters = async (
     }),
   );
 
-  return posters
-    .filter(isFulfilled)
-    .map(({ value }) => imdbApiMovieSchema.parse(value))
-    .flatMap((poster) => {
-      const movies = poster.data;
-
-      if (movies.length > 0 && movies[0].poster_path) {
-        const posterUrl = `https://image.tmdb.org/t/p/original${movies[0].poster_path}`;
+  return posters.flatMap((result, index) => {
+    if (isFulfilled(result)) {
+      const { data } = imdbApiMovieSchema.parse(result.value);
+      if (data.length > 0 && data[0].poster_path) {
+        const posterUrl = `https://image.tmdb.org/t/p/original${data[0].poster_path}`;
         return {
           link: posterUrl,
-          title: movies[0].original_title,
-          subtitle: movies[0].release_date.slice(0, 4),
+          title: data[0].original_title,
+          subtitle: data[0].release_date.slice(0, 4),
+          index,
         };
       }
 
       return [];
-    });
+    }
+    return [];
+  });
 };
 
 const imdbApitvShowSchema = z.object({
@@ -99,21 +99,21 @@ export const getTvShowPosters = async (
     }),
   );
 
-  return posters
-    .filter(isFulfilled)
-    .map(({ value }) => imdbApitvShowSchema.parse(value))
-    .flatMap((poster) => {
-      const movies = poster.data;
-
-      if (movies.length > 0 && movies[0].poster_path) {
-        const posterUrl = `https://image.tmdb.org/t/p/original${movies[0].poster_path}`;
+  return posters.flatMap((result, index) => {
+    if (isFulfilled(result)) {
+      const { data } = imdbApitvShowSchema.parse(result.value);
+      if (data.length > 0 && data[0].poster_path) {
+        const posterUrl = `https://image.tmdb.org/t/p/original${data[0].poster_path}`;
         return {
           link: posterUrl,
-          title: movies[0].name,
-          subtitle: movies[0].first_air_date.slice(0, 4),
+          title: data[0].name,
+          subtitle: data[0].first_air_date.slice(0, 4),
+          index,
         };
       }
 
       return [];
-    });
+    }
+    return [];
+  });
 };

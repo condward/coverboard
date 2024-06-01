@@ -1,19 +1,17 @@
 import { FC, useState } from 'react';
-import { Chip, Stack, Box, FormControl, FormLabel } from '@mui/material';
+import { Chip, Stack, Box } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-import { ToolConfigIDs, AppSchema, Media, MediaMap } from 'types';
+import { ToolConfigIDs, AppSchema, Media, mediaMap, SPACING_GAP } from 'types';
 import {
   addPrefix,
   DEFAULT_KEY,
   DEFAULT_STORAGE,
-  haxPrefix,
   removePrefix,
   useSaveId,
 } from 'utils';
 import { useMainStore, useToastStore } from 'store';
-import { SPACING_GAP } from 'components';
 
 const getMediaFromStorage = (storageString: string) => {
   try {
@@ -36,23 +34,20 @@ const getMediaFromStorage = (storageString: string) => {
 interface ToolbarShareProps {
   onClose: () => void;
   setJsonData: React.Dispatch<React.SetStateAction<string>>;
+  pages: Array<string>;
 }
 
 export const ToolbarSharePages: FC<ToolbarShareProps> = ({
   onClose,
   setJsonData,
+  pages,
 }) => {
   const navigate = useNavigate();
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const saveId = useSaveId();
   const resetStoreValues = useMainStore((state) => state.resetStoreValues);
 
-  const [keyList, setKeyList] = useState([
-    DEFAULT_KEY,
-    ...Object.keys(window.localStorage).filter(
-      (key) => key !== addPrefix(DEFAULT_KEY) && haxPrefix(key),
-    ),
-  ]);
+  const [keyList, setKeyList] = useState(pages);
   const hasDefault = !!window.localStorage.getItem(addPrefix(DEFAULT_KEY));
 
   const handleDeleteElements = () => {
@@ -62,91 +57,83 @@ export const ToolbarSharePages: FC<ToolbarShareProps> = ({
 
   return (
     <>
-      <FormControl component="fieldset">
-        <FormLabel component="legend" id="chip-group-label">
-          Pick a page:
-        </FormLabel>
-        <Stack
-          direction="row"
-          flexWrap="wrap"
-          gap={SPACING_GAP / 2}
-          role="radiogroup"
-          aria-labelledby="chip-group-label">
-          {keyList.map((currentSaveWithPrefix) => {
-            const currentSave = removePrefix(currentSaveWithPrefix);
-            const showDelete =
-              currentSave !== DEFAULT_KEY ||
-              (currentSave === saveId && hasDefault);
+      <Stack
+        direction="row"
+        flexWrap="wrap"
+        gap={SPACING_GAP / 2}
+        role="radiogroup"
+        aria-labelledby="chip-group-label">
+        {keyList.map((currentSaveWithPrefix) => {
+          const currentSave = removePrefix(currentSaveWithPrefix);
+          const showDelete =
+            currentSave !== DEFAULT_KEY ||
+            (currentSave === saveId && hasDefault);
 
-            const currentMedia = getMediaFromStorage(currentSaveWithPrefix);
+          const currentMedia = getMediaFromStorage(currentSaveWithPrefix);
 
-            return (
-              <Chip
-                role="radio"
-                aria-checked={saveId === currentSave}
-                key={currentSave}
-                label={`${MediaMap[currentMedia].emoji} ${currentSave}`}
-                color={saveId === currentSave ? 'primary' : 'default'}
-                onClick={() => {
-                  navigate(`/${currentSave}#${ToolConfigIDs.SHARE}`);
-                  const data = window.localStorage.getItem(
-                    addPrefix(currentSave),
-                  );
-                  if (data) {
-                    setJsonData(
-                      JSON.stringify(JSON.parse(data).state, null, 4),
-                    );
-                  }
-                }}
-                onDelete={
-                  showDelete
-                    ? (evt) => {
-                        evt.preventDefault();
+          return (
+            <Chip
+              role="radio"
+              aria-checked={saveId === currentSave}
+              key={currentSave}
+              label={`${mediaMap[currentMedia].emoji} ${currentSave}`}
+              color={saveId === currentSave ? 'primary' : 'default'}
+              onClick={() => {
+                navigate(`/${currentSave}#${ToolConfigIDs.SHARE}`);
+                const data = window.localStorage.getItem(
+                  addPrefix(currentSave),
+                );
+                if (data) {
+                  setJsonData(JSON.stringify(JSON.parse(data).state, null, 4));
+                }
+              }}
+              onDelete={
+                showDelete
+                  ? (evt) => {
+                      evt.preventDefault();
 
-                        if (saveId === DEFAULT_KEY && currentSave === saveId) {
-                          handleDeleteElements();
-                          onClose();
-                          return;
-                        }
+                      if (saveId === DEFAULT_KEY && currentSave === saveId) {
+                        handleDeleteElements();
+                        onClose();
+                        return;
+                      }
 
-                        window.localStorage.removeItem(addPrefix(currentSave));
-                        setKeyList((keys) =>
-                          keys.filter(
-                            (currentKey) =>
-                              currentKey !== addPrefix(currentSave),
-                          ),
-                        );
+                      window.localStorage.removeItem(addPrefix(currentSave));
+                      setKeyList((keys) =>
+                        keys.filter(
+                          (currentKey) => currentKey !== addPrefix(currentSave),
+                        ),
+                      );
 
-                        if (saveId === currentSave) {
-                          navigate(`/${DEFAULT_KEY}#${ToolConfigIDs.SHARE}`);
+                      if (saveId === currentSave) {
+                        navigate(`/${DEFAULT_KEY}#${ToolConfigIDs.SHARE}`);
 
-                          const defaultData =
-                            window.localStorage.getItem(DEFAULT_STORAGE);
-                          if (defaultData) {
-                            setJsonData(
-                              JSON.stringify(
-                                JSON.parse(defaultData).state,
-                                null,
-                                4,
-                              ),
-                            );
-                          }
+                        const defaultData =
+                          window.localStorage.getItem(DEFAULT_STORAGE);
+                        if (defaultData) {
+                          setJsonData(
+                            JSON.stringify(
+                              JSON.parse(defaultData).state,
+                              null,
+                              4,
+                            ),
+                          );
                         }
                       }
-                    : undefined
-                }
-                deleteIcon={
-                  showDelete ? (
-                    <Box sx={{ display: 'flex' }} title="delete page">
-                      <CloseIcon />
-                    </Box>
-                  ) : undefined
-                }
-              />
-            );
-          })}
-        </Stack>
-      </FormControl>
+                    }
+                  : undefined
+              }
+              deleteIcon={
+                showDelete ? (
+                  <Box sx={{ display: 'flex' }} title="delete page">
+                    <CloseIcon />
+                  </Box>
+                ) : undefined
+              }
+            />
+          );
+        })}
+      </Stack>
     </>
   );
 };

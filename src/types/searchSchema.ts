@@ -87,7 +87,7 @@ type MediaMapRecord = Record<
   }
 >;
 
-export const MediaMap: MediaMapRecord = {
+export const mediaMap: MediaMapRecord = {
   [Media.MUSIC]: {
     emoji: '🎵',
     title: {
@@ -169,5 +169,6 @@ export interface SearchResult {
   link: string;
   title: string;
   subtitle: string;
+  index: number;
 }
 export type SearchResults = Array<SearchResult>;

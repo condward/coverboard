@@ -1,8 +1,8 @@
 import { FC, useState } from 'react';
 import { Button, CircularProgress, Stack, TextField } from '@mui/material';
 
-import { ApiKeys, ToolConfigIDs } from 'types';
-import { CommonDialog, SPACING_GAP } from 'components';
+import { ApiKeys, ToolConfigIDs, SPACING_GAP } from 'types';
+import { CommonDialog } from 'components';
 import { useToastStore, useUpdateApiKey } from 'store';
 
 import { ToolbarSearchMedia } from './ToobarSeachMedia';
@@ -25,7 +25,6 @@ export const ToolbarApiKeyPopover: FC<ToolbarApiKeyPopoverProps> = ({
 
   return (
     <CommonDialog
-      open
       title="Search and add"
       onClose={onClose}
       hash={ToolConfigIDs.SEARCH}
@@ -41,7 +40,7 @@ export const ToolbarApiKeyPopover: FC<ToolbarApiKeyPopoverProps> = ({
       }}
       content={
         <Stack direction="column" gap={SPACING_GAP}>
-          <ToolbarSearchMedia />
+          <ToolbarSearchMedia onReset={() => setKey('')} />
           <TextField
             fullWidth
             autoFocus

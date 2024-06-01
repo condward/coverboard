@@ -5,6 +5,7 @@ import { useAtomValue } from 'jotai';
 
 import { GroupSchema } from 'types';
 import { useMainStore, selectedAtom } from 'store';
+import { useGetSizesContext } from 'providers';
 
 interface CoverImageProps {
   id: GroupSchema['id'];
@@ -21,8 +22,7 @@ export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
 
   const updateGroupScale = useMainStore((state) => state.updateGroupScale);
 
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const coverSizeWidthScaled = coverSizeWidth * scaleX;
   const coverSizeHeightScaled = coverSizeHeight * scaleY;
 

@@ -90,10 +90,11 @@ export const getBookCovers = async (
     }),
   );
 
-  return posters
-    .filter(isFulfilled)
-    .map(({ value }) => googleBooksApi.parse(value))
-    .flatMap(({ data: { items } }) => {
+  return posters.flatMap((result, index) => {
+    if (isFulfilled(result)) {
+      const {
+        data: { items },
+      } = googleBooksApi.parse(result.value);
       if (items.length > 0 && items[0].volumeInfo.imageLinks) {
         const isbm = items[0].volumeInfo.industryIdentifiers?.find(
           (identifier: { type: string }) => identifier.type === 'ISBN_13',
@@ -104,10 +105,11 @@ export const getBookCovers = async (
             link: `https://covers.openlibrary.org/b/isbn/${isbm}-M.jpg`,
             title: items[0].volumeInfo.title,
             subtitle: items[0].volumeInfo.authors?.join(', ') ?? '',
+            index,
           };
         }
       }
-
-      return [];
-    });
+    }
+    return [];
+  });
 };

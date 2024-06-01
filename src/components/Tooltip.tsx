@@ -2,6 +2,7 @@ import Konva from 'konva';
 import { RefObject, useRef, useState, useEffect, FC } from 'react';
 import { Group, Rect, Text } from 'react-konva';
 
+import { useGetSizesContext } from 'providers';
 import { useMainStore } from 'store';
 
 interface TooltipProps {
@@ -12,8 +13,7 @@ interface TooltipProps {
 }
 
 export const Tooltip: FC<TooltipProps> = ({ text, align = 'left', x, y }) => {
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const fontSize = useMainStore((state) => state.getFontSize());
+  const { fontSize, coverSizeWidth } = useGetSizesContext();
   const backColor = useMainStore((state) => state.getBackColor());
   const textRef: RefObject<Konva.Text> = useRef(null);
   const [textWidth, setTextWidth] = useState(0);

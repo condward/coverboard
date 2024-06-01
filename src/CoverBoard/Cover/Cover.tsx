@@ -1,5 +1,4 @@
 import { FC, memo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { Group } from 'react-konva';
 import { useSetAtom } from 'jotai';
 
@@ -11,6 +10,8 @@ import {
   CommonLabel,
 } from 'CoverBoard/Common';
 import { CoverSchema, LabelTypes, PosTypes } from 'types';
+import { useGetSizesContext } from 'providers';
+import { useIsLandscape } from 'utils';
 
 import { CoverLoadImage, CoverStar, CoverStarDraggable } from '.';
 
@@ -41,14 +42,13 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
   link,
   renderTime,
 }) => {
+  const isLandscape = useIsLandscape();
   const color = useMainStore((state) => state.getCoverColor());
   const showTitle = useMainStore((state) => state.configs.showTitle);
   const showSubtitle = useMainStore((state) => state.configs.showSubtitle);
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
-  const fontSize = useMainStore((state) => state.getFontSize());
-  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
-  const windowSize = useMainStore((state) => state.windowSize);
-  const showStars = useMainStore((state) => state.getShowStars());
+  const { fontSize, dragLimits, coverSizeWidth, coverSizeHeight } =
+    useGetSizesContext();
+  const showStars = useMainStore((state) => state.configs.showStars);
   const setSelected = useSetAtom(selectedAtom);
   const updateCoverPosition = useMainStore(
     (state) => state.updateCoverPosition,
@@ -58,8 +58,6 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
   );
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const coverSizeHeight = useMainStore((state) => state.getCoverSizeHeight());
 
   let titleOffset = 0;
   let subtitleOffset = 0;
@@ -129,8 +127,10 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
           y: dragLimits.y,
         }}
         max={{
-          x: windowSize.width - 3.5 * toobarIconSize,
-          y: windowSize.height - 3.5 * toobarIconSize,
+          x: isLandscape ? dragLimits.width : dragLimits.width - coverSizeWidth,
+          y: isLandscape
+            ? dragLimits.height - coverSizeHeight
+            : dragLimits.height + dragLimits.y - coverSizeHeight,
         }}>
         <CommonDrawLine id={id} />
 

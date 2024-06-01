@@ -5,9 +5,10 @@ import { useSetAtom } from 'jotai';
 
 import { selectedAtom, useIsSelected, useMainStore } from 'store';
 import { LineSchema } from 'types';
+import { useGetSizesContext } from 'providers';
 
 export const LineCircle: FC<{ id: LineSchema['id'] }> = ({ id }) => {
-  const circleRadius = useMainStore((state) => state.getCircleRadius());
+  const { circleRadius } = useGetSizesContext();
   const isSelected = useIsSelected(id);
   const setSelected = useSetAtom(selectedAtom);
   const color = useMainStore((state) => state.getArrowColor());

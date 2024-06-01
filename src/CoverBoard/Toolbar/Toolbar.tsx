@@ -1,8 +1,7 @@
 import { FC, memo } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+
 import { useAtom, useAtomValue } from 'jotai';
 import { useStore } from 'zustand';
-import { ZodError } from 'zod';
 
 import { colorMap, Colors, ToolConfig, ToolConfigIDs } from 'types';
 import { haxPrefix } from 'utils';
@@ -14,14 +13,14 @@ import {
   shareAtom,
   pointsAtom,
   selectedAtom,
-  useToastStore,
 } from 'store';
-import { useKeysListener } from 'CoverBoard';
+import { useGetSizesContext } from 'providers';
 
 import { ToolbarIcon, ToolbarTooltip } from '.';
 
 interface ToolbarProps {
   takeScreenshot: () => void;
+  createGroup: () => void;
   showTooltips: boolean;
 }
 
@@ -47,6 +46,7 @@ const ToolbarActionIcon: FC = () => {
 const ToolbarWithoutMemo: FC<ToolbarProps> = ({
   takeScreenshot,
   showTooltips,
+  createGroup,
 }) => {
   const editLines = useAtomValue(pointsAtom);
   const [openConfig, setOpenConfig] = useAtom(configAtom);
@@ -56,40 +56,7 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
   const coversLength = useMainStore((state) => state.covers.length);
   const groupsLength = useMainStore((state) => state.groups.length);
   const linesLength = useMainStore((state) => state.lines.length);
-  const coverSizeWidth = useMainStore((state) => state.getCoverSizeWidth());
-  const addGroups = useMainStore((state) => state.addGroups);
-  const groupDir = useMainStore((state) => state.configs.groupDir);
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-
-  const createGroup = () => {
-    const id = uuidv4();
-    try {
-      addGroups([
-        {
-          id,
-          x: 0,
-          y: 0,
-          title: { text: '', dir: groupDir },
-          subtitle: { text: '', dir: groupDir },
-          scaleX: 3,
-          scaleY: 3,
-        },
-      ]);
-      setSelected({ id, open: false });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const tooBig = error.issues.find((msg) => msg.code === 'too_big');
-
-        if (tooBig) {
-          showErrorMessage(tooBig.message);
-          return;
-        }
-        showErrorMessage('Bad formatted group');
-        return;
-      }
-      throw error;
-    }
-  };
+  const { coverSizeWidth } = useGetSizesContext();
 
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
@@ -201,8 +168,6 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
       shortcut: 'C',
     },
   ];
-
-  useKeysListener({ createGroup, takeScreenshot });
 
   return (
     <>

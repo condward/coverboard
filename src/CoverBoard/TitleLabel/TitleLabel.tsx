@@ -1,33 +1,25 @@
 import { FC, memo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 
 import { PosTypes } from 'types';
-import { editTitleAtom, useMainStore } from 'store';
+import { editTitleAtom, hideToolbarAtom, useMainStore } from 'store';
 import { CommonTextLabel } from 'CoverBoard/Common';
-import { useSaveId } from 'utils';
+import { useIsLandscape, useSaveId } from 'utils';
+import { useGetSizesContext } from 'providers';
 
 const TitleLabelWithoutMemo: FC = () => {
-  const updateTitle = useMainStore((state) => state.updateTitle);
+  const isLandscape = useIsLandscape();
+  const updateConfigs = useMainStore((state) => state.updateConfigs);
   const resetTitle = useMainStore((state) => state.resetTitle);
   const title = useMainStore((state) => state.configs.title);
   const showMainTitle = useMainStore((state) => state.configs.showMainTitle);
   const saveId = useSaveId();
   const color = useMainStore((state) => state.getColor());
 
-  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
+  const { toolbarIconSize, dragLimits } = useGetSizesContext();
 
   const [open, setOpen] = useAtom(editTitleAtom);
-
-  const handleReset = () => {
-    resetTitle();
-  };
-
-  const handleSetLabel = (text: string) => {
-    updateTitle(text);
-  };
-
+  const setHideToolBar = useSetAtom(hideToolbarAtom);
   const titleMode = showMainTitle ? title || `<edit ${saveId} title>` : '';
 
   return (
@@ -35,12 +27,19 @@ const TitleLabelWithoutMemo: FC = () => {
       color={color}
       title="title"
       open={open}
-      setOpen={setOpen}
-      onReset={handleReset}
+      setOpen={(val) => {
+        setHideToolBar(false);
+        setOpen(val);
+      }}
+      onReset={() => resetTitle()}
       label={titleMode}
-      setLabel={handleSetLabel}
-      x={dragLimits.width / 21}
-      y={dragLimits.y + toobarIconSize / 2}
+      setLabel={(text) => updateConfigs({ title: text })}
+      x={
+        isLandscape ? dragLimits.width / 21 : dragLimits.y + toolbarIconSize / 2
+      }
+      y={
+        isLandscape ? dragLimits.y + toolbarIconSize / 2 : dragLimits.width / 21
+      }
       width={dragLimits.width * 0.9}
       dir={PosTypes.TOP}
       labelSize={2}

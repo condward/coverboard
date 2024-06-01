@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Stack, Button, Tooltip } from '@mui/material';
+import { useAtom } from 'jotai';
 
 import {
   ConfigSchema,
@@ -10,9 +11,10 @@ import {
   ToolConfigIDs,
   ToolbarConfigValues,
   configSchema,
+  SPACING_GAP,
 } from 'types';
-import { CommonDialog, SPACING_GAP } from 'components';
-import { useMainStore } from 'store';
+import { CommonDialog } from 'components';
+import { hideToolbarAtom, useMainStore, useToastStore } from 'store';
 
 import { ToolbarConfigForm } from './ToolbarConfigForm';
 
@@ -24,6 +26,8 @@ export const ToolbarConfigPopover: FC<{
   const updateAllCoversDir = useMainStore((state) => state.updateAllCoversDir);
   const updateAllStarsDir = useMainStore((state) => state.updateAllStarsDir);
   const updateAllGroupsDir = useMainStore((state) => state.updateAllGroupsDir);
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const [isToolbarHidden, setHideToolBar] = useAtom(hideToolbarAtom);
 
   const {
     control,
@@ -36,21 +40,29 @@ export const ToolbarConfigPopover: FC<{
     defaultValues: { ...configs, size: configs.size / 100 },
   });
 
-  const onSubmit = handleSubmit((config) => {
-    updateAllCoversDir(config[ToolbarConfigValues.labelDir]);
-    updateAllStarsDir(config[ToolbarConfigValues.starsDir]);
-    updateAllGroupsDir(config[ToolbarConfigValues.groupDir]);
-    updateConfigs({
-      ...config,
-      title: config.title.trim(),
-      size: config.size * 100,
-    });
-    onClose();
-  });
+  const onSubmit = handleSubmit(
+    (config) => {
+      updateAllCoversDir(config[ToolbarConfigValues.labelDir]);
+      updateAllStarsDir(config[ToolbarConfigValues.starsDir]);
+      updateAllGroupsDir(config[ToolbarConfigValues.groupDir]);
+      updateConfigs({
+        ...config,
+        title: config.title.trim(),
+        size: config.size * 100,
+      });
+      onClose();
+    },
+    (error) => {
+      const errorMessage = Object.values(error).map((err) => err.message)[0];
+
+      if (errorMessage) {
+        showErrorMessage(errorMessage);
+      }
+    },
+  );
 
   return (
     <CommonDialog
-      open
       onClose={onClose}
       onSubmit={onSubmit}
       title="Options"
@@ -68,8 +80,10 @@ export const ToolbarConfigPopover: FC<{
                 <p>G - create group</p>
                 <p>C - download image of board</p>
                 <p>U or CTRL+Z - undo</p>
+                <p>H - toggle show and hide toolbar</p>
                 <h3>Misc.</h3>
                 <p>E - edit title</p>
+                <p>F - toggle fit to screen</p>
                 <p>N - next cover and group</p>
                 <p>P - prev cover or group</p>
                 <h3>When elem selected</h3>
@@ -83,6 +97,15 @@ export const ToolbarConfigPopover: FC<{
               Keyboard Shortcuts
             </Button>
           </Tooltip>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              setHideToolBar((t) => !t);
+              onClose();
+            }}>
+            {isToolbarHidden ? 'Show Toolbar' : 'Hide Toolbar'}
+          </Button>
           <Button
             disabled={!isDirty}
             variant="contained"

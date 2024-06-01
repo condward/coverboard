@@ -2,10 +2,11 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { Group, Image, Text } from 'react-konva';
 import { FC, memo } from 'react';
 import useImage from 'use-image';
-import { useShallow } from 'zustand/react/shallow';
 
 import { useMainStore } from 'store';
 import { Media } from 'types';
+import { useGetSizesContext } from 'providers';
+import { useIsLandscape } from 'utils';
 
 const getURL = (media: Media) => {
   if (media === Media.MUSIC) {
@@ -21,15 +22,15 @@ const getURL = (media: Media) => {
 
 const LogoWithoutMemo: FC = () => {
   const media = useMainStore((state) => state.configs.media);
-  const dragLimits = useMainStore(useShallow((state) => state.getDragLimits()));
-  const toobarIconSize = useMainStore((state) => state.getToobarIconSize());
-  const fontSize = useMainStore((state) => state.getFontSize());
+  const { dragLimits, toolbarIconSize, fontSize } = useGetSizesContext();
   const [image] = useImage(getURL(media));
+  const isLandscape = useIsLandscape();
 
   if (media === Media.MUSIC) {
     return (
       <Group
-        y={dragLimits.height - toobarIconSize}
+        x={isLandscape ? 0 : dragLimits.width - 2.1 * toolbarIconSize}
+        y={isLandscape ? dragLimits.height - toolbarIconSize : 24}
         onClick={() => window.open('https://www.last.fm')}
         onTap={() => window.open('https://www.last.fm')}
         onMouseMove={(evt: KonvaEventObject<MouseEvent>) => {
@@ -48,15 +49,15 @@ const LogoWithoutMemo: FC = () => {
         }}>
         <Image
           image={image}
-          scaleX={0.01 * toobarIconSize}
-          scaleY={0.01 * toobarIconSize}
-          x={toobarIconSize * 0.65}
-          y={-toobarIconSize / 2}
+          scaleX={0.01 * toolbarIconSize}
+          scaleY={0.01 * toolbarIconSize}
+          x={toolbarIconSize * 0.65}
+          y={-toolbarIconSize / 2}
         />
         <Text
           y={0}
           fontSize={fontSize * 0.8}
-          width={toobarIconSize * 2}
+          width={toolbarIconSize * 2}
           fill="white"
           align="center"
           text="powered"
@@ -65,7 +66,7 @@ const LogoWithoutMemo: FC = () => {
         <Text
           y={fontSize}
           fontSize={fontSize * 0.8}
-          width={toobarIconSize * 2}
+          width={toolbarIconSize * 2}
           fill="white"
           align="center"
           text="by"
@@ -74,7 +75,7 @@ const LogoWithoutMemo: FC = () => {
         <Text
           y={fontSize * 2}
           fontSize={fontSize * 0.8}
-          width={toobarIconSize * 2}
+          width={toolbarIconSize * 2}
           fill="white"
           align="center"
           text="AudioScrobbler"
@@ -101,10 +102,10 @@ const LogoWithoutMemo: FC = () => {
         }}
         onClick={() => window.open('https://www.themoviedb.org/')}
         image={image}
-        scaleX={0.01 * toobarIconSize}
-        scaleY={0.01 * toobarIconSize}
-        x={0}
-        y={dragLimits.height - 1.6 * toobarIconSize}
+        scaleX={0.01 * toolbarIconSize}
+        scaleY={0.01 * toolbarIconSize}
+        x={isLandscape ? 0 : dragLimits.width - 2.2 * toolbarIconSize}
+        y={isLandscape ? dragLimits.height - 1.6 * toolbarIconSize : 8}
       />
     );
   } else if (media === Media.BOOK) {
@@ -126,10 +127,18 @@ const LogoWithoutMemo: FC = () => {
         }}
         onClick={() => window.open('https://openlibrary.org/')}
         image={image}
-        scaleX={0.008 * toobarIconSize}
-        scaleY={0.008 * toobarIconSize}
-        x={toobarIconSize / 8}
-        y={dragLimits.height - 1.2 * toobarIconSize}
+        scaleX={0.008 * toolbarIconSize}
+        scaleY={0.008 * toolbarIconSize}
+        x={
+          isLandscape
+            ? toolbarIconSize / 8
+            : dragLimits.width - 1.9 * toolbarIconSize
+        }
+        y={
+          isLandscape
+            ? dragLimits.height - 1.2 * toolbarIconSize
+            : toolbarIconSize / 2
+        }
       />
     );
   }
@@ -151,10 +160,18 @@ const LogoWithoutMemo: FC = () => {
       }}
       onClick={() => window.open('https://rawg.io/')}
       image={image}
-      scaleX={0.008 * toobarIconSize}
-      scaleY={0.008 * toobarIconSize}
-      x={toobarIconSize / 2}
-      y={dragLimits.height - 1.2 * toobarIconSize}
+      scaleX={0.008 * toolbarIconSize}
+      scaleY={0.008 * toolbarIconSize}
+      x={
+        isLandscape
+          ? toolbarIconSize / 2
+          : dragLimits.width - 1.2 * toolbarIconSize
+      }
+      y={
+        isLandscape
+          ? dragLimits.height - 1.2 * toolbarIconSize
+          : toolbarIconSize / 2
+      }
     />
   );
 };
