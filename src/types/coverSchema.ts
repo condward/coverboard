@@ -93,7 +93,7 @@ export const coversSchema = z
     invalid_type_error: 'covers must be an array of objects',
     required_error: 'covers is required',
   })
-  .max(20, 'Only 20 covers are allowed');
+  .max(25, 'Only 25 covers are allowed');
 export type CoversSchema = z.input<typeof coversSchema>;
 
 export type CoverLabelValue = {

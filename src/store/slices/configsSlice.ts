@@ -28,6 +28,7 @@ export const initialConfigValues = (): ConfigSchema => ({
   coverColor: Colors.ORANGE,
   groupColor: Colors.GREEN,
   backColor: BackColors.DARK,
+  groupBackColor: BackColors.DARK,
   showTitle: true,
   showSubtitle: true,
   showArrow: true,
@@ -37,6 +38,7 @@ export const initialConfigValues = (): ConfigSchema => ({
   groupDir: PosTypes.TOP,
   media: Media.MUSIC,
   showStars: true,
+  showHelpers: true,
 });
 
 export interface UseConfigsParams {
@@ -47,6 +49,7 @@ export interface UseConfigsParams {
   getColor: () => string;
   getArrowColor: () => string;
   getBackColor: () => string;
+  getGroupBackColor: () => string;
   getGroupColor: () => string;
   getCoverColor: () => string;
   getTitleLabel: () => MediaDesc;
@@ -102,4 +105,5 @@ export const createConfigsSlice: StateCreator<
   getCoverColor: () => colorMap[get().configs.coverColor],
   getGroupColor: () => colorMap[get().configs.groupColor],
   getBackColor: () => backColorMap[get().configs.backColor],
+  getGroupBackColor: () => backColorMap[get().configs.groupBackColor],
 });

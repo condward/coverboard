@@ -122,6 +122,15 @@ export const configSchema = z.object(
         };
       },
     }),
+    groupBackColor: z.nativeEnum(BackColors, {
+      errorMap: () => {
+        return {
+          message: `configs:groupBackColor must be ${Object.values(
+            BackColors,
+          ).join(' | ')}`,
+        };
+      },
+    }),
     backColor: z.nativeEnum(BackColors, {
       errorMap: () => {
         return {
@@ -150,6 +159,10 @@ export const configSchema = z.object(
     showStars: z.boolean({
       invalid_type_error: 'configs:showStars must be a boolean',
       required_error: 'configs:showStars is required',
+    }),
+    showHelpers: z.boolean({
+      invalid_type_error: 'configs:showHelpers must be a boolean',
+      required_error: 'configs:showHelpers is required',
     }),
     labelDir: z.nativeEnum(PosTypes, {
       errorMap: () => {

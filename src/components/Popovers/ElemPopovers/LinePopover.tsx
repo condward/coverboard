@@ -2,18 +2,49 @@ import { FC } from 'react';
 import { TextField, Button, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { useSetAtom } from 'jotai';
+import {
+  ArrowCircleLeftOutlined,
+  ArrowCircleRightOutlined,
+  DeleteOutline,
+  SaveOutlined,
+  SwapHorizOutlined,
+} from '@mui/icons-material';
 
 import { LineSchema, LineSchemaOutput, lineSchema, SPACING_GAP } from 'types';
 import { CommonDialog, DirectionRadio, FieldSet } from 'components';
-import { selectedAtom, useMainStore, useToastStore } from 'store';
+import { useMainStore, useToastStore } from 'store';
 
-export const LinePopover: FC<{
+import { formatLabel } from 'utils';
+
+interface LinePopoverProps {
+  onClose: (id?: string) => void;
+  onChange: (from: string, to: string) => void;
+  onReturn?: () => void;
   line: LineSchema;
-}> = ({ line }) => {
+}
+
+export const LinePopover: FC<LinePopoverProps> = ({
+  line,
+  onClose,
+  onChange,
+  onReturn,
+}) => {
   const updateLine = useMainStore((state) => state.updateLine);
-  const setSelected = useSetAtom(selectedAtom);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const covers = useMainStore((state) => state.covers);
+  const groups = useMainStore((state) => state.groups);
+
+  const originCoverTitle = covers.find((cov) => cov.id === line.origin.id)
+    ?.title.text;
+  const targetCoverTitle = covers.find((cov) => cov.id === line.target.id)
+    ?.title.text;
+  const originGroupTitle = groups.find((grp) => grp.id === line.origin.id)
+    ?.title.text;
+  const targetGroupTitle = groups.find((grp) => grp.id === line.target.id)
+    ?.title.text;
+
+  const originTitle = originCoverTitle || originGroupTitle || '';
+  const targetTitle = targetCoverTitle || targetGroupTitle || '';
 
   const {
     control,
@@ -32,7 +63,7 @@ export const LinePopover: FC<{
         origin: { dir: values.origin.dir },
         target: { dir: values.target.dir },
       });
-      setSelected(null);
+      onClose();
     },
     (error) => {
       const errorMessage = Object.values(error).map((err) => err.message)[0];
@@ -46,7 +77,7 @@ export const LinePopover: FC<{
   const removeLine = useMainStore((state) => state.removeLine);
   const handleDelete = () => {
     removeLine(line.id);
-    setSelected(null);
+    onClose();
   };
 
   const handleSwapDirection = () => {
@@ -54,16 +85,20 @@ export const LinePopover: FC<{
       origin: { id: line.target.id, dir: line.target.dir },
       target: { id: line.origin.id, dir: line.origin.dir },
     });
-    setSelected(null);
+    onClose();
   };
 
   return (
     <CommonDialog
-      onClose={() => setSelected({ id: line.id, open: false })}
-      title="Edit labels"
+      onClose={() => onClose(line.id)}
+      onReturn={onReturn}
+      title="Edit Line"
       onSubmit={onSubmit}
       content={
         <Stack direction="column" gap={SPACING_GAP}>
+          <Stack direction="row" justifyContent="end">
+            <legend>ID: {line.id.slice(0, 8).toUpperCase()}</legend>
+          </Stack>
           <FieldSet direction="column" label="Label">
             <Controller
               name="text"
@@ -92,34 +127,56 @@ export const LinePopover: FC<{
               )}
             />
           </FieldSet>
-          <FieldSet direction="column" label="Arrow Position">
-            <Controller
-              name="origin.dir"
-              control={control}
-              render={({ field }) => (
-                <DirectionRadio
-                  label="Start Position"
-                  id="start-position"
-                  name="startLineRadio"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="target.dir"
-              control={control}
-              render={({ field }) => (
-                <DirectionRadio
-                  label="End Position"
-                  id="end-position"
-                  name="endLineRadio"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
+          <Controller
+            name="origin.dir"
+            control={control}
+            render={({ field }) => {
+              return (
+                <FieldSet direction="column" label="Origin">
+                  <DirectionRadio
+                    label="Position"
+                    id="origin-position"
+                    name="originLineRadio"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                  <Button
+                    variant="outlined"
+                    type="button"
+                    color="primary"
+                    startIcon={<ArrowCircleLeftOutlined />}
+                    onClick={() => onChange(line.id, line.origin.id)}>
+                    {formatLabel(originTitle, line.origin.id).slice(0, 50)}
+                  </Button>
+                </FieldSet>
+              );
+            }}
+          />
+          <Controller
+            name="target.dir"
+            control={control}
+            render={({ field }) => {
+              return (
+                <FieldSet direction="column" label="Target">
+                  <DirectionRadio
+                    label="Position"
+                    id="target-position"
+                    name="targetLineRadio"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                  <Button
+                    variant="outlined"
+                    type="button"
+                    color="primary"
+                    startIcon={<ArrowCircleRightOutlined />}
+                    onClick={() => onChange(line.id, line.target.id)}>
+                    {formatLabel(targetTitle, line.target.id).slice(0, 50)}
+                  </Button>
+                </FieldSet>
+              );
+            }}
+          />
         </Stack>
       }
       actions={
@@ -128,6 +185,7 @@ export const LinePopover: FC<{
             variant="outlined"
             color="error"
             type="button"
+            startIcon={<DeleteOutline />}
             onClick={handleDelete}>
             Delete
           </Button>
@@ -135,6 +193,7 @@ export const LinePopover: FC<{
             variant="outlined"
             color="secondary"
             type="button"
+            startIcon={<SwapHorizOutlined />}
             onClick={handleSwapDirection}>
             Swap Direction
           </Button>
@@ -142,8 +201,9 @@ export const LinePopover: FC<{
             disabled={!isDirty}
             variant="contained"
             color="primary"
+            startIcon={<SaveOutlined />}
             type="submit">
-            Submit
+            Save
           </Button>
         </Stack>
       }

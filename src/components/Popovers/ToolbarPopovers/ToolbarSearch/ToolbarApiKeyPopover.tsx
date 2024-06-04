@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { Button, CircularProgress, Stack, TextField } from '@mui/material';
+import { SaveOutlined } from '@mui/icons-material';
 
 import { ApiKeys, ToolConfigIDs, SPACING_GAP } from 'types';
 import { CommonDialog } from 'components';
@@ -57,11 +58,12 @@ export const ToolbarApiKeyPopover: FC<ToolbarApiKeyPopoverProps> = ({
             color="primary"
             id="searchSubmit"
             disabled={!key}
-            type="submit">
+            type="submit"
+            startIcon={<SaveOutlined />}>
             {isPending ? (
               <CircularProgress size="1.5rem" aria-labelledby="searchSubmit" />
             ) : (
-              'Submit'
+              'Save'
             )}
           </Button>
         </Stack>

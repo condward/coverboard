@@ -2,35 +2,46 @@ import { FC } from 'react';
 import { TextField, Button, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { useSetAtom } from 'jotai';
+import { DeleteOutline, SaveOutlined } from '@mui/icons-material';
 
 import {
   GroupSchema,
-  GroupSchemaOutput,
   groupSchema,
   SPACING_GAP,
+  GroupSchemaOutput,
 } from 'types';
 import {
   CommonDialog,
+  CommonTabs,
   DirectionRadio,
   FieldSet,
   SliderField,
 } from 'components';
-import { selectedAtom, useMainStore, useToastStore } from 'store';
+import { useMainStore, useToastStore } from 'store';
 
-export const GroupPopover: FC<{
+import { GroupConnections } from './connections';
+
+interface GroupPopover {
+  onClose: (id?: string) => void;
+  onChange: (from: string, to: string) => void;
+  onReturn?: () => void;
   group: GroupSchema;
-}> = ({ group }) => {
+}
+export const GroupPopover: FC<GroupPopover> = ({
+  group,
+  onClose,
+  onChange,
+  onReturn,
+}) => {
   const updateGroup = useMainStore((state) => state.updateGroup);
-  const setSelected = useSetAtom(selectedAtom);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
-  const removeCoverAndRelatedLines = useMainStore(
+  const removeGroupAndRelatedLines = useMainStore(
     (state) => state.removeGroupAndRelatedLines,
   );
   const handleDelete = () => {
-    removeCoverAndRelatedLines(group.id);
-    setSelected(null);
+    removeGroupAndRelatedLines(group.id);
+    onClose();
   };
 
   const {
@@ -58,12 +69,12 @@ export const GroupPopover: FC<{
         x: values.x,
         y: values.y,
       });
-      setSelected(null);
+      onClose();
     },
     (error) => {
       const errorMessage = Object.values(error).map((err) => err.message)[0];
 
-      if (errorMessage) {
+      if (errorMessage !== undefined) {
         showErrorMessage(errorMessage);
       }
     },
@@ -71,135 +82,156 @@ export const GroupPopover: FC<{
 
   return (
     <CommonDialog
-      onClose={() => setSelected({ id: group.id, open: false })}
+      onClose={() => onClose(group.id)}
+      onReturn={onReturn}
       onSubmit={onSubmit}
       title="Edit group"
       content={
-        <Stack direction="column" gap={SPACING_GAP}>
-          <FieldSet label="Title" direction="row">
-            <Controller
-              name="title.text"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label="text"
-                  autoFocus
-                  fullWidth
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="title.dir"
-              control={control}
-              render={({ field }) => (
-                <DirectionRadio
-                  label="Position"
-                  id="group-title"
-                  name="titleRadio"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
-          <FieldSet label="Description" direction="row">
-            <Controller
-              name="subtitle.text"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label="text"
-                  fullWidth
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="subtitle.dir"
-              control={control}
-              render={({ field }) => (
-                <DirectionRadio
-                  label="Position"
-                  id="group-subtitle"
-                  name="subtitleRadio"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
-          <FieldSet label="Scale" direction="column">
-            <Controller
-              name="scaleX"
-              control={control}
-              render={({ field }) => (
-                <SliderField
-                  id="scale-x"
-                  name="scaleX"
-                  label="ScaleX"
-                  aria-labelledby="scale-x"
-                  min={0}
-                  max={8}
-                  step={0.5}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="scaleY"
-              control={control}
-              render={({ field }) => (
-                <SliderField
-                  id="scale-y"
-                  name="scaleY"
-                  label="ScaleY"
-                  aria-labelledby="scale-y"
-                  min={0}
-                  max={8}
-                  step={0.5}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
-          <FieldSet
-            direction="row"
-            label="Position"
-            gap={SPACING_GAP / 2}
-            flexWrap="nowrap">
-            <Controller
-              name="x"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="X"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="y"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Y"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
-        </Stack>
+        <CommonTabs
+          tabs={[
+            {
+              label: 'Edit',
+              value: 'edit',
+              component: (
+                <Stack direction="column" gap={SPACING_GAP}>
+                  <Stack direction="row" justifyContent="end">
+                    <legend>ID: {group.id.slice(0, 8).toUpperCase()}</legend>
+                  </Stack>
+                  <FieldSet label="Title" direction="column">
+                    <Controller
+                      name="title.text"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label="text"
+                          autoFocus
+                          fullWidth
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="title.dir"
+                      control={control}
+                      render={({ field }) => (
+                        <DirectionRadio
+                          label="Position"
+                          id="group-title"
+                          name="titleRadio"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                  <FieldSet label="Description" direction="column">
+                    <Controller
+                      name="subtitle.text"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label="text"
+                          fullWidth
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="subtitle.dir"
+                      control={control}
+                      render={({ field }) => (
+                        <DirectionRadio
+                          label="Position"
+                          id="group-subtitle"
+                          name="subtitleRadio"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                  <FieldSet label="Scale" direction="column">
+                    <Controller
+                      name="scaleX"
+                      control={control}
+                      render={({ field }) => (
+                        <SliderField
+                          id="scale-x"
+                          name="scaleX"
+                          label="ScaleX"
+                          aria-labelledby="scale-x"
+                          min={0}
+                          max={8}
+                          step={0.5}
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="scaleY"
+                      control={control}
+                      render={({ field }) => (
+                        <SliderField
+                          id="scale-y"
+                          name="scaleY"
+                          label="ScaleY"
+                          aria-labelledby="scale-y"
+                          min={0}
+                          max={8}
+                          step={0.5}
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                  <FieldSet
+                    direction="row"
+                    label="Position"
+                    gap={SPACING_GAP / 2}
+                    flexWrap="nowrap">
+                    <Controller
+                      name="x"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          fullWidth
+                          type="number"
+                          label="X"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="y"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          fullWidth
+                          type="number"
+                          label="Y"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                </Stack>
+              ),
+            },
+            {
+              label: 'Connections',
+              value: 'connections',
+              component: (
+                <GroupConnections groupId={group.id} onChange={onChange} />
+              ),
+            },
+          ]}
+        />
       }
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
@@ -207,6 +239,7 @@ export const GroupPopover: FC<{
             variant="outlined"
             color="error"
             type="button"
+            startIcon={<DeleteOutline />}
             onClick={handleDelete}>
             Delete
           </Button>
@@ -214,8 +247,9 @@ export const GroupPopover: FC<{
             disabled={!isDirty}
             variant="contained"
             color="primary"
+            startIcon={<SaveOutlined />}
             type="submit">
-            Submit
+            Save
           </Button>
         </Stack>
       }

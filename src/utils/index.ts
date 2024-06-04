@@ -1,5 +1,6 @@
 export * from './getAlign';
 export * from './hash';
+export * from './labels';
 export * from './storage';
 export * from './time';
 export * from './drag';

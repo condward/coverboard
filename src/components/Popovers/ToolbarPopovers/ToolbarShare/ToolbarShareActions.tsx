@@ -1,10 +1,16 @@
 import { FC } from 'react';
-import { Button, Stack, Tooltip } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import { ZodError } from 'zod';
+import {
+  CopyAllOutlined,
+  DownloadOutlined,
+  RefreshOutlined,
+  SaveOutlined,
+} from '@mui/icons-material';
 
 import { useToastStore } from 'store';
 import { useSaveId } from 'utils';
-import { BackColors, Colors, Media, appSchema, SPACING_GAP } from 'types';
+import { appSchema, SPACING_GAP } from 'types';
 
 const isValidJSONFn = (jsonData: string) => {
   try {
@@ -18,6 +24,7 @@ const isValidJSONFn = (jsonData: string) => {
 interface ToolbarShareActionsProps {
   jsonData: string;
   defaultJsonData: string;
+  showButtons: boolean;
   setJsonData: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -25,6 +32,7 @@ export const ToolbarShareActions: FC<ToolbarShareActionsProps> = ({
   jsonData,
   setJsonData,
   defaultJsonData,
+  showButtons,
 }) => {
   const saveId = useSaveId();
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
@@ -69,50 +77,43 @@ export const ToolbarShareActions: FC<ToolbarShareActionsProps> = ({
 
   return (
     <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
-      <Tooltip
-        title={
-          <>
-            <h3>Colors</h3>
-            <p>{Object.values(Colors).map((color) => `${color} `)}</p>
-            <h3>Background Colors</h3>
-            <p>{Object.values(BackColors).map((color) => `${color} `)}</p>
-            <h3>Directions</h3>
-            <p>left right top bottom</p>
-            <h3>Media</h3>
-            <p>{Object.values(Media).map((color) => `${color} `)}</p>
-          </>
-        }>
-        <Button variant="outlined" color="info" type="button">
-          Info
-        </Button>
-      </Tooltip>
-      <Button
-        variant="outlined"
-        color="secondary"
-        onClick={handleCopyText}
-        disabled={!isValidJSON}>
-        Copy
-      </Button>
-      <Button
-        variant="outlined"
-        color="secondary"
-        onClick={exportData}
-        disabled={!isValidJSON}>
-        Download
-      </Button>
-      <Button
-        variant="outlined"
-        color="secondary"
-        disabled={defaultJsonData === jsonData}
-        onClick={() => setJsonData(defaultJsonData)}>
-        Reset
-      </Button>
+      {showButtons && (
+        <>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleCopyText}
+            disabled={!isValidJSON}
+            startIcon={<CopyAllOutlined />}>
+            Copy
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={exportData}
+            startIcon={<DownloadOutlined />}
+            disabled={!isValidJSON}>
+            Export
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            disabled={defaultJsonData === jsonData}
+            startIcon={<RefreshOutlined />}
+            onClick={() => setJsonData(defaultJsonData)}>
+            Reset
+          </Button>
+        </>
+      )}
       <Button
         type="submit"
         variant="contained"
         color="primary"
-        disabled={!isValidJSON}>
-        Submit
+        startIcon={<SaveOutlined />}
+        disabled={
+          showButtons && (!isValidJSON || defaultJsonData === jsonData)
+        }>
+        Save
       </Button>
     </Stack>
   );

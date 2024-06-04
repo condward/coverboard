@@ -1,6 +1,6 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Chip, Stack, Box } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { CancelRounded } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 import { ToolConfigIDs, AppSchema, Media, mediaMap, SPACING_GAP } from 'types';
@@ -34,20 +34,21 @@ const getMediaFromStorage = (storageString: string) => {
 interface ToolbarShareProps {
   onClose: () => void;
   setJsonData: React.Dispatch<React.SetStateAction<string>>;
-  pages: Array<string>;
+  setKeyList: React.Dispatch<React.SetStateAction<string[]>>;
+  keyList: Array<string>;
 }
 
 export const ToolbarSharePages: FC<ToolbarShareProps> = ({
   onClose,
   setJsonData,
-  pages,
+  keyList,
+  setKeyList,
 }) => {
   const navigate = useNavigate();
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const saveId = useSaveId();
   const resetStoreValues = useMainStore((state) => state.resetStoreValues);
 
-  const [keyList, setKeyList] = useState(pages);
   const hasDefault = !!window.localStorage.getItem(addPrefix(DEFAULT_KEY));
 
   const handleDeleteElements = () => {
@@ -126,7 +127,7 @@ export const ToolbarSharePages: FC<ToolbarShareProps> = ({
               deleteIcon={
                 showDelete ? (
                   <Box sx={{ display: 'flex' }} title="delete page">
-                    <CloseIcon />
+                    <CancelRounded />
                   </Box>
                 ) : undefined
               }

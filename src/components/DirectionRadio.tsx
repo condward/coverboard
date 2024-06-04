@@ -31,6 +31,7 @@ export const DirectionRadio: FC<DirectionRadioProps> = ({
         direction="row"
         alignItems="center"
         gap={SPACING_GAP}
+        justifyContent="space-between"
         flexWrap="wrap">
         <FormLabel component="legend" id={id}>
           {label}:

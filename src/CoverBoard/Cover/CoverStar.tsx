@@ -66,7 +66,6 @@ export const CoverStarChild: FC<CoverStarProps> = ({
             y={-1.5 * starRadius}
             width={3.5 * starRadius}
             height={starRadius * 3.5}
-            fill={backColor}
           />
           <Star
             numPoints={5}

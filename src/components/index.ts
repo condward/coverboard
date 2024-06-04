@@ -1,4 +1,5 @@
 export * from './CommonDialog';
+export * from './CommonTabs';
 export * from './DirectionRadio';
 export * from './Toast';
 export * from './Tooltip';

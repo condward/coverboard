@@ -24,6 +24,7 @@ export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
   const { fontSize, coverSizeWidth } = useGetSizesContext();
   const color = useMainStore((state) => state.getArrowColor());
   const updateLine = useMainStore((state) => state.updateLine);
+  const showHelpers = useMainStore((state) => state.configs.showHelpers);
 
   const selected = useIsSelected(id);
   const setEditingText = useSetAtom(editingTextAtom);
@@ -39,7 +40,7 @@ export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
   const getLabel = () => {
     if (text) {
       return text;
-    } else if (selected && text === '') {
+    } else if ((selected && text === '') || (text === '' && showHelpers)) {
       return '<add text>';
     }
     return '';

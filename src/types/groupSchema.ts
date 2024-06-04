@@ -80,5 +80,5 @@ export const groupsSchema = z
     invalid_type_error: 'groups must be an array of objects',
     required_error: 'groups is required',
   })
-  .max(20, 'Only 20 groups are allowed');
+  .max(25, 'Only 20 groups are allowed');
 export type GroupsSchema = z.input<typeof groupsSchema>;

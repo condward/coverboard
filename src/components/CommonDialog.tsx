@@ -6,9 +6,10 @@ import {
   DialogActions,
   Stack,
   Divider,
+  Box,
 } from '@mui/material';
 import { useSetAtom } from 'jotai';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { ArrowCircleLeft, Close as CloseIcon } from '@mui/icons-material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, ReactNode, FormEvent, FC } from 'react';
@@ -19,9 +20,12 @@ import { backColorMap, BackColors, SPACING_GAP } from 'types';
 
 interface CommonDialogProps {
   onClose: () => void;
+  onReturn?: () => void;
   onSubmit: (e: FormEvent) => void;
   content: ReactNode;
   actions: ReactNode;
+  header?: ReactNode;
+  navigation?: ReactNode;
   title: string;
   hash?: string;
   isForm?: boolean;
@@ -30,9 +34,12 @@ interface CommonDialogProps {
 export const CommonDialog: FC<CommonDialogProps> = ({
   onClose,
   onSubmit,
+  onReturn,
   content,
   actions,
+  navigation,
   title,
+  header,
   hash,
   isForm = true,
 }) => {
@@ -67,23 +74,53 @@ export const CommonDialog: FC<CommonDialogProps> = ({
         },
       }}>
       <DialogTitle color={backColorMap[BackColors.DARKER]}>
-        <Stack gap={SPACING_GAP} style={{ textTransform: 'uppercase' }}>
+        <Stack
+          gap={SPACING_GAP}
+          direction="row"
+          alignItems="center"
+          style={{ textTransform: 'uppercase' }}>
+          {onReturn && (
+            <IconButton
+              aria-label="close"
+              title="Return"
+              color="inherit"
+              onClick={onReturn}>
+              <ArrowCircleLeft />
+            </IconButton>
+          )}
+
           {title}
-          <IconButton
-            aria-label="close"
-            color="inherit"
-            onClick={handleClose}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-            }}>
-            <CloseIcon />
-          </IconButton>
+          <Stack direction="row" justifyContent="flex-end">
+            <Box
+              sx={{
+                position: 'absolute',
+                right: 60,
+                top: 12,
+              }}>
+              {header}
+            </Box>
+            <IconButton
+              aria-label="close"
+              title="Close"
+              color="inherit"
+              onClick={handleClose}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+              }}>
+              <CloseIcon />
+            </IconButton>
+          </Stack>
           <Divider />
         </Stack>
       </DialogTitle>
-      <DialogContent style={{ paddingTop: '0.4rem' }}>{content}</DialogContent>
+      <DialogContent style={{ paddingTop: '0.4rem' }}>
+        <Stack gap={SPACING_GAP / 2}>
+          {navigation}
+          {content}
+        </Stack>
+      </DialogContent>
       <DialogActions sx={{ backgroundColor: '#F2F4F7' }}>
         {actions}
       </DialogActions>

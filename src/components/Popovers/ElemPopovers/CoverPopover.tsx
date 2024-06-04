@@ -1,25 +1,36 @@
 import { FC } from 'react';
 import { TextField, Button, Link, Stack } from '@mui/material';
-import { useSetAtom } from 'jotai';
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import { Controller, useForm } from 'react-hook-form';
+import { ZodError } from 'zod';
+import {
+  DeleteOutline,
+  LinkOutlined,
+  RefreshOutlined,
+  SaveOutlined,
+  SearchOutlined,
+} from '@mui/icons-material';
 
 import {
-  CoverSchemaOutput,
   CoverSchema,
   Media,
-  coverSchema,
   SPACING_GAP,
+  mediaMap,
+  CoverSchemaOutput,
+  coverSchema,
 } from 'types';
 
 import {
   CommonDialog,
+  CommonTabs,
   DirectionRadio,
   FieldSet,
   SliderField,
 } from 'components';
-import { selectedAtom, useMainStore, useToastStore } from 'store';
+import { useMainStore, useToastStore } from 'store';
+
+import { useSearchValue } from './useSearchValue';
+import { CoverConnections } from './connections';
 
 const getButtons = (media: Media, currentCover: CoverSchema) => {
   if (media === Media.MUSIC) {
@@ -90,26 +101,38 @@ const getButtons = (media: Media, currentCover: CoverSchema) => {
   ];
 };
 
-export const CoverPopover: FC<{
+interface CoverPopoverProps {
+  onClose: (id?: string) => void;
+  onChange: (from: string, to: string) => void;
   cover: CoverSchema;
-}> = ({ cover }) => {
+  onReturn?: () => void;
+}
+
+export const CoverPopover: FC<CoverPopoverProps> = ({
+  cover,
+  onClose,
+  onChange,
+  onReturn,
+}) => {
   const titleLabel = useMainStore((state) => state.getTitleLabel().label);
   const subTitleLabel = useMainStore((state) => state.getSubTitleLabel().label);
   const media = useMainStore((state) => state.configs.media);
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
   );
+  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const resetCoverLabels = useMainStore((state) => state.resetCoverLabels);
   const updateCover = useMainStore((state) => state.updateCover);
-  const setSelected = useSetAtom(selectedAtom);
 
   const buttons = getButtons(media, cover);
+  const searchValue = useSearchValue(cover.id);
 
   const {
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { isDirty },
   } = useForm<CoverSchema, unknown, CoverSchemaOutput>({
     resolver: zodResolver(coverSchema),
@@ -134,12 +157,12 @@ export const CoverPopover: FC<{
         x: values.x,
         y: values.y,
       });
-      setSelected(null);
+      onClose();
     },
     (error) => {
       const errorMessage = Object.values(error).map((err) => err.message)[0];
 
-      if (errorMessage) {
+      if (errorMessage !== undefined) {
         showErrorMessage(errorMessage);
       }
     },
@@ -148,172 +171,251 @@ export const CoverPopover: FC<{
   const handleReset = () => {
     resetCoverLabels(cover.id);
     reset();
-    setSelected(null);
+    onClose();
   };
 
   const handleDelete = () => {
     removeCoverAndRelatedLines(cover.id);
-    setSelected(null);
+    onClose();
+  };
+
+  const handleSearchAgain = async () => {
+    const values = getValues();
+
+    const subTitleRequired = mediaMap[media].subtitle.required;
+    if (!values.title.text) {
+      showErrorMessage(`${mediaMap[media].title.label} is required`);
+      return;
+    } else if (subTitleRequired && !values.subtitle.text) {
+      showErrorMessage(`${mediaMap[media].subtitle.label} is required`);
+      return;
+    }
+
+    try {
+      await searchValue.mutateAsync([
+        {
+          title: values.title.text,
+          subtitle: values.subtitle.text,
+        },
+      ]);
+      onClose();
+      showSuccessMessage('Cover was updated with success');
+    } catch (error) {
+      if (error instanceof ZodError) {
+        showErrorMessage('Bad response from the server');
+      }
+      showErrorMessage('Failed to fetch from the server');
+    }
   };
 
   return (
     <CommonDialog
-      onClose={() => setSelected({ id: cover.id, open: false })}
-      title="Edit labels"
-      content={
-        <Stack direction="column" gap={SPACING_GAP}>
-          <FieldSet
-            label={
-              cover.title.search
-                ? `${titleLabel} (searched: ${cover.title.search})`
-                : titleLabel
-            }
-            direction="row">
-            <Controller
-              name="title.text"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label={`text`}
-                  autoFocus
-                  fullWidth
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="title.dir"
-              control={control}
-              render={({ field }) => (
-                <DirectionRadio
-                  label="Position"
-                  id="cover-title"
-                  name="titleRadio"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
-          <FieldSet
-            label={
-              cover.subtitle.search
-                ? `${subTitleLabel} (searched: ${cover.subtitle.search})`
-                : subTitleLabel
-            }
-            direction="row">
-            <Controller
-              name="subtitle.text"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label="text"
-                  autoFocus
-                  fullWidth
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="subtitle.dir"
-              control={control}
-              render={({ field }) => (
-                <DirectionRadio
-                  label="Position"
-                  id="cover-subtitle"
-                  name="subtitleRadio"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
-          <FieldSet label="Rating" direction="column">
-            <Controller
-              name="star.count"
-              control={control}
-              render={({ field }) => (
-                <SliderField
-                  label="Rating"
-                  id="star-rating"
-                  name="starSlider"
-                  value={field.value}
-                  onChange={field.onChange}
-                  min={0}
-                  max={5}
-                  step={0.5}
-                />
-              )}
-            />
-            <Controller
-              name="star.dir"
-              control={control}
-              render={({ field }) => (
-                <DirectionRadio
-                  label="Position"
-                  id="star-rating"
-                  name="starRadio"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
-          <FieldSet
-            direction="row"
-            label="Position"
-            gap={SPACING_GAP / 2}
-            flexWrap="nowrap">
-            <Controller
-              name="x"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="X"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="y"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Y"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
+      onClose={() => onClose(cover.id)}
+      onReturn={onReturn}
+      title="Edit Cover"
+      header={
+        <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
+          {buttons.map((button) => (
+            <Button
+              key={button.name}
+              variant="outlined"
+              color="info"
+              target="_blank"
+              component={Link}
+              startIcon={<LinkOutlined />}
+              href={button.href}>
+              {button.name}
+            </Button>
+          ))}
         </Stack>
+      }
+      content={
+        <CommonTabs
+          tabs={[
+            {
+              label: 'Edit',
+              value: 'edit',
+              component: (
+                <Stack direction="column" gap={SPACING_GAP}>
+                  <Stack direction="row" justifyContent="end">
+                    <legend>ID: {cover.id.slice(0, 8).toUpperCase()}</legend>
+                  </Stack>
+                  <FieldSet
+                    label={
+                      cover.title.search
+                        ? `${titleLabel} (searched: ${cover.title.search})`
+                        : titleLabel
+                    }
+                    direction="column">
+                    <Controller
+                      name="title.text"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label={`text`}
+                          autoFocus
+                          fullWidth
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="title.dir"
+                      control={control}
+                      render={({ field }) => (
+                        <DirectionRadio
+                          label="Position"
+                          id="cover-title"
+                          name="titleRadio"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                  <FieldSet
+                    label={
+                      cover.subtitle.search
+                        ? `${subTitleLabel} (searched: ${cover.subtitle.search})`
+                        : subTitleLabel
+                    }
+                    direction="column">
+                    <Controller
+                      name="subtitle.text"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label="text"
+                          autoFocus
+                          fullWidth
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="subtitle.dir"
+                      control={control}
+                      render={({ field }) => (
+                        <DirectionRadio
+                          label="Position"
+                          id="cover-subtitle"
+                          name="subtitleRadio"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                  <FieldSet label="Rating" direction="column">
+                    <Controller
+                      name="star.count"
+                      control={control}
+                      render={({ field }) => (
+                        <SliderField
+                          label="Rating"
+                          id="star-rating"
+                          name="starSlider"
+                          value={field.value}
+                          onChange={field.onChange}
+                          min={0}
+                          max={5}
+                          step={0.5}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="star.dir"
+                      control={control}
+                      render={({ field }) => (
+                        <DirectionRadio
+                          label="Position"
+                          id="star-rating"
+                          name="starRadio"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                  <FieldSet
+                    direction="row"
+                    label="Position"
+                    gap={SPACING_GAP / 2}
+                    flexWrap="nowrap">
+                    <Controller
+                      name="x"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          fullWidth
+                          type="number"
+                          label="X"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="y"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          fullWidth
+                          type="number"
+                          label="Y"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                  {cover.link && (
+                    <FieldSet
+                      direction="row"
+                      label="Image Link"
+                      gap={SPACING_GAP / 2}
+                      flexWrap="nowrap">
+                      <TextField
+                        fullWidth
+                        disabled
+                        label="Link"
+                        value={cover.link}
+                      />
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        type="button"
+                        onClick={() =>
+                          updateCover(cover.id, {
+                            link: '',
+                          })
+                        }>
+                        Delete
+                      </Button>
+                    </FieldSet>
+                  )}
+                </Stack>
+              ),
+            },
+            {
+              label: 'Connections',
+              value: 'connections',
+              component: (
+                <CoverConnections coverId={cover.id} onChange={onChange} />
+              ),
+            },
+          ]}
+        />
       }
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
-          <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
-            {buttons.map((button) => (
-              <Button
-                key={button.name}
-                variant="outlined"
-                color="secondary"
-                target="_blank"
-                component={Link}
-                href={button.href}>
-                {button.name}
-              </Button>
-            ))}
-          </Stack>
           <Button
             variant="outlined"
             color="error"
             type="button"
+            startIcon={<DeleteOutline />}
             onClick={handleDelete}>
             Delete
           </Button>
@@ -322,16 +424,24 @@ export const CoverPopover: FC<{
             variant="outlined"
             color="secondary"
             type="button"
+            startIcon={<RefreshOutlined />}
             onClick={handleReset}>
             Reset
           </Button>
-
+          <Button
+            variant="outlined"
+            color="secondary"
+            startIcon={<SearchOutlined />}
+            onClick={handleSearchAgain}>
+            Search
+          </Button>
           <Button
             disabled={!isDirty}
             variant="contained"
             color="primary"
-            type="submit">
-            Submit
+            type="submit"
+            startIcon={<SaveOutlined />}>
+            Save
           </Button>
         </Stack>
       }

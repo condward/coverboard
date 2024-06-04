@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react';
 import { Button, FormLabel } from '@mui/material';
+import { UploadOutlined } from '@mui/icons-material';
 
 interface FileImporterProps
   extends DetailedHTMLProps<
@@ -60,6 +61,7 @@ const FileImporter: React.FC<FileImporterProps> = (props) => {
           variant="outlined"
           color="secondary"
           component="span"
+          startIcon={<UploadOutlined />}
           disabled={disabled}>
           {label}
         </Button>

@@ -78,7 +78,7 @@ export const lineSchemas = z
     invalid_type_error: 'lines must be an array of objects',
     required_error: 'lines is required',
   })
-  .max(20, 'Only 40 lines are allowed');
+  .max(50, 'Only 50 lines are allowed');
 export type LinesSchema = z.input<typeof lineSchemas>;
 
 export interface LineParams {

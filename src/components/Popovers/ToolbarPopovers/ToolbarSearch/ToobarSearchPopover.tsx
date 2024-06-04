@@ -5,10 +5,18 @@ import {
   CircularProgress,
   Stack,
   Alert,
+  Tooltip,
 } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import Papa, { ParseResult } from 'papaparse';
+import {
+  AddOutlined,
+  DownloadOutlined,
+  InfoOutlined,
+  KeyOutlined,
+  SearchOutlined,
+} from '@mui/icons-material';
 
 import {
   CoverLabelValue,
@@ -25,6 +33,7 @@ import FileImporter from 'components/FileImporter';
 
 import { useSearchValues } from './useSearchValues';
 import { ToolbarSearchMedia } from './ToobarSeachMedia';
+import { useAddEmptyCover } from './useAddEmptyCover';
 
 const getInitialState = (): SearchSchema['search'] => [
   { title: '', subtitle: '' },
@@ -43,8 +52,9 @@ export const ToolbarSearchPopover: FC<{
   const { resetApiKey } = useResetApiKey();
   const media = useMainStore((state) => state.configs.media);
   const [failedCovers, setFailedCovers] = useState<SearchSchema['search']>([]);
-
+  const addEmptyCover = useAddEmptyCover();
   const { mutateAsync: handleSearch, isPending } = useSearchValues();
+  const coversLength = useMainStore((state) => state.covers.length);
 
   const {
     control,
@@ -98,12 +108,37 @@ export const ToolbarSearchPopover: FC<{
     });
   };
 
+  const handleSubmitWithoutImage = () => {
+    addEmptyCover(failedCovers);
+    onClose();
+  };
+
   return (
     <CommonDialog
       title="Search and add"
       onClose={onClose}
       onSubmit={onSubmit}
       hash={ToolConfigIDs.SEARCH}
+      header={
+        coversLength ? (
+          <Tooltip
+            title={
+              <>
+                <p>Clear board</p>
+                <p>Add new page in Share button</p>
+                <p>Change Url after /coverboard</p>
+              </>
+            }>
+            <Button
+              variant="outlined"
+              color="info"
+              startIcon={<InfoOutlined />}
+              sx={{ textTransform: 'capitalize' }}>
+              CHANGE MEDIA
+            </Button>
+          </Tooltip>
+        ) : undefined
+      }
       content={
         <Stack direction="column" gap={SPACING_GAP}>
           {failedCovers.length === 0 ? (
@@ -111,7 +146,7 @@ export const ToolbarSearchPopover: FC<{
           ) : (
             <Alert severity="error">
               The following search fields failed to fetch from the server, try
-              again, correct the fields or manually enter a compatible image URL
+              again, correct the fields or add them without image
             </Alert>
           )}
 
@@ -157,44 +192,59 @@ export const ToolbarSearchPopover: FC<{
       }
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
-          {mediaMap[media].apiName !== null && (
+          {failedCovers.length === 0 ? (
+            <>
+              {mediaMap[media].apiName !== null ? (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  id="changeApiKey"
+                  startIcon={<KeyOutlined />}
+                  onClick={resetApiKey}>
+                  Change ApiKey
+                </Button>
+              ) : undefined}
+              {!isDirty ? (
+                <FileImporter
+                  accept="csv/*"
+                  id="importSearch"
+                  label="Import"
+                  onFileRead={importCSV}
+                  disabled={isDirty}
+                />
+              ) : (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  id="searchExport"
+                  disabled={!isValid || isPending}
+                  onClick={exportCSV}
+                  startIcon={<DownloadOutlined />}>
+                  Export
+                </Button>
+              )}
+            </>
+          ) : (
             <Button
               variant="outlined"
               color="secondary"
-              id="changeApiKey"
-              onClick={resetApiKey}>
-              Change ApiKey
+              id="searchWithoutSubmit"
+              onClick={handleSubmitWithoutImage}
+              startIcon={<AddOutlined />}>
+              Add without image
             </Button>
-          )}
-          {failedCovers.length === 0 && (
-            <>
-              <Button
-                variant="outlined"
-                color="secondary"
-                id="searchExport"
-                disabled={!isDirty || !isValid || isPending}
-                onClick={exportCSV}>
-                Export
-              </Button>
-              <FileImporter
-                accept="csv/*"
-                id="importSearch"
-                label="Import CSV"
-                onFileRead={importCSV}
-                disabled={isDirty}
-              />
-            </>
           )}
           <Button
             variant="contained"
             color="primary"
             id="searchSubmit"
             disabled={!isDirty || !isValid || isPending}
+            startIcon={<SearchOutlined />}
             type="submit">
             {isPending ? (
               <CircularProgress size="1.5rem" aria-labelledby="searchSubmit" />
             ) : (
-              'Submit'
+              'Search'
             )}
           </Button>
         </Stack>

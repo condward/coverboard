@@ -26,6 +26,9 @@ export const MuiThemeProvider: FC<{
       error: {
         main: colorMap[Colors.RED],
       },
+      warning: {
+        main: colorMap[Colors.ORANGE],
+      },
     },
     components: {
       MuiTextField: {
@@ -52,6 +55,13 @@ export const MuiThemeProvider: FC<{
       MuiFormControlLabel: {
         styleOverrides: {
           root: {
+            color: backColorMap[BackColors.LIGHTER],
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          deleteIcon: {
             color: backColorMap[BackColors.LIGHTER],
           },
         },

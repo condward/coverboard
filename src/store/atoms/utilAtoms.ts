@@ -14,6 +14,8 @@ type SelectedElement = {
 
 export const pointsAtom = atom<LinePointSchema | null>(null);
 
+export const parentSelectedAtom = atom<Array<string>>([]);
+
 export const selectedAtom = atom<SelectedElement | null>(null);
 export const useIsSelected = (id: string) => {
   const selected = useAtomValue(selectedAtom);

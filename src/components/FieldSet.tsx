@@ -10,9 +10,9 @@ import {
 
 interface FieldSetProps {
   label: string;
-  children: ReactNode[];
+  children: ReactNode | ReactNode[];
   direction: 'row' | 'column';
-  gap?: number;
+  gap?: number | { xs: number; sm: number };
   flexWrap?: 'wrap' | 'nowrap';
 }
 

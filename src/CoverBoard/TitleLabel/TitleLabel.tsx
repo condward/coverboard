@@ -15,12 +15,14 @@ const TitleLabelWithoutMemo: FC = () => {
   const showMainTitle = useMainStore((state) => state.configs.showMainTitle);
   const saveId = useSaveId();
   const color = useMainStore((state) => state.getColor());
-
+  const showHelpers = useMainStore((state) => state.configs.showHelpers);
   const { toolbarIconSize, dragLimits } = useGetSizesContext();
 
   const [open, setOpen] = useAtom(editTitleAtom);
   const setHideToolBar = useSetAtom(hideToolbarAtom);
-  const titleMode = showMainTitle ? title || `<edit ${saveId} title>` : '';
+  const titleMode = showMainTitle
+    ? title || (showHelpers ? `<edit ${saveId} title>` : '')
+    : '';
 
   return (
     <CommonTextLabel
@@ -35,7 +37,7 @@ const TitleLabelWithoutMemo: FC = () => {
       label={titleMode}
       setLabel={(text) => updateConfigs({ title: text })}
       x={
-        isLandscape ? dragLimits.width / 21 : dragLimits.y + toolbarIconSize / 2
+        isLandscape ? dragLimits.width / 21 : dragLimits.x + toolbarIconSize / 2
       }
       y={
         isLandscape ? dragLimits.y + toolbarIconSize / 2 : dragLimits.width / 21

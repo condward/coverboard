@@ -91,6 +91,7 @@ export const CommonTextLabel: FC<TitleTexProps> = ({
             x={getXTextPos()}
             y={y}
             fill={backColor}
+            opacity={0.1}
             width={textWidth}
             height={fontSize * labelSize}
           />

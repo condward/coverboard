@@ -1,10 +1,9 @@
 import { FC, useRef, useEffect } from 'react';
 import { Rect, Transformer } from 'react-konva';
 import Konva from 'konva';
-import { useAtomValue } from 'jotai';
 
 import { GroupSchema } from 'types';
-import { useMainStore, selectedAtom } from 'store';
+import { useMainStore, useIsSelected } from 'store';
 import { useGetSizesContext } from 'providers';
 
 interface CoverImageProps {
@@ -14,9 +13,9 @@ interface CoverImageProps {
 }
 
 export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
-  const selected = useAtomValue(selectedAtom);
+  const isSelected = useIsSelected(id);
   const color = useMainStore((state) => state.getGroupColor());
-  const backColor = useMainStore((state) => state.getBackColor());
+  const groupBackColor = useMainStore((state) => state.getGroupBackColor());
 
   const boxRef = useRef<null | { width: number; height: number }>(null);
 
@@ -34,10 +33,10 @@ export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
   const trRef = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
-    if (trRef.current && rectRef.current && selected && selected.id === id) {
+    if (trRef.current && rectRef.current && isSelected) {
       trRef.current.nodes([rectRef.current]);
     }
-  }, [id, selected, removeCoverAndRelatedLines]);
+  }, [isSelected, removeCoverAndRelatedLines]);
 
   const handleTransform = () => {
     if (rectRef.current && boxRef.current) {
@@ -65,11 +64,11 @@ export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
         y={1}
         strokeWidth={1}
         stroke={color}
-        fill={backColor}
+        fill={groupBackColor}
         ref={rectRef}
         onTransformEnd={handleTransform}
       />
-      {selected && selected.id === id && (
+      {isSelected && (
         <Transformer
           ref={trRef}
           centeredScaling

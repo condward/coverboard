@@ -1,13 +1,16 @@
 import { FC, FormEvent, useState } from 'react';
 import {
+  Button,
   FormControl,
   FormLabel,
   Stack,
   TextField,
   TextareaAutosize,
+  Tooltip,
 } from '@mui/material';
 import { ZodError } from 'zod';
 import { useNavigate } from 'react-router-dom';
+import { InfoOutlined } from '@mui/icons-material';
 
 import {
   AppSchema,
@@ -15,6 +18,9 @@ import {
   appSchema,
   POPOVER_BACK_COLOR,
   SPACING_GAP,
+  BackColors,
+  Colors,
+  Media,
 } from 'types';
 import { CommonDialog, FieldSet } from 'components';
 import { DEFAULT_KEY, addPrefix, haxPrefix, useSaveId } from 'utils';
@@ -43,6 +49,7 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
       (key) => key !== addPrefix(DEFAULT_KEY) && haxPrefix(key),
     ),
   ];
+  const [keyList, setKeyList] = useState(pages);
 
   const handleImport = (evt: FormEvent) => {
     evt.preventDefault();
@@ -77,6 +84,29 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
       onSubmit={(evt) => handleImport(evt)}
       title="Share and save"
       hash={ToolConfigIDs.SHARE}
+      header={
+        <Tooltip
+          title={
+            <>
+              <h3>Colors</h3>
+              <p>{Object.values(Colors).map((color) => `${color} `)}</p>
+              <h3>Background Colors</h3>
+              <p>{Object.values(BackColors).map((color) => `${color} `)}</p>
+              <h3>Directions</h3>
+              <p>left right top bottom</p>
+              <h3>Media</h3>
+              <p>{Object.values(Media).map((color) => `${color} `)}</p>
+            </>
+          }>
+          <Button
+            variant="outlined"
+            color="info"
+            type="button"
+            startIcon={<InfoOutlined />}>
+            Config Types
+          </Button>
+        </Tooltip>
+      }
       content={
         <Stack direction="column" gap={SPACING_GAP}>
           <TextField
@@ -87,32 +117,36 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
             value={newSave}
             autoFocus
           />
-          <FieldSet direction="row" label="Pick a page">
-            <ToolbarSharePages
-              onClose={onClose}
-              setJsonData={setJsonData}
-              pages={pages}
-            />
-            <FormControl style={{ width: '100%' }}>
-              <FormLabel htmlFor="jsonInput">{`JSON for: ${saveId}`}</FormLabel>
-              <TextareaAutosize
-                id="jsonInput"
-                minRows={2}
-                maxRows={20}
-                value={jsonData}
-                style={{
-                  resize: 'none',
-                  width: '95%',
-                  backgroundColor: POPOVER_BACK_COLOR,
-                }}
-                onChange={(event) => setJsonData(event.target.value)}
+          {newSave === '' && (
+            <FieldSet direction="row" label="Pick a page">
+              <ToolbarSharePages
+                onClose={onClose}
+                setJsonData={setJsonData}
+                keyList={keyList}
+                setKeyList={setKeyList}
               />
-            </FormControl>
-          </FieldSet>
+              <FormControl style={{ width: '100%' }}>
+                <FormLabel htmlFor="jsonInput">{`JSON for: ${saveId}`}</FormLabel>
+                <TextareaAutosize
+                  id="jsonInput"
+                  minRows={2}
+                  maxRows={20}
+                  value={jsonData}
+                  style={{
+                    resize: 'none',
+                    width: '95%',
+                    backgroundColor: POPOVER_BACK_COLOR,
+                  }}
+                  onChange={(event) => setJsonData(event.target.value)}
+                />
+              </FormControl>
+            </FieldSet>
+          )}
         </Stack>
       }
       actions={
         <ToolbarShareActions
+          showButtons={newSave === ''}
           jsonData={jsonData}
           setJsonData={setJsonData}
           defaultJsonData={defaultJsonData}

@@ -5,7 +5,13 @@ import { useAtom, useAtomValue } from 'jotai';
 import { ZodError } from 'zod';
 
 import { CoverSchema, PosTypes } from 'types';
-import { useMainStore, pointsAtom, useIsSelected, useToastStore } from 'store';
+import {
+  useMainStore,
+  pointsAtom,
+  useIsSelected,
+  useToastStore,
+  selectedAtom,
+} from 'store';
 import { useGetSizesContext } from 'providers';
 
 interface CommonDrawLineProps {
@@ -66,8 +72,22 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
 }) => {
   const [points, setPoints] = useAtom(pointsAtom);
   const isSelected = useIsSelected(id);
+  const selected = useAtomValue(selectedAtom);
+
   const createLine = useMainStore((state) => state.createLine);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const cover = useMainStore((state) =>
+    selected?.id
+      ? state.covers.find((cover) => selected.id === cover.id)
+      : undefined,
+  );
+  const group = useMainStore((state) =>
+    selected?.id
+      ? state.groups.find((group) => selected.id === group.id)
+      : undefined,
+  );
+  const updateCover = useMainStore((state) => state.updateCover);
+  const updateGroup = useMainStore((state) => state.updateGroup);
 
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const selection: PosTypes | null = points?.id === id ? points.dir : null;
@@ -138,16 +158,49 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
 
     const keyFn = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
-        handleDrawLine(id, PosTypes.RIGHT);
+        if (selection && selection === PosTypes.RIGHT) {
+          if (cover) {
+            updateCover(cover.id, { x: cover.x + 1 });
+          } else if (group) {
+            updateGroup(group.id, { x: group.x + 1 });
+          }
+        } else {
+          handleDrawLine(id, PosTypes.RIGHT);
+        }
+
         e.preventDefault();
       } else if (e.key === 'ArrowLeft') {
-        handleDrawLine(id, PosTypes.LEFT);
+        if (selection && selection === PosTypes.LEFT) {
+          if (cover) {
+            updateCover(cover.id, { x: cover.x - 1 });
+          } else if (group) {
+            updateGroup(group.id, { x: group.x - 1 });
+          }
+        } else {
+          handleDrawLine(id, PosTypes.LEFT);
+        }
         e.preventDefault();
       } else if (e.key === 'ArrowUp') {
-        handleDrawLine(id, PosTypes.TOP);
+        if (selection && selection === PosTypes.TOP) {
+          if (cover) {
+            updateCover(cover.id, { y: cover.y - 1 });
+          } else if (group) {
+            updateGroup(group.id, { y: group.y - 1 });
+          }
+        } else {
+          handleDrawLine(id, PosTypes.TOP);
+        }
         e.preventDefault();
       } else if (e.key === 'ArrowDown') {
-        handleDrawLine(id, PosTypes.BOTTOM);
+        if (selection && selection === PosTypes.BOTTOM) {
+          if (cover) {
+            updateCover(cover.id, { y: cover.y + 1 });
+          } else if (group) {
+            updateGroup(group.id, { y: group.y + 1 });
+          }
+        } else {
+          handleDrawLine(id, PosTypes.BOTTOM);
+        }
         e.preventDefault();
       } else if (e.key === 'Escape') {
         setPoints(null);
@@ -157,7 +210,17 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
     document.addEventListener('keydown', keyFn);
 
     return () => document.removeEventListener('keydown', keyFn);
-  }, [handleDrawLine, id, isSelected, setPoints]);
+  }, [
+    cover,
+    group,
+    handleDrawLine,
+    id,
+    isSelected,
+    selection,
+    setPoints,
+    updateCover,
+    updateGroup,
+  ]);
 
   return (
     <Group>

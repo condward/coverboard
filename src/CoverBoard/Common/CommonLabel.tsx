@@ -7,6 +7,7 @@ import {
   pointsAtom,
   useIsCurrentTextSelected,
   useIsSelected,
+  useMainStore,
 } from 'store';
 
 import { CommonTextLabel } from '.';
@@ -52,6 +53,7 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
     id,
     text: coverLabel,
   });
+  const showHelpers = useMainStore((state) => state.configs.showHelpers);
 
   const handleSetOpen = (open: boolean) => {
     open ? setEditingText({ id, text: coverLabel }) : setEditingText(null);
@@ -60,7 +62,7 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
   const getTitleText = () => {
     if (text) {
       return text;
-    } else if (text === null) {
+    } else if (text === '' && showHelpers) {
       return '<add title>';
     }
     return '';

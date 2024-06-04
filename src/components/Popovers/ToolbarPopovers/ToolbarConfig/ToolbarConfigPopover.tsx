@@ -4,6 +4,11 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Stack, Button, Tooltip } from '@mui/material';
 import { useAtom } from 'jotai';
+import {
+  HideSourceOutlined,
+  InfoOutlined,
+  SaveOutlined,
+} from '@mui/icons-material';
 
 import {
   ConfigSchema,
@@ -68,38 +73,45 @@ export const ToolbarConfigPopover: FC<{
       title="Options"
       hash={ToolConfigIDs.CONFIG}
       content={<ToolbarConfigForm control={control} />}
+      header={
+        <Tooltip
+          title={
+            <>
+              <h3>Toolbar (no selections)</h3>
+              <p>A - open Search and add</p>
+              <p>O - open Options</p>
+              <p>S - open Share and save</p>
+              <p>G - create group</p>
+              <p>C - download image of board</p>
+              <p>U or CTRL+Z - undo</p>
+              <p>H - toggle show and hide toolbar</p>
+              <h3>Misc.</h3>
+              <p>E - edit title</p>
+              <p>F - toggle fit to screen</p>
+              <p>N - next cover and group</p>
+              <p>P - prev cover or group</p>
+              <h3>When elem selected</h3>
+              <p>Delete - delete elem</p>
+              <p>Enter - open config popover</p>
+              <p>Esc - exit selection</p>
+              <p>ArrowKeys - select arrow direction and move</p>
+            </>
+          }>
+          <Button
+            variant="outlined"
+            color="info"
+            type="button"
+            startIcon={<InfoOutlined />}>
+            Keyboard Shortcuts
+          </Button>
+        </Tooltip>
+      }
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
-          <Tooltip
-            title={
-              <>
-                <h3>Toolbar (no selections)</h3>
-                <p>A - open Search and add</p>
-                <p>O - open Options</p>
-                <p>S - open Share and save</p>
-                <p>G - create group</p>
-                <p>C - download image of board</p>
-                <p>U or CTRL+Z - undo</p>
-                <p>H - toggle show and hide toolbar</p>
-                <h3>Misc.</h3>
-                <p>E - edit title</p>
-                <p>F - toggle fit to screen</p>
-                <p>N - next cover and group</p>
-                <p>P - prev cover or group</p>
-                <h3>When elem selected</h3>
-                <p>Delete - delete elem</p>
-                <p>Enter - open config popover</p>
-                <p>Esc - exit selection</p>
-                <p>ArrowKeys - select arrow direction</p>
-              </>
-            }>
-            <Button variant="outlined" color="info" type="button">
-              Keyboard Shortcuts
-            </Button>
-          </Tooltip>
           <Button
             variant="outlined"
             color="primary"
+            startIcon={<HideSourceOutlined />}
             onClick={() => {
               setHideToolBar((t) => !t);
               onClose();
@@ -110,8 +122,9 @@ export const ToolbarConfigPopover: FC<{
             disabled={!isDirty}
             variant="contained"
             color="primary"
+            startIcon={<SaveOutlined />}
             type="submit">
-            Submit
+            Save
           </Button>
         </Stack>
       }

@@ -28,6 +28,7 @@ import { useMainStore } from 'store';
 const commonSelectSx = {
   fontSize: '0.8rem',
   fontWeight: 'bold',
+  width: '5rem',
 };
 
 const ColorSettings = [
@@ -209,68 +210,124 @@ export const ToolbarConfigForm: FC<{
             </FormControl>
           )}
         />
+        <Controller
+          name={ToolbarConfigValues.groupBackColor}
+          control={control}
+          render={({ field }) => (
+            <FormControl>
+              <InputLabel
+                variant="outlined"
+                id={ToolbarConfigValues.groupBackColor}>
+                Group Back Color
+              </InputLabel>
+              <Select
+                labelId={ToolbarConfigValues.groupBackColor}
+                aria-labelledby={ToolbarConfigValues.groupBackColor}
+                fullWidth
+                value={field.value}
+                label="Group Back Color"
+                onChange={field.onChange}>
+                {Object.values(BackColors).map((clr) => (
+                  <MenuItem value={clr} key={clr}>
+                    <Button
+                      sx={{
+                        ...commonSelectSx,
+                        backgroundColor: backColorMap[clr],
+                        color: POPOVER_BACK_COLOR,
+                        border:
+                          clr === field.value
+                            ? `1px solid ${backColorMap[BackColors.DARK]}`
+                            : undefined,
+                      }}>
+                      {clr}
+                    </Button>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        />
       </FieldSet>
-      <FieldSet label="Visibility" direction="row">
-        <Controller
-          name={ToolbarConfigValues.showMainTitle}
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Switch checked={field.value} onChange={field.onChange} />
-              }
-              label="Show main title"
-            />
-          )}
-        />
-        <Controller
-          name={ToolbarConfigValues.showTitle}
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Switch checked={field.value} onChange={field.onChange} />
-              }
-              label={`Show ${titleLabel} name`}
-            />
-          )}
-        />
-        <Controller
-          name={ToolbarConfigValues.showSubtitle}
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Switch checked={field.value} onChange={field.onChange} />
-              }
-              label={`Show ${subTitleLabel} name`}
-            />
-          )}
-        />
-        <Controller
-          name={ToolbarConfigValues.showArrow}
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Switch checked={field.value} onChange={field.onChange} />
-              }
-              label={`Show arrow labels`}
-            />
-          )}
-        />
-        <Controller
-          name={ToolbarConfigValues.showStars}
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Switch checked={field.value} onChange={field.onChange} />
-              }
-              label={`Show rating stars`}
-            />
-          )}
-        />
+      <FieldSet
+        label="Visibility"
+        direction="row"
+        gap={{ xs: 0, sm: SPACING_GAP }}>
+        <Stack>
+          <Controller
+            name={ToolbarConfigValues.showMainTitle}
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch checked={field.value} onChange={field.onChange} />
+                }
+                label="Show main title"
+              />
+            )}
+          />
+          <Controller
+            name={ToolbarConfigValues.showHelpers}
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch checked={field.value} onChange={field.onChange} />
+                }
+                label="Show empty texts"
+              />
+            )}
+          />
+          <Controller
+            name={ToolbarConfigValues.showArrow}
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch checked={field.value} onChange={field.onChange} />
+                }
+                label="Show arrow circles"
+              />
+            )}
+          />
+        </Stack>
+        <Stack>
+          <Controller
+            name={ToolbarConfigValues.showTitle}
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch checked={field.value} onChange={field.onChange} />
+                }
+                label={`Show ${titleLabel} name`}
+              />
+            )}
+          />
+          <Controller
+            name={ToolbarConfigValues.showSubtitle}
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch checked={field.value} onChange={field.onChange} />
+                }
+                label={`Show ${subTitleLabel} name`}
+              />
+            )}
+          />
+          <Controller
+            name={ToolbarConfigValues.showStars}
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch checked={field.value} onChange={field.onChange} />
+                }
+                label="Show rating stars"
+              />
+            )}
+          />
+        </Stack>
       </FieldSet>
 
       <FieldSet label="Positions" direction="column">
@@ -279,7 +336,7 @@ export const ToolbarConfigForm: FC<{
           control={control}
           render={({ field }) => (
             <DirectionRadio
-              label="Cover labels default position:"
+              label="Cover labels position"
               id="cover-labels-default"
               name="labelRadio"
               value={field.value}
@@ -292,7 +349,7 @@ export const ToolbarConfigForm: FC<{
           control={control}
           render={({ field }) => (
             <DirectionRadio
-              label="Group labels default position:"
+              label="Group labels position"
               id="group-labels-default"
               name="groupRadio"
               value={field.value}
@@ -305,7 +362,7 @@ export const ToolbarConfigForm: FC<{
           control={control}
           render={({ field }) => (
             <DirectionRadio
-              label="Rating stars default position:"
+              label="Rating stars position"
               id="rating-stars-default"
               name="groupRadio"
               value={field.value}

@@ -25,6 +25,8 @@ export interface UseLinesParams {
     pos: PosTypes,
   ) => void;
   removeConnectedLine: (id1: string, id2: string) => void;
+  getOriginRelatedLines: (id: string) => Array<LineSchema>;
+  getTargetRelatedLines: (id: string) => Array<LineSchema>;
 }
 
 export const createLinesSlice: StateCreator<
@@ -121,7 +123,7 @@ export const createLinesSlice: StateCreator<
     }));
   },
 
-  removeConnectedLine(id1: string, id2: string) {
+  removeConnectedLine(id1, id2) {
     set(({ lines }) => ({
       lines: lines.filter(
         (l) =>
@@ -131,5 +133,11 @@ export const createLinesSlice: StateCreator<
           ),
       ),
     }));
+  },
+  getOriginRelatedLines(elementId) {
+    return get().lines.filter((line) => line.origin.id === elementId);
+  },
+  getTargetRelatedLines(elementId) {
+    return get().lines.filter((line) => line.target.id === elementId);
   },
 });

@@ -137,7 +137,6 @@ const LineWithoutMemo: FC<LineProps> = ({
   targetDir,
   text,
 }) => {
-  const showArrow = useMainStore((state) => state.configs.showArrow);
   const lineParams = useGetLineParams({
     originId,
     originDir,
@@ -150,11 +149,9 @@ const LineWithoutMemo: FC<LineProps> = ({
   return (
     <Group>
       <LineArrow lineParams={lineParams} />
-      {showArrow && (
-        <Group x={lineParams.midX} y={lineParams.midY}>
-          <LineLabel id={id} dir={dir} lineParams={lineParams} text={text} />
-        </Group>
-      )}
+      <Group x={lineParams.midX} y={lineParams.midY}>
+        <LineLabel id={id} dir={dir} lineParams={lineParams} text={text} />
+      </Group>
     </Group>
   );
 };
