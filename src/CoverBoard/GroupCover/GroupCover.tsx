@@ -67,10 +67,10 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
     refreshGroups(id);
   };
 
-  const getXPosition = () => {
-    if (dir === PosTypes.BOTTOM || dir === PosTypes.TOP) {
+  const getXPosition = (currentDir: PosTypes) => {
+    if (currentDir === PosTypes.BOTTOM || currentDir === PosTypes.TOP) {
       return (coverSizeWidth * scaleX) / 2 - (coverSizeWidth * 3) / 2;
-    } else if (dir === PosTypes.RIGHT) {
+    } else if (currentDir === PosTypes.RIGHT) {
       return -coverSizeWidth * scaleX;
     }
     return coverSizeWidth * scaleX * 2 - coverSizeWidth * 3;
@@ -101,53 +101,39 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
           <Group onClick={handlesSelect} onTap={handlesSelect}>
             <GroupSquare id={id} scaleX={scaleX} scaleY={scaleY} />
           </Group>
-          <CommonLabelDraggable
-            updateDir={(dir) => updateGroup(id, { title: { dir } })}
-            x={x}
-            y={y}
-            dir={dir}
-            scaleX={scaleX}
-            scaleY={scaleY}>
-            <CommonLabel
-              color={color}
-              dir={dir}
-              coverLabel={LabelTypes.TITLE}
-              updateLabel={(text) => updateGroup(id, { title: { text } })}
-              text={titleText}
-              id={id}
-              fontStyle="bold"
-              scaleX={scaleX}
-              scaleY={scaleY}
-              x={getXPosition()}
-              y={coverSizeHeight * scaleY + offset1}
-              width={coverSizeWidth * 3}
-            />
-          </CommonLabelDraggable>
+          {Object.values(LabelTypes).map((labelType) => {
+            const currentDir = labelType === LabelTypes.TITLE ? dir : subDir;
+            const currentTitle =
+              labelType === LabelTypes.TITLE ? titleText : subtitleText;
+            const offSet = labelType === LabelTypes.TITLE ? offset1 : offset2;
 
-          {subtitleText && (
-            <CommonLabelDraggable
-              updateDir={(dir) => updateGroup(id, { subtitle: { dir } })}
-              x={x}
-              y={y}
-              dir={subDir}
-              scaleX={scaleX}
-              scaleY={scaleY}>
-              <CommonLabel
-                color={color}
-                dir={subDir}
-                coverLabel={LabelTypes.SUBTITLE}
-                updateLabel={(text) => updateGroup(id, { subtitle: { text } })}
-                text={subtitleText}
-                id={id}
-                fontStyle="bold"
+            return (
+              <CommonLabelDraggable
+                updateDir={(dir) => updateGroup(id, { [labelType]: { dir } })}
+                x={x}
+                y={y}
+                dir={currentDir}
                 scaleX={scaleX}
-                scaleY={scaleY}
-                x={getXPosition()}
-                y={coverSizeHeight * scaleY + offset2}
-                width={coverSizeWidth * 3}
-              />
-            </CommonLabelDraggable>
-          )}
+                scaleY={scaleY}>
+                <CommonLabel
+                  color={color}
+                  dir={currentDir}
+                  coverLabel={labelType}
+                  updateLabel={(text) =>
+                    updateGroup(id, { [labelType]: { text } })
+                  }
+                  text={currentTitle}
+                  id={id}
+                  fontStyle="bold"
+                  scaleX={scaleX}
+                  scaleY={scaleY}
+                  x={getXPosition(currentDir)}
+                  y={coverSizeHeight * scaleY + offSet}
+                  width={coverSizeWidth * 3}
+                />
+              </CommonLabelDraggable>
+            );
+          })}
         </>
       </CommonDraggable>
     </>
