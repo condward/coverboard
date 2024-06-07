@@ -22,7 +22,7 @@ import {
   POPOVER_BACK_COLOR,
   SPACING_GAP,
 } from 'types';
-import { DirectionRadio, FieldSet, SliderField } from 'components';
+import { SliderInput, DirectionRadio, FieldSet } from 'components';
 import { useMainStore } from 'store';
 
 const commonSelectSx = {
@@ -122,10 +122,9 @@ export const ToolbarConfigForm: FC<{
           name={ToolbarConfigValues.size}
           control={control}
           render={({ field }) => (
-            <SliderField
-              label="Elements scale:"
-              id="elements-size"
-              name="elemSize"
+            <SliderInput
+              label="Elements scale"
+              name={field.name}
               value={field.value}
               onChange={field.onChange}
               min={0.5}
@@ -330,7 +329,7 @@ export const ToolbarConfigForm: FC<{
         </Stack>
       </FieldSet>
 
-      <FieldSet label="Positions" direction="column">
+      <FieldSet label="Default Positions" direction="column">
         <Controller
           name={ToolbarConfigValues.labelDir}
           control={control}

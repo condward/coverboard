@@ -143,6 +143,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
                   <Button
                     variant="outlined"
                     type="button"
+                    component="a"
                     color="primary"
                     startIcon={<ArrowCircleLeftOutlined />}
                     onClick={() => onChange(line.id, line.origin.id)}>
@@ -169,6 +170,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
                     variant="outlined"
                     type="button"
                     color="primary"
+                    component="a"
                     startIcon={<ArrowCircleRightOutlined />}
                     onClick={() => onChange(line.id, line.target.id)}>
                     {formatLabel(targetTitle, line.target.id).slice(0, 50)}

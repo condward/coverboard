@@ -1,4 +1,5 @@
 import { Stack, Chip } from '@mui/material';
+import { LinkOutlined } from '@mui/icons-material';
 import { FC } from 'react';
 
 import { useMainStore } from 'store';
@@ -27,13 +28,15 @@ export const ParentGroupsOfCover: FC<ParentGroupsOfCoverProps> = ({
   return (
     <FieldSet
       direction="row"
-      label="Parent Groups"
+      label={`Parent Groups (${groupsOfCover.length})`}
       gap={SPACING_GAP / 2}
       flexWrap="nowrap">
       <Stack direction="row" flexWrap="wrap" gap={SPACING_GAP / 2}>
         {groupsOfCover.map((group) => {
           return (
             <Chip
+              icon={<LinkOutlined />}
+              component="a"
               key={group.id}
               label={formatLabel(group.title.text, group.id)}
               onClick={() => onChange(coverId, group.id)}

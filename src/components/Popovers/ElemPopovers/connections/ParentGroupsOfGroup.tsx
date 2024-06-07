@@ -1,4 +1,5 @@
 import { Stack, Chip } from '@mui/material';
+import { LinkOutlined } from '@mui/icons-material';
 import { FC } from 'react';
 
 import { useMainStore } from 'store';
@@ -27,7 +28,7 @@ export const ParentGroupsOfGroup: FC<ParentGroupsOfGroupProps> = ({
   return (
     <FieldSet
       direction="row"
-      label="Parent Groups"
+      label={`Parent Groups (${groupsOutsideGroup.length})`}
       gap={SPACING_GAP / 2}
       flexWrap="nowrap">
       <Stack direction="row" flexWrap="wrap" gap={SPACING_GAP / 2}>
@@ -35,6 +36,8 @@ export const ParentGroupsOfGroup: FC<ParentGroupsOfGroupProps> = ({
           return (
             <Chip
               key={group.id}
+              icon={<LinkOutlined />}
+              component="a"
               label={formatLabel(group.title.text, group.id)}
               onClick={() => onChange(groupId, group.id)}
               onDelete={(evt) => {

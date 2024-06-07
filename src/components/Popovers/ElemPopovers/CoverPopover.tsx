@@ -23,11 +23,13 @@ import {
 import {
   CommonDialog,
   CommonTabs,
+  SliderInput,
   DirectionRadio,
   FieldSet,
-  SliderField,
 } from 'components';
 import { useMainStore, useToastStore } from 'store';
+import { useGetSizesContext } from 'providers';
+import { useIsLandscape } from 'utils';
 
 import { useSearchValue } from './useSearchValue';
 import { CoverConnections } from './connections';
@@ -127,6 +129,8 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
 
   const buttons = getButtons(media, cover);
   const searchValue = useSearchValue(cover.id);
+  const isLandscape = useIsLandscape();
+  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
   const {
     control,
@@ -313,13 +317,11 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                       name="star.count"
                       control={control}
                       render={({ field }) => (
-                        <SliderField
+                        <SliderInput
                           label="Rating"
-                          id="star-rating"
-                          name="starSlider"
+                          name={field.name}
                           value={field.value}
                           onChange={field.onChange}
-                          min={0}
                           max={5}
                           step={0.5}
                         />
@@ -340,7 +342,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                     />
                   </FieldSet>
                   <FieldSet
-                    direction="row"
+                    direction="column"
                     label="Position"
                     gap={SPACING_GAP / 2}
                     flexWrap="nowrap">
@@ -348,12 +350,16 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                       name="x"
                       control={control}
                       render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          type="number"
+                        <SliderInput
                           label="X"
+                          name={field.name}
                           value={field.value}
                           onChange={field.onChange}
+                          max={
+                            isLandscape
+                              ? dragLimits.width - dragLimits.x
+                              : dragLimits.width - dragLimits.x - coverSizeWidth
+                          }
                         />
                       )}
                     />
@@ -361,12 +367,18 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                       name="y"
                       control={control}
                       render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          type="number"
-                          label="Y"
+                        <SliderInput
+                          label="X"
+                          name={field.name}
                           value={field.value}
                           onChange={field.onChange}
+                          max={
+                            isLandscape
+                              ? dragLimits.height - coverSizeHeight
+                              : dragLimits.height +
+                                dragLimits.y -
+                                2 * coverSizeHeight
+                          }
                         />
                       )}
                     />

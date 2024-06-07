@@ -21,14 +21,15 @@ import { backColorMap, BackColors, SPACING_GAP } from 'types';
 interface CommonDialogProps {
   onClose: () => void;
   onReturn?: () => void;
-  onSubmit: (e: FormEvent) => void;
+  onSubmit?: (e: FormEvent) => void;
   content: ReactNode;
-  actions: ReactNode;
+  actions?: ReactNode;
   header?: ReactNode;
   navigation?: ReactNode;
   title: string;
   hash?: string;
   isForm?: boolean;
+  opaque?: boolean;
 }
 
 export const CommonDialog: FC<CommonDialogProps> = ({
@@ -42,6 +43,7 @@ export const CommonDialog: FC<CommonDialogProps> = ({
   header,
   hash,
   isForm = true,
+  opaque = false,
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -69,7 +71,7 @@ export const CommonDialog: FC<CommonDialogProps> = ({
       onSubmit={isForm ? onSubmit : undefined}
       PaperProps={{
         style: {
-          opacity: 0.85,
+          opacity: opaque ? 1 : 0.85,
           minWidth: fullScreen ? undefined : '35rem',
         },
       }}>
@@ -88,7 +90,6 @@ export const CommonDialog: FC<CommonDialogProps> = ({
               <ArrowCircleLeft />
             </IconButton>
           )}
-
           {title}
           <Stack direction="row" justifyContent="flex-end">
             <Box

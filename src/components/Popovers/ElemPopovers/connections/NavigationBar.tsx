@@ -31,6 +31,7 @@ export const NavigationBar: FC<NavigatioNbarProps> = ({
       <Button
         variant="outlined"
         type="button"
+        component="a"
         color="primary"
         disabled={!prev}
         startIcon={<ArrowCircleLeftOutlined />}
@@ -40,6 +41,7 @@ export const NavigationBar: FC<NavigatioNbarProps> = ({
       <Button
         variant="outlined"
         type="button"
+        component="a"
         color="primary"
         disabled={!next}
         endIcon={<ArrowCircleRightOutlined />}

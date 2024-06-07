@@ -1,4 +1,5 @@
 import { Stack, Chip } from '@mui/material';
+import { LinkOutlined } from '@mui/icons-material';
 import { FC } from 'react';
 
 import { CoverSchema, GroupSchema, SPACING_GAP } from 'types';
@@ -40,7 +41,7 @@ export const LinesOfGroupTarget: FC<LinesOfGroupTargetProps> = ({
   return (
     <FieldSet
       direction="column"
-      label="Lines to Groups"
+      label={`Lines to Groups (${defaultGroupConnections.length})`}
       gap={SPACING_GAP}
       flexWrap="nowrap">
       <Stack direction="row" flexWrap="wrap" gap={SPACING_GAP / 2}>
@@ -52,6 +53,8 @@ export const LinesOfGroupTarget: FC<LinesOfGroupTargetProps> = ({
           return (
             <Chip
               key={line.lineId}
+              icon={<LinkOutlined />}
+              component="a"
               label={formatLabel(group.title.text, group.id)}
               onClick={() => onChange(id, line.lineId)}
               onDelete={(evt) => {

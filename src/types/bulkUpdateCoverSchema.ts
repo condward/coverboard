@@ -29,6 +29,26 @@ export const bulkUpdateCoverSchema = z.object({
     })
     .min(-1, 'covers:y position must be positive number')
     .max(MAX_BOUNDARY, `covers:x position must be less than ${MAX_BOUNDARY}`),
+  paceX: z.coerce
+    .number({
+      invalid_type_error: 'covers:paceX position must be a number',
+      required_error: 'covers:paceX is required',
+    })
+    .min(0, 'covers:paceX position must be positive number')
+    .max(
+      MAX_BOUNDARY,
+      `covers:paceX position must be less than ${MAX_BOUNDARY}`,
+    ),
+  paceY: z.coerce
+    .number({
+      invalid_type_error: 'covers:paceY position must be a number',
+      required_error: 'covers:paceY is required',
+    })
+    .min(0, 'covers:paceY position must be positive number')
+    .max(
+      MAX_BOUNDARY,
+      `covers:paceY position must be less than ${MAX_BOUNDARY}`,
+    ),
   title: z.object({
     dir: z
       .nativeEnum(PosTypes, {

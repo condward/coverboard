@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -7,6 +7,7 @@ import { useAtom } from 'jotai';
 import {
   HideSourceOutlined,
   InfoOutlined,
+  LinkOutlined,
   SaveOutlined,
 } from '@mui/icons-material';
 
@@ -20,6 +21,7 @@ import {
 } from 'types';
 import { CommonDialog } from 'components';
 import { hideToolbarAtom, useMainStore, useToastStore } from 'store';
+import { CoverboardOverview } from 'components/Popovers/ElemPopovers/connections';
 
 import { ToolbarConfigForm } from './ToolbarConfigForm';
 
@@ -27,6 +29,10 @@ export const ToolbarConfigPopover: FC<{
   onClose: () => void;
 }> = ({ onClose }) => {
   const configs = useMainStore((state) => state.configs);
+  const groupsLength = useMainStore((state) => state.groups.length);
+  const coversLength = useMainStore((state) => state.covers.length);
+  const totalLength = groupsLength + coversLength;
+
   const updateConfigs = useMainStore((state) => state.updateConfigs);
   const updateAllCoversDir = useMainStore((state) => state.updateAllCoversDir);
   const updateAllStarsDir = useMainStore((state) => state.updateAllStarsDir);
@@ -66,13 +72,22 @@ export const ToolbarConfigPopover: FC<{
     },
   );
 
+  const [openOverview, setOverviewOpen] = useState(false);
+
   return (
     <CommonDialog
       onClose={onClose}
       onSubmit={onSubmit}
       title="Options"
       hash={ToolConfigIDs.CONFIG}
-      content={<ToolbarConfigForm control={control} />}
+      content={
+        <Stack gap={SPACING_GAP}>
+          <ToolbarConfigForm control={control} />
+          {openOverview && (
+            <CoverboardOverview onClose={() => setOverviewOpen(false)} />
+          )}
+        </Stack>
+      }
       header={
         <Tooltip
           title={
@@ -102,7 +117,7 @@ export const ToolbarConfigPopover: FC<{
             color="info"
             type="button"
             startIcon={<InfoOutlined />}>
-            Keyboard Shortcuts
+            Shortcut keys
           </Button>
         </Tooltip>
       }
@@ -110,13 +125,21 @@ export const ToolbarConfigPopover: FC<{
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
           <Button
             variant="outlined"
-            color="primary"
+            color="secondary"
             startIcon={<HideSourceOutlined />}
             onClick={() => {
               setHideToolBar((t) => !t);
               onClose();
             }}>
             {isToolbarHidden ? 'Show Toolbar' : 'Hide Toolbar'}
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            startIcon={<LinkOutlined />}
+            disabled={totalLength === 0}
+            onClick={() => setOverviewOpen(true)}>
+            Overview
           </Button>
           <Button
             disabled={!isDirty}

@@ -52,12 +52,7 @@ export const GroupConnections: FC<GroupConnectionsProps> = ({
             : undefined
         }
       />
-      <ChildCoversOfGroup
-        groupId={groupId}
-        onChange={onChange}
-        x={groups[groupIdx].x}
-        y={groups[groupIdx].y}
-      />
+      <ChildCoversOfGroup groupId={groupId} onChange={onChange} />
       <ChildGroupsOfGroup groupId={groupId} onChange={onChange} />
       <ParentGroupsOfGroup groupId={groupId} onChange={onChange} />
       <LinesOfCoverOrigin id={groupId} onChange={onChange} />

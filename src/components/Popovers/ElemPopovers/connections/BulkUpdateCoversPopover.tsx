@@ -1,8 +1,13 @@
 import { FC } from 'react';
-import { Button, Stack, Chip } from '@mui/material';
+import { Button, Stack, Chip, Box } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { DeleteOutline, SaveOutlined } from '@mui/icons-material';
+import {
+  AddOutlined,
+  DeleteOutline,
+  HideSourceOutlined,
+  SaveOutlined,
+} from '@mui/icons-material';
 
 import {
   BulkUpdateCoverSchema,
@@ -16,13 +21,14 @@ import {
 
 import {
   CommonDialog,
+  SliderInput,
   DirectionRadio,
   FieldSet,
-  SliderField,
 } from 'components';
 import { useMainStore, useToastStore } from 'store';
 
 import { formatLabel } from 'utils';
+import { useGetSizesContext } from 'providers';
 
 interface BulkUpdateCoversPopoverProps {
   onClose: () => void;
@@ -41,17 +47,28 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   );
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const updateCover = useMainStore((state) => state.updateCover);
+  const size = useMainStore((state) => state.configs.size);
+  const heightRatio = useMainStore((state) => state.getHeightRatio());
+  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const offLimitCovers = covers.flatMap((covers) => {
+    if (
+      (covers.x > dragLimits.width && dragLimits.width > size) ||
+      (covers.y > dragLimits.height && dragLimits.height > size)
+    ) {
+      return covers;
+    }
 
-  const {
-    control,
-    getValues,
-    handleSubmit,
-    watch,
-    formState: { isDirty },
-  } = useForm<BulkUpdateCoverSchema, unknown, BulkUpdateCoverSchemaOutput>({
+    return [];
+  });
+
+  const { control, getValues, handleSubmit, watch } = useForm<
+    BulkUpdateCoverSchema,
+    unknown,
+    BulkUpdateCoverSchemaOutput
+  >({
     resolver: zodResolver(bulkUpdateCoverSchema),
     defaultValues: {
-      ids: [],
+      ids: covers.map((cov) => cov.id),
       title: {
         dir: 'none',
       },
@@ -64,6 +81,8 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
       },
       x: -1,
       y: -1,
+      paceX: 0,
+      paceY: 0,
     },
   });
 
@@ -72,7 +91,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
       const minValueX = values.x === 0 ? maxBounds.x + 1 : maxBounds.x;
       const minValueY = values.y === 0 ? maxBounds.y + 1 : maxBounds.y;
 
-      values.ids.forEach((id) =>
+      values.ids.forEach((id, index) =>
         updateCover(id, {
           title: {
             dir: values.title.dir !== 'none' ? values.title.dir : undefined,
@@ -85,8 +104,20 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             count: values.star.count > -1 ? values.star.count : undefined,
             dir: values.star.dir !== 'none' ? values.star.dir : undefined,
           },
-          x: values.x > -1 ? minValueX + values.x : undefined,
-          y: values.y > -1 ? minValueY + values.y : undefined,
+          x:
+            values.x > -1
+              ? minValueX +
+                values.x +
+                (index <= values.paceX ? index * values.paceX * size : 0)
+              : undefined,
+          y:
+            values.y > -1
+              ? minValueY +
+                values.y +
+                (index <= values.paceY
+                  ? index * values.paceY * size * heightRatio
+                  : 0)
+              : undefined,
         }),
       );
 
@@ -106,15 +137,31 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
     onClose();
   };
 
+  const handleBringToScreen = () => {
+    offLimitCovers.forEach((cover) => {
+      updateCover(cover.id, {
+        x:
+          cover.x > dragLimits.width
+            ? dragLimits.width - coverSizeWidth
+            : cover.x,
+        y:
+          cover.y > dragLimits.height
+            ? dragLimits.height - coverSizeHeight
+            : cover.y,
+      });
+    });
+  };
+
   return (
     <CommonDialog
       onClose={onClose}
+      opaque
       title="Bulk Update Covers"
       content={
         <Stack direction="column" gap={SPACING_GAP}>
           <FieldSet
             direction="row"
-            label="Child Covers"
+            label={`Covers Selection (${watch('ids').length})`}
             gap={SPACING_GAP / 2}
             flexWrap="nowrap">
             <Stack direction="row" flexWrap="wrap" gap={SPACING_GAP / 2}>
@@ -124,14 +171,22 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
                 render={({ field }) => (
                   <>
                     {covers.map((cover) => {
+                      const isChecked = field.value.includes(cover.id);
+                      // offLimitCovers
                       return (
                         <Chip
-                          aria-checked={field.value.includes(cover.id)}
-                          color={
-                            field.value.includes(cover.id)
-                              ? 'primary'
-                              : 'default'
+                          role="checkbox"
+                          icon={
+                            offLimitCovers.some(
+                              (cov) => cov.id === cover.id,
+                            ) ? (
+                              <Box title="Hidden">
+                                <HideSourceOutlined />
+                              </Box>
+                            ) : undefined
                           }
+                          aria-checked={isChecked}
+                          color={isChecked ? 'primary' : 'default'}
                           key={cover.id}
                           label={formatLabel(cover.title.text, cover.id)}
                           onClick={() => {
@@ -185,10 +240,9 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
               name="star.count"
               control={control}
               render={({ field }) => (
-                <SliderField
+                <SliderInput
                   label="Rating"
-                  id="star-rating"
-                  name="starSlider"
+                  name={field.name}
                   value={field.value}
                   onChange={field.onChange}
                   min={0}
@@ -213,38 +267,71 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
           </FieldSet>
           <FieldSet
             direction="column"
-            label="Position"
+            label="Coordinate X"
             gap={SPACING_GAP / 2}
             flexWrap="nowrap">
             <Controller
               name="x"
               control={control}
               render={({ field }) => (
-                <SliderField
-                  label="X"
-                  id="x-value"
-                  name="xSlider"
+                <SliderInput
+                  label="Start"
+                  name={field.name}
                   value={field.value}
                   onChange={field.onChange}
-                  min={0}
+                  min={-1}
                   max={maxBounds.width - 1}
-                  step={1}
                 />
               )}
             />
             <Controller
+              name="paceX"
+              control={control}
+              render={({ field }) => (
+                <SliderInput
+                  label="Step"
+                  name={field.name}
+                  value={field.value}
+                  onChange={field.onChange}
+                  max={Math.floor(
+                    (maxBounds.width - maxBounds.x - watch('x')) / size,
+                  )}
+                />
+              )}
+            />
+          </FieldSet>
+          <FieldSet
+            direction="column"
+            label="Coordinate Y"
+            gap={SPACING_GAP / 2}
+            flexWrap="nowrap">
+            <Controller
               name="y"
               control={control}
               render={({ field }) => (
-                <SliderField
-                  label="Y"
-                  id="y-value"
-                  name="ySlider"
+                <SliderInput
+                  label="Start"
+                  name={field.name}
                   value={field.value}
                   onChange={field.onChange}
-                  min={0}
+                  min={-1}
                   max={maxBounds.height - 1}
-                  step={1}
+                />
+              )}
+            />
+            <Controller
+              name="paceY"
+              control={control}
+              render={({ field }) => (
+                <SliderInput
+                  label="Step"
+                  name={field.name}
+                  value={field.value}
+                  onChange={field.onChange}
+                  max={Math.floor(
+                    (maxBounds.height - maxBounds.y - watch('y')) /
+                      (size + heightRatio),
+                  )}
                 />
               )}
             />
@@ -262,7 +349,16 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             Delete
           </Button>
           <Button
-            disabled={!isDirty || watch('ids').length === 0}
+            variant="outlined"
+            color="secondary"
+            type="button"
+            startIcon={<AddOutlined />}
+            disabled={offLimitCovers.length === 0}
+            onClick={handleBringToScreen}>
+            Bring to screen
+          </Button>
+          <Button
+            disabled={watch('ids').length === 0}
             variant="contained"
             color="primary"
             type="submit"

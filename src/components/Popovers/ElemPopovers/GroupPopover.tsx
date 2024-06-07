@@ -1,8 +1,12 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { TextField, Button, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { DeleteOutline, SaveOutlined } from '@mui/icons-material';
+import {
+  DeleteOutline,
+  SaveOutlined,
+  UpdateOutlined,
+} from '@mui/icons-material';
 
 import {
   GroupSchema,
@@ -13,13 +17,15 @@ import {
 import {
   CommonDialog,
   CommonTabs,
+  SliderInput,
   DirectionRadio,
   FieldSet,
-  SliderField,
 } from 'components';
 import { useMainStore, useToastStore } from 'store';
 
-import { GroupConnections } from './connections';
+import { useGetSizesContext } from 'providers';
+
+import { BulkUpdateCoversPopover, GroupConnections } from './connections';
 
 interface GroupPopover {
   onClose: (id?: string) => void;
@@ -35,6 +41,12 @@ export const GroupPopover: FC<GroupPopover> = ({
 }) => {
   const updateGroup = useMainStore((state) => state.updateGroup);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const [open, setOpen] = useState(false);
+
+  const coversInsideGroup = useMainStore((state) =>
+    state.getCoversInsideGroup(group.id),
+  );
+  const groupBound = useMainStore((state) => state.getGroupBounds(group.id));
 
   const removeGroupAndRelatedLines = useMainStore(
     (state) => state.removeGroupAndRelatedLines,
@@ -43,6 +55,8 @@ export const GroupPopover: FC<GroupPopover> = ({
     removeGroupAndRelatedLines(group.id);
     onClose();
   };
+
+  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
   const {
     control,
@@ -152,44 +166,8 @@ export const GroupPopover: FC<GroupPopover> = ({
                       )}
                     />
                   </FieldSet>
-                  <FieldSet label="Scale" direction="column">
-                    <Controller
-                      name="scaleX"
-                      control={control}
-                      render={({ field }) => (
-                        <SliderField
-                          id="scale-x"
-                          name="scaleX"
-                          label="ScaleX"
-                          aria-labelledby="scale-x"
-                          min={0}
-                          max={8}
-                          step={0.5}
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="scaleY"
-                      control={control}
-                      render={({ field }) => (
-                        <SliderField
-                          id="scale-y"
-                          name="scaleY"
-                          label="ScaleY"
-                          aria-labelledby="scale-y"
-                          min={0}
-                          max={8}
-                          step={0.5}
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    />
-                  </FieldSet>
                   <FieldSet
-                    direction="row"
+                    direction="column"
                     label="Position"
                     gap={SPACING_GAP / 2}
                     flexWrap="nowrap">
@@ -197,12 +175,12 @@ export const GroupPopover: FC<GroupPopover> = ({
                       name="x"
                       control={control}
                       render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          type="number"
+                        <SliderInput
                           label="X"
+                          name={field.name}
                           value={field.value}
                           onChange={field.onChange}
+                          max={dragLimits.width - coverSizeWidth * group.scaleX}
                         />
                       )}
                     />
@@ -210,12 +188,44 @@ export const GroupPopover: FC<GroupPopover> = ({
                       name="y"
                       control={control}
                       render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          type="number"
+                        <SliderInput
                           label="Y"
+                          name={field.name}
                           value={field.value}
                           onChange={field.onChange}
+                          max={
+                            dragLimits.height - coverSizeHeight * group.scaleY
+                          }
+                        />
+                      )}
+                    />
+                  </FieldSet>
+                  <FieldSet label="Scale" direction="column">
+                    <Controller
+                      name="scaleX"
+                      control={control}
+                      render={({ field }) => (
+                        <SliderInput
+                          label="Scale X"
+                          name={field.name}
+                          value={field.value}
+                          onChange={field.onChange}
+                          max={8}
+                          step={0.5}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="scaleY"
+                      control={control}
+                      render={({ field }) => (
+                        <SliderInput
+                          label="Scale Y"
+                          name={field.name}
+                          value={field.value}
+                          onChange={field.onChange}
+                          max={8}
+                          step={0.5}
                         />
                       )}
                     />
@@ -243,6 +253,27 @@ export const GroupPopover: FC<GroupPopover> = ({
             onClick={handleDelete}>
             Delete
           </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            type="button"
+            disabled={coversInsideGroup.length === 0}
+            onClick={() => setOpen(true)}
+            startIcon={<UpdateOutlined />}>
+            Bulk update Covers
+          </Button>
+          {open && groupBound && (
+            <BulkUpdateCoversPopover
+              covers={coversInsideGroup}
+              onClose={() => setOpen(false)}
+              maxBounds={{
+                x: group.x,
+                y: group.y,
+                width: groupBound.x,
+                height: groupBound.y,
+              }}
+            />
+          )}
           <Button
             disabled={!isDirty}
             variant="contained"

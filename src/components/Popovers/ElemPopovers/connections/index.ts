@@ -10,3 +10,4 @@ export * from './LinesOfGroupTarget';
 export * from './CoverConnections';
 export * from './GroupConnections';
 export * from './NavigationBar';
+export * from './CoverboardOverview';
