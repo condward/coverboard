@@ -34,11 +34,24 @@ export const createCoversSlice: StateCreator<
         const cover = coverCopy[coverIdx];
 
         coverCopy[coverIdx] = {
-          ...cover,
-          ...partialCover,
-          star: { ...cover.star, ...partialCover.star },
-          title: { ...cover.title, ...partialCover.title },
-          subtitle: { ...cover.subtitle, ...partialCover.subtitle },
+          id: partialCover.id ?? cover.id,
+          x: partialCover.x ?? cover.x,
+          y: partialCover.y ?? cover.y,
+          link: partialCover.link ?? cover.link,
+          star: {
+            dir: partialCover.star?.dir ?? cover.star.dir,
+            count: partialCover.star?.count ?? cover.star.count,
+          },
+          title: {
+            dir: partialCover.title?.dir ?? cover.title.dir,
+            text: partialCover.title?.text ?? cover.title.text,
+            search: partialCover.title?.search ?? cover.title.search,
+          },
+          subtitle: {
+            dir: partialCover.subtitle?.dir ?? cover.subtitle.dir,
+            text: partialCover.subtitle?.text ?? cover.subtitle.text,
+            search: partialCover.subtitle?.search ?? cover.subtitle.search,
+          },
         };
 
         return { covers: coverCopy };

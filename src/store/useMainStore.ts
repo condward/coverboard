@@ -39,6 +39,7 @@ interface CoverContextData {
     scale: { scaleX: number; scaleY: number },
   ) => void;
   refreshGroups: (groupId: string) => void;
+  getGroupBounds: (groupId: string) => Vector2d | undefined;
   getGroupsInsideGroup: (groupId: string) => GroupSchema[];
   getCoversInsideGroup: (coverId: string) => CoverSchema[];
   getGroupsOfCover: (coverId: string) => GroupSchema[];
@@ -73,7 +74,21 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
   resetStoreValues() {
     set(defaultValues());
   },
-  getCoversInsideGroup(groupId: string) {
+  getGroupBounds(groupId) {
+    const group = get().groups.find(
+      (currentGroup) => currentGroup.id === groupId,
+    );
+
+    if (!group) return undefined;
+
+    return {
+      x: get().configs.size * group.scaleX - get().configs.size,
+      y:
+        get().configs.size * get().getHeightRatio() * group.scaleY -
+        get().configs.size,
+    };
+  },
+  getCoversInsideGroup(groupId) {
     const group = get().groups.find(
       (currentGroup) => currentGroup.id === groupId,
     );

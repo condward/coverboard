@@ -110,6 +110,7 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
             return (
               <CommonLabelDraggable
                 updateDir={(dir) => updateGroup(id, { [labelType]: { dir } })}
+                key={labelType}
                 x={x}
                 y={y}
                 dir={currentDir}

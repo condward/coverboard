@@ -37,6 +37,22 @@ export const createGroupsSlice: StateCreator<
           subtitle: { ...group.subtitle, ...partialGroup.subtitle },
         };
 
+        groupCopy[groupIdx] = {
+          id: partialGroup.id ?? group.id,
+          x: partialGroup.x ?? group.x,
+          y: partialGroup.y ?? group.y,
+          scaleX: partialGroup.scaleX ?? group.scaleX,
+          scaleY: partialGroup.scaleY ?? group.scaleY,
+          title: {
+            dir: partialGroup.title?.dir ?? group.title.dir,
+            text: partialGroup.title?.text ?? group.title.text,
+          },
+          subtitle: {
+            dir: partialGroup.subtitle?.dir ?? group.subtitle.dir,
+            text: partialGroup.subtitle?.text ?? group.subtitle.text,
+          },
+        };
+
         return { groups: groupCopy };
       }
       return { groups };

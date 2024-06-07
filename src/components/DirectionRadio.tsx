@@ -11,7 +11,7 @@ import { FC, ChangeEvent } from 'react';
 import { PosTypes, SPACING_GAP } from 'types';
 
 interface DirectionRadioProps {
-  value: PosTypes;
+  value: PosTypes | 'none';
   onChange: (event: ChangeEvent<HTMLInputElement>, value: string) => void;
   name: string;
   id: string;

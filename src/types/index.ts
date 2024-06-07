@@ -8,4 +8,6 @@ export * from './lineSchema';
 export * from './configSchema';
 export * from './appSchema';
 
+export * from './bulkUpdateCoverSchema';
+
 export * from './constants';

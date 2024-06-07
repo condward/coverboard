@@ -1,3 +1,4 @@
+export * from './BulkUpdateCoversPopover';
 export * from './ChildCoversOfGroup';
 export * from './ChildGroupsOfGroup';
 export * from './ParentGroupsOfGroup';

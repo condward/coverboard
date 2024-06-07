@@ -93,10 +93,17 @@ export const createLinesSlice: StateCreator<
         const line = lineCopy[lineIdx];
 
         lineCopy[lineIdx] = {
-          ...line,
-          ...partialLine,
-          origin: { ...line.origin, ...partialLine.origin },
-          target: { ...line.target, ...partialLine.target },
+          id: partialLine.id ?? line.id,
+          text: partialLine.text ?? line.text,
+          dir: partialLine.dir ?? line.dir,
+          origin: {
+            dir: partialLine.origin?.dir ?? line.origin.dir,
+            id: partialLine.origin?.id ?? line.origin.id,
+          },
+          target: {
+            dir: partialLine.target?.dir ?? line.target.dir,
+            id: partialLine.target?.id ?? line.target.id,
+          },
         };
 
         return { lines: lineCopy };
