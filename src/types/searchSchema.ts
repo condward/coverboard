@@ -84,6 +84,7 @@ type MediaMapRecord = Record<
     subtitle: MediaDesc;
     heightRatio: number;
     apiName: ApiKeys | null;
+    baseUrl: string | null;
   }
 >;
 
@@ -102,6 +103,7 @@ export const mediaMap: MediaMapRecord = {
     },
     heightRatio: 1,
     apiName: ApiKeys.LAST_FM,
+    baseUrl: '/api/get-album',
   },
   [Media.MOVIE]: {
     emoji: '🎬',
@@ -117,6 +119,7 @@ export const mediaMap: MediaMapRecord = {
     },
     heightRatio: 1.5,
     apiName: ApiKeys.TMDB,
+    baseUrl: '/api/get-movie',
   },
   [Media.TVSHOW]: {
     emoji: '📺',
@@ -132,6 +135,7 @@ export const mediaMap: MediaMapRecord = {
     },
     heightRatio: 1.5,
     apiName: ApiKeys.TMDB,
+    baseUrl: '/api/get-movie',
   },
   [Media.BOOK]: {
     emoji: '📚',
@@ -147,6 +151,7 @@ export const mediaMap: MediaMapRecord = {
     },
     heightRatio: 1.5,
     apiName: null,
+    baseUrl: null,
   },
   [Media.GAME]: {
     emoji: '🎮',
@@ -162,6 +167,7 @@ export const mediaMap: MediaMapRecord = {
     },
     heightRatio: 0.7,
     apiName: ApiKeys.RAWG,
+    baseUrl: '/api/get-game',
   },
 };
 

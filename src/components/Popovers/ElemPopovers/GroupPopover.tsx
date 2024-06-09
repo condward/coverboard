@@ -7,6 +7,7 @@ import {
   SaveOutlined,
   UpdateOutlined,
 } from '@mui/icons-material';
+import { useAtomValue } from 'jotai';
 
 import {
   GroupSchema,
@@ -21,7 +22,7 @@ import {
   DirectionRadio,
   FieldSet,
 } from 'components';
-import { useMainStore, useToastStore } from 'store';
+import { configAtom, useMainStore, useToastStore } from 'store';
 
 import { useGetSizesContext } from 'providers';
 
@@ -42,6 +43,7 @@ export const GroupPopover: FC<GroupPopover> = ({
   const updateGroup = useMainStore((state) => state.updateGroup);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const [open, setOpen] = useState(false);
+  const configToolbarOpen = useAtomValue(configAtom);
 
   const coversInsideGroup = useMainStore((state) =>
     state.getCoversInsideGroup(group.id),
@@ -97,6 +99,7 @@ export const GroupPopover: FC<GroupPopover> = ({
   return (
     <CommonDialog
       onClose={() => onClose(group.id)}
+      opaque={configToolbarOpen}
       onReturn={onReturn}
       onSubmit={onSubmit}
       title="Edit group"

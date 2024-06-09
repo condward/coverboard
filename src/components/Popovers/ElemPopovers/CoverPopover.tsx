@@ -10,6 +10,7 @@ import {
   SaveOutlined,
   SearchOutlined,
 } from '@mui/icons-material';
+import { useAtomValue } from 'jotai';
 
 import {
   CoverSchema,
@@ -27,7 +28,7 @@ import {
   DirectionRadio,
   FieldSet,
 } from 'components';
-import { useMainStore, useToastStore } from 'store';
+import { configAtom, useMainStore, useToastStore } from 'store';
 import { useGetSizesContext } from 'providers';
 import { useIsLandscape } from 'utils';
 
@@ -122,6 +123,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
   );
+  const configToolbarOpen = useAtomValue(configAtom);
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const resetCoverLabels = useMainStore((state) => state.resetCoverLabels);
@@ -217,6 +219,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
       onClose={() => onClose(cover.id)}
       onReturn={onReturn}
       title="Edit Cover"
+      opaque={configToolbarOpen}
       header={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
           {buttons.map((button) => (

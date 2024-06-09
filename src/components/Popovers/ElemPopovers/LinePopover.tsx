@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { TextField, Button, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
+import { useAtomValue } from 'jotai';
 import {
   ArrowCircleLeftOutlined,
   ArrowCircleRightOutlined,
@@ -12,7 +13,7 @@ import {
 
 import { LineSchema, LineSchemaOutput, lineSchema, SPACING_GAP } from 'types';
 import { CommonDialog, DirectionRadio, FieldSet } from 'components';
-import { useMainStore, useToastStore } from 'store';
+import { configAtom, useMainStore, useToastStore } from 'store';
 
 import { formatLabel } from 'utils';
 
@@ -33,6 +34,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const covers = useMainStore((state) => state.covers);
   const groups = useMainStore((state) => state.groups);
+  const configToolbarOpen = useAtomValue(configAtom);
 
   const originCoverTitle = covers.find((cov) => cov.id === line.origin.id)
     ?.title.text;
@@ -93,6 +95,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
       onClose={() => onClose(line.id)}
       onReturn={onReturn}
       title="Edit Line"
+      opaque={configToolbarOpen}
       onSubmit={onSubmit}
       content={
         <Stack direction="column" gap={SPACING_GAP}>

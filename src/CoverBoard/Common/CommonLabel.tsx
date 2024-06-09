@@ -62,7 +62,7 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
   const getTitleText = () => {
     if (text) {
       return text;
-    } else if (text === '' && showHelpers) {
+    } else if (text === '' && showHelpers && coverLabel === LabelTypes.TITLE) {
       return '<add title>';
     }
     return '';

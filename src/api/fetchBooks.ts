@@ -10,49 +10,11 @@ const googleBooksApi = z.object({
   data: z.object({
     items: z.array(
       z.object({
-        accessInfo: z.object({
-          accessViewStatus: z.string(),
-          country: z.string(),
-          embeddable: z.boolean(),
-          epub: z.object({ isAvailable: z.boolean() }),
-          pdf: z.object({ isAvailable: z.boolean() }),
-          publicDomain: z.boolean(),
-          quoteSharingAllowed: z.boolean(),
-          textToSpeechPermission: z.string(),
-          viewability: z.string(),
-          webReaderLink: z.string().url(),
-        }),
-        etag: z.string(),
-        id: z.string(),
-        kind: z.string(),
-        saleInfo: z.object({
-          country: z.string(),
-          isEbook: z.boolean(),
-          saleability: z.string(),
-        }),
-        searchInfo: z.object({ textSnippet: z.string() }).optional(),
-        selfLink: z.string().url(),
         volumeInfo: z.object({
           title: z.string(),
           authors: z.array(z.string()).optional(),
-          publisher: z.string().optional(),
-          publishedDate: z.string().optional(),
-          description: z.string().optional(),
           industryIdentifiers: z
             .array(z.object({ type: z.string(), identifier: z.string() }))
-            .optional(),
-          readingModes: z.object({ text: z.boolean(), image: z.boolean() }),
-          pageCount: z.number().optional(),
-          printType: z.string(),
-          categories: z.array(z.string()).optional(),
-          maturityRating: z.string(),
-          allowAnonLogging: z.boolean(),
-          contentVersion: z.string(),
-          panelizationSummary: z
-            .object({
-              containsEpubBubbles: z.boolean(),
-              containsImageBubbles: z.boolean(),
-            })
             .optional(),
           imageLinks: z
             .object({
@@ -60,15 +22,9 @@ const googleBooksApi = z.object({
               thumbnail: z.string().url(),
             })
             .optional(),
-          language: z.string(),
-          previewLink: z.string().url(),
-          infoLink: z.string().url(),
-          canonicalVolumeLink: z.string().url(),
         }),
       }),
     ),
-    kind: z.string(),
-    totalItems: z.number(),
   }),
 });
 

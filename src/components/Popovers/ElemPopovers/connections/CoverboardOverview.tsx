@@ -142,7 +142,7 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
                             key={childGroupId}
                             icon={<LinkOutlined />}
                             component="a"
-                            label={`${prefix}:${formatLabel(childGroup.title.text, childGroupId)}`}
+                            label={`${prefix}: ${formatLabel(childGroup.title.text, childGroupId)}`}
                             onClick={() =>
                               setSelected({ id: childGroupId, open: true })
                             }
