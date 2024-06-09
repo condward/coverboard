@@ -9,11 +9,11 @@ import { useGetSizesContext } from 'providers';
 
 interface CommonLabelDraggableProps {
   children: ReactNode;
-  x: CoverSchema['x'] | GroupSchema['x'];
-  y: CoverSchema['y'] | GroupSchema['y'];
+  x: CoverSchema['pos']['x'] | GroupSchema['pos']['x'];
+  y: CoverSchema['pos']['y'] | GroupSchema['pos']['y'];
   dir: PosTypes;
-  scaleX?: GroupSchema['scaleX'];
-  scaleY?: GroupSchema['scaleY'];
+  scaleX?: GroupSchema['scale']['x'];
+  scaleY?: GroupSchema['scale']['y'];
   updateDir: (dir: PosTypes) => void;
 }
 

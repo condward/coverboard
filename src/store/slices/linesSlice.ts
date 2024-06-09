@@ -13,7 +13,6 @@ import {
 export interface UseLinesParams {
   lines: LinesSchema;
   isLine: (lineId: LineSchema['id']) => boolean;
-  resetLine: (linedId: LineSchema['id']) => void;
   updateLine: (
     linedId: LineSchema['id'],
     value: DeepPartial<LineSchema>,
@@ -73,9 +72,10 @@ export const createLinesSlice: StateCreator<
         lines: lineSchemas.parse([
           ...lineCopy,
           {
-            text: '',
-            dir: PosTypes.BOTTOM,
-
+            title: {
+              text: '',
+              dir: PosTypes.BOTTOM,
+            },
             origin: { ...points },
             target: { id, dir },
             id: uuidv4(),
@@ -86,43 +86,29 @@ export const createLinesSlice: StateCreator<
   },
   updateLine(lineId, partialLine) {
     set(({ lines }) => {
-      const lineIdx = lines.findIndex((line) => line.id === lineId);
+      const line = lines.find((line) => line.id === lineId);
 
-      if (lineIdx > -1) {
-        const lineCopy = [...lines];
-        const line = lineCopy[lineIdx];
+      if (!line) return { lines };
 
-        lineCopy[lineIdx] = {
-          id: partialLine.id ?? line.id,
-          text: partialLine.text ?? line.text,
-          dir: partialLine.dir ?? line.dir,
-          origin: {
-            dir: partialLine.origin?.dir ?? line.origin.dir,
-            id: partialLine.origin?.id ?? line.origin.id,
-          },
-          target: {
-            dir: partialLine.target?.dir ?? line.target.dir,
-            id: partialLine.target?.id ?? line.target.id,
-          },
-        };
+      const lineCopy = lines.filter((line) => line.id !== lineId);
+      lineCopy.push({
+        id: partialLine.id ?? line.id,
+        title: {
+          text: partialLine.title?.text ?? line.title.text,
+          dir: partialLine.title?.dir ?? line.title.dir,
+        },
+        origin: {
+          dir: partialLine.origin?.dir ?? line.origin.dir,
+          id: partialLine.origin?.id ?? line.origin.id,
+        },
+        target: {
+          dir: partialLine.target?.dir ?? line.target.dir,
+          id: partialLine.target?.id ?? line.target.id,
+        },
+      });
 
-        return { lines: lineCopy };
-      }
-      return { lines };
+      return { lines: lineCopy };
     });
-  },
-  resetLine(linedId) {
-    set(({ lines }) => ({
-      lines: lines.map((currentLine) => {
-        if (currentLine.id === linedId) {
-          return {
-            ...currentLine,
-            dir: PosTypes.BOTTOM,
-          };
-        }
-        return currentLine;
-      }),
-    }));
   },
   removeLine(linedId) {
     set(({ lines }) => ({

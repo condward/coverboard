@@ -8,13 +8,12 @@ import { Tooltip } from 'components';
 import { useGetSizesContext } from 'providers';
 
 interface BoundaryArrowProps {
-  id: CoverSchema['id'] | GroupSchema['id'];
   title: CoverSchema['title']['text'] | GroupSchema['title']['text'];
-  x: CoverSchema['x'] | GroupSchema['x'];
-  y: CoverSchema['y'] | GroupSchema['y'];
-  scaleX?: GroupSchema['x'];
-  scaleY?: GroupSchema['y'];
-  updatePosition: (coverId: string, { x, y }: Vector2d) => void;
+  x: CoverSchema['pos']['x'] | GroupSchema['pos']['x'];
+  y: CoverSchema['pos']['y'] | GroupSchema['pos']['y'];
+  scaleX?: GroupSchema['scale']['x'];
+  scaleY?: GroupSchema['scale']['y'];
+  updatePosition: ({ x, y }: Vector2d) => void;
   removeCascade: (id: string) => void;
   color: string;
 }
@@ -65,7 +64,6 @@ const useGetPoints = ({
 };
 
 const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
-  id,
   title,
   x,
   y,
@@ -89,7 +87,7 @@ const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
       newPos.y = dragLimits.height - coverSizeHeight * scaleY;
     }
 
-    updatePosition(id, newPos);
+    updatePosition(newPos);
   };
 
   return (

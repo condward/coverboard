@@ -19,12 +19,12 @@ interface CoverImageProps {
   id: GroupSchema['id'];
   titleText: GroupSchema['title']['text'];
   subtitleText: GroupSchema['subtitle']['text'];
-  x: GroupSchema['x'];
-  y: GroupSchema['y'];
+  x: GroupSchema['pos']['x'];
+  y: GroupSchema['pos']['y'];
   dir: GroupSchema['title']['dir'];
   subDir: GroupSchema['subtitle']['dir'];
-  scaleX: GroupSchema['scaleX'];
-  scaleY: GroupSchema['scaleY'];
+  scaleX: GroupSchema['scale']['x'];
+  scaleY: GroupSchema['scale']['y'];
 }
 
 const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
@@ -44,9 +44,7 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
     useGetSizesContext();
   const setSelected = useSetAtom(selectedAtom);
   const updateGroup = useMainStore((state) => state.updateGroup);
-  const updateGroupPosition = useMainStore(
-    (state) => state.updateGroupPosition,
-  );
+
   const removeGroupAndRelatedLines = useMainStore(
     (state) => state.removeGroupAndRelatedLines,
   );
@@ -79,7 +77,7 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
   return (
     <>
       <CommonDraggable
-        updatePosition={updateGroupPosition}
+        updatePosition={(pos) => updateGroup(id, { pos })}
         onDelete={removeGroupAndRelatedLines}
         id={id}
         x={x}

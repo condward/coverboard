@@ -33,7 +33,7 @@ export const useKeysListener = ({
   const isGroup = useMainStore((state) => state.isGroup);
   const isLine = useMainStore((state) => state.isLine);
 
-  const fitToScreen = useMainStore((state) => state.configs.fitToScreen);
+  const fitToScreen = useMainStore((state) => state.configs.layout.fitToScreen);
   const updateConfigs = useMainStore((state) => state.updateConfigs);
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
@@ -107,7 +107,7 @@ export const useKeysListener = ({
           setHideToolBar((prev) => !prev);
           e.preventDefault();
         } else if (e.key === 'f') {
-          updateConfigs({ fitToScreen: !fitToScreen });
+          updateConfigs({ layout: { fitToScreen: !fitToScreen } });
           e.preventDefault();
         }
       }

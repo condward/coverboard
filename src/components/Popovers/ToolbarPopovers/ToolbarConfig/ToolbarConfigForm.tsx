@@ -18,7 +18,6 @@ import {
   colorMap,
   Colors,
   ConfigSchema,
-  ToolbarConfigValues,
   POPOVER_BACK_COLOR,
   SPACING_GAP,
 } from 'types';
@@ -31,21 +30,24 @@ const commonSelectSx = {
   width: '5rem',
 };
 
-const ColorSettings = [
+const ColorSettings: Array<{
+  name: keyof ConfigSchema['colors'];
+  label: string;
+}> = [
   {
-    name: ToolbarConfigValues.color,
+    name: 'main',
     label: 'Main Color',
   },
   {
-    name: ToolbarConfigValues.coverColor,
+    name: 'covers',
     label: 'Cover Color',
   },
   {
-    name: ToolbarConfigValues.groupColor,
+    name: 'groups',
     label: 'Group Color',
   },
   {
-    name: ToolbarConfigValues.arrowColor,
+    name: 'arrows',
     label: 'Arrow Color',
   },
 ];
@@ -57,14 +59,14 @@ export const ToolbarConfigForm: FC<{
   const subTitleLabel = useMainStore((state) => state.getSubTitleLabel().label);
   const showScreenSizes = useWatch({
     control,
-    name: ToolbarConfigValues.fitToScreen,
+    name: 'layout.fitToScreen',
   });
 
   return (
     <Stack direction="column" gap={SPACING_GAP} flexWrap="wrap">
       <FieldSet label="Layout config" direction="column">
         <Controller
-          name={ToolbarConfigValues.title}
+          name="layout.title"
           control={control}
           render={({ field }) => (
             <TextField
@@ -77,7 +79,7 @@ export const ToolbarConfigForm: FC<{
           )}
         />
         <Controller
-          name={ToolbarConfigValues.fitToScreen}
+          name="layout.fitToScreen"
           control={control}
           render={({ field }) => (
             <FormControlLabel
@@ -91,7 +93,7 @@ export const ToolbarConfigForm: FC<{
         {!showScreenSizes && (
           <Stack direction="row" gap={SPACING_GAP / 2}>
             <Controller
-              name={ToolbarConfigValues.width}
+              name="layout.width"
               control={control}
               render={({ field }) => (
                 <TextField
@@ -104,7 +106,7 @@ export const ToolbarConfigForm: FC<{
               )}
             />
             <Controller
-              name={ToolbarConfigValues.height}
+              name="layout.height"
               control={control}
               render={({ field }) => (
                 <TextField
@@ -119,7 +121,7 @@ export const ToolbarConfigForm: FC<{
           </Stack>
         )}
         <Controller
-          name={ToolbarConfigValues.size}
+          name="layout.scale"
           control={control}
           render={({ field }) => (
             <SliderInput
@@ -137,7 +139,7 @@ export const ToolbarConfigForm: FC<{
       <FieldSet label="Colors" direction="row">
         {ColorSettings.map((colorSetting) => (
           <Controller
-            name={colorSetting.name}
+            name={`colors.${colorSetting.name}`}
             control={control}
             key={colorSetting.name}
             render={({ field }) => (
@@ -176,16 +178,16 @@ export const ToolbarConfigForm: FC<{
           />
         ))}
         <Controller
-          name={ToolbarConfigValues.backColor}
+          name="colors.mainBack"
           control={control}
           render={({ field }) => (
             <FormControl>
-              <InputLabel variant="outlined" id={ToolbarConfigValues.backColor}>
+              <InputLabel variant="outlined" id="colors.mainBack">
                 Back Color
               </InputLabel>
               <Select
-                labelId={ToolbarConfigValues.backColor}
-                aria-labelledby={ToolbarConfigValues.backColor}
+                labelId="colors.mainBack"
+                aria-labelledby="colors.mainBack"
                 value={field.value}
                 label="Back Color"
                 onChange={field.onChange}>
@@ -210,18 +212,16 @@ export const ToolbarConfigForm: FC<{
           )}
         />
         <Controller
-          name={ToolbarConfigValues.groupBackColor}
+          name="colors.groupsBack"
           control={control}
           render={({ field }) => (
             <FormControl>
-              <InputLabel
-                variant="outlined"
-                id={ToolbarConfigValues.groupBackColor}>
+              <InputLabel variant="outlined" id="colors.groupsBack">
                 Group Back Color
               </InputLabel>
               <Select
-                labelId={ToolbarConfigValues.groupBackColor}
-                aria-labelledby={ToolbarConfigValues.groupBackColor}
+                labelId="colors.groupsBack"
+                aria-labelledby="colors.groupsBack"
                 fullWidth
                 value={field.value}
                 label="Group Back Color"
@@ -253,7 +253,7 @@ export const ToolbarConfigForm: FC<{
         gap={{ xs: 0, sm: SPACING_GAP }}>
         <Stack>
           <Controller
-            name={ToolbarConfigValues.showMainTitle}
+            name="visibility.mainTitle"
             control={control}
             render={({ field }) => (
               <FormControlLabel
@@ -265,7 +265,7 @@ export const ToolbarConfigForm: FC<{
             )}
           />
           <Controller
-            name={ToolbarConfigValues.showHelpers}
+            name="visibility.helpers"
             control={control}
             render={({ field }) => (
               <FormControlLabel
@@ -277,7 +277,7 @@ export const ToolbarConfigForm: FC<{
             )}
           />
           <Controller
-            name={ToolbarConfigValues.showArrow}
+            name="visibility.arrows"
             control={control}
             render={({ field }) => (
               <FormControlLabel
@@ -291,7 +291,7 @@ export const ToolbarConfigForm: FC<{
         </Stack>
         <Stack>
           <Controller
-            name={ToolbarConfigValues.showTitle}
+            name="visibility.titles"
             control={control}
             render={({ field }) => (
               <FormControlLabel
@@ -303,7 +303,7 @@ export const ToolbarConfigForm: FC<{
             )}
           />
           <Controller
-            name={ToolbarConfigValues.showSubtitle}
+            name="visibility.subtitles"
             control={control}
             render={({ field }) => (
               <FormControlLabel
@@ -315,7 +315,7 @@ export const ToolbarConfigForm: FC<{
             )}
           />
           <Controller
-            name={ToolbarConfigValues.showStars}
+            name="visibility.stars"
             control={control}
             render={({ field }) => (
               <FormControlLabel
@@ -331,7 +331,7 @@ export const ToolbarConfigForm: FC<{
 
       <FieldSet label="Default Positions" direction="column">
         <Controller
-          name={ToolbarConfigValues.labelDir}
+          name="dir.covers"
           control={control}
           render={({ field }) => (
             <DirectionRadio
@@ -344,7 +344,7 @@ export const ToolbarConfigForm: FC<{
           )}
         />
         <Controller
-          name={ToolbarConfigValues.groupDir}
+          name="dir.groups"
           control={control}
           render={({ field }) => (
             <DirectionRadio
@@ -357,7 +357,7 @@ export const ToolbarConfigForm: FC<{
           )}
         />
         <Controller
-          name={ToolbarConfigValues.starsDir}
+          name="dir.stars"
           control={control}
           render={({ field }) => (
             <DirectionRadio

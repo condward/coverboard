@@ -15,40 +15,50 @@ export const bulkUpdateCoverSchema = z.object({
         return validate(id);
       }, 'covers:id has invalid format'),
   ),
-  x: z.coerce
-    .number({
-      invalid_type_error: 'covers:x position must be a number',
-      required_error: 'covers:x is required',
-    })
-    .min(-1, 'covers:x position must be positive number')
-    .max(MAX_BOUNDARY, `covers:x position must be less than ${MAX_BOUNDARY}`),
-  y: z.coerce
-    .number({
-      invalid_type_error: 'covers:y position must be a number',
-      required_error: 'covers:y is required',
-    })
-    .min(-1, 'covers:y position must be positive number')
-    .max(MAX_BOUNDARY, `covers:x position must be less than ${MAX_BOUNDARY}`),
-  paceX: z.coerce
-    .number({
-      invalid_type_error: 'covers:paceX position must be a number',
-      required_error: 'covers:paceX is required',
-    })
-    .min(0, 'covers:paceX position must be positive number')
-    .max(
-      MAX_BOUNDARY,
-      `covers:paceX position must be less than ${MAX_BOUNDARY}`,
-    ),
-  paceY: z.coerce
-    .number({
-      invalid_type_error: 'covers:paceY position must be a number',
-      required_error: 'covers:paceY is required',
-    })
-    .min(0, 'covers:paceY position must be positive number')
-    .max(
-      MAX_BOUNDARY,
-      `covers:paceY position must be less than ${MAX_BOUNDARY}`,
-    ),
+  pos: z.object({
+    x: z.coerce
+      .number({
+        invalid_type_error: 'covers:pos:x position must be a number',
+        required_error: 'covers:pos:x is required',
+      })
+      .min(-1, 'covers:pos:x position must be positive number')
+      .max(
+        MAX_BOUNDARY,
+        `covers:pos:x position must be less than ${MAX_BOUNDARY}`,
+      ),
+    y: z.coerce
+      .number({
+        invalid_type_error: 'covers:pos:y position must be a number',
+        required_error: 'covers:pos:y is required',
+      })
+      .min(-1, 'covers:pos:y position must be positive number')
+      .max(
+        MAX_BOUNDARY,
+        `covers:pos:y position must be less than ${MAX_BOUNDARY}`,
+      ),
+  }),
+  pace: z.object({
+    x: z.coerce
+      .number({
+        invalid_type_error: 'covers:pace:x position must be a number',
+        required_error: 'covers:pace:x is required',
+      })
+      .min(0, 'covers:pace:x position must be positive number')
+      .max(
+        MAX_BOUNDARY,
+        `covers:pace:x position must be less than ${MAX_BOUNDARY}`,
+      ),
+    y: z.coerce
+      .number({
+        invalid_type_error: 'covers:pace:y position must be a number',
+        required_error: 'covers:pace:y is required',
+      })
+      .min(0, 'covers:pace:y position must be positive number')
+      .max(
+        MAX_BOUNDARY,
+        `covers:pace:y position must be less than ${MAX_BOUNDARY}`,
+      ),
+  }),
   title: z.object({
     dir: z
       .nativeEnum(PosTypes, {

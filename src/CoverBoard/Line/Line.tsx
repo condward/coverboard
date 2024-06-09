@@ -9,12 +9,12 @@ import { LineArrow, LineLabel } from '.';
 
 interface LineProps {
   id: LineSchema['id'];
-  dir: LineSchema['dir'];
+  text: LineSchema['title']['text'];
+  dir: LineSchema['title']['dir'];
   originId: LineSchema['origin']['id'];
   originDir: LineSchema['origin']['dir'];
   targetId: LineSchema['target']['id'];
   targetDir: LineSchema['target']['dir'];
-  text: LineSchema['text'];
 }
 
 const convertPosToXY = (
@@ -83,13 +83,13 @@ const useGetLineParams = ({
   const targetSquare = targetSquareCover ?? targetSquareGroup;
 
   const scaleOriginX =
-    originSquare && 'scaleX' in originSquare ? originSquare.scaleX : 1;
+    originSquare && 'scale' in originSquare ? originSquare.scale.x : 1;
   const scaleOriginY =
-    originSquare && 'scaleY' in originSquare ? originSquare.scaleY : 1;
+    originSquare && 'scale' in originSquare ? originSquare.scale.y : 1;
   const scaleDestX =
-    targetSquare && 'scaleX' in targetSquare ? targetSquare.scaleX : 1;
+    targetSquare && 'scale' in targetSquare ? targetSquare.scale.x : 1;
   const scaleDestY =
-    targetSquare && 'scaleY' in targetSquare ? targetSquare.scaleY : 1;
+    targetSquare && 'scale' in targetSquare ? targetSquare.scale.y : 1;
 
   const coverSizeOriginWidth = coverSizeWidth * scaleOriginX;
   const coverSizeOriginHeight = coverSizeHeight * scaleOriginY;
@@ -111,10 +111,10 @@ const useGetLineParams = ({
     );
 
     const points = [
-      originSquare.x + originPos.x,
-      originSquare.y + originPos.y,
-      targetSquare.x + targetPos.x,
-      targetSquare.y + targetPos.y,
+      originSquare.pos.x + originPos.x,
+      originSquare.pos.y + originPos.y,
+      targetSquare.pos.x + targetPos.x,
+      targetSquare.pos.y + targetPos.y,
     ];
 
     const midX = (points[0] + points[2]) / 2;

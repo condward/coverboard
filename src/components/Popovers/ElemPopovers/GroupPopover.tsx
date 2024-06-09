@@ -80,10 +80,14 @@ export const GroupPopover: FC<GroupPopover> = ({
           text: values.subtitle.text,
           dir: values.subtitle.dir,
         },
-        scaleX: values.scaleX,
-        scaleY: values.scaleY,
-        x: values.x,
-        y: values.y,
+        scale: {
+          x: values.scale.x,
+          y: values.scale.y,
+        },
+        pos: {
+          x: values.pos.x,
+          y: values.pos.y,
+        },
       });
       onClose();
     },
@@ -175,7 +179,7 @@ export const GroupPopover: FC<GroupPopover> = ({
                     gap={SPACING_GAP / 2}
                     flexWrap="nowrap">
                     <Controller
-                      name="x"
+                      name="pos.x"
                       control={control}
                       render={({ field }) => (
                         <SliderInput
@@ -183,12 +187,14 @@ export const GroupPopover: FC<GroupPopover> = ({
                           name={field.name}
                           value={field.value}
                           onChange={field.onChange}
-                          max={dragLimits.width - coverSizeWidth * group.scaleX}
+                          max={
+                            dragLimits.width - coverSizeWidth * group.scale.x
+                          }
                         />
                       )}
                     />
                     <Controller
-                      name="y"
+                      name="pos.y"
                       control={control}
                       render={({ field }) => (
                         <SliderInput
@@ -197,7 +203,7 @@ export const GroupPopover: FC<GroupPopover> = ({
                           value={field.value}
                           onChange={field.onChange}
                           max={
-                            dragLimits.height - coverSizeHeight * group.scaleY
+                            dragLimits.height - coverSizeHeight * group.scale.y
                           }
                         />
                       )}
@@ -205,7 +211,7 @@ export const GroupPopover: FC<GroupPopover> = ({
                   </FieldSet>
                   <FieldSet label="Scale" direction="column">
                     <Controller
-                      name="scaleX"
+                      name="scale.x"
                       control={control}
                       render={({ field }) => (
                         <SliderInput
@@ -219,7 +225,7 @@ export const GroupPopover: FC<GroupPopover> = ({
                       )}
                     />
                     <Controller
-                      name="scaleY"
+                      name="scale.y"
                       control={control}
                       render={({ field }) => (
                         <SliderInput
@@ -270,8 +276,8 @@ export const GroupPopover: FC<GroupPopover> = ({
               covers={coversInsideGroup}
               onClose={() => setOpen(false)}
               maxBounds={{
-                x: group.x,
-                y: group.y,
+                x: group.pos.x,
+                y: group.pos.y,
                 width: groupBound.x,
                 height: groupBound.y,
               }}

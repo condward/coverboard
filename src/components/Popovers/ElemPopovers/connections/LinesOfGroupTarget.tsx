@@ -26,8 +26,8 @@ export const LinesOfGroupTarget: FC<LinesOfGroupTargetProps> = ({
     if (group) {
       return {
         lineId: line.id,
-        lineLabel: line.text,
-        lineDir: line.dir,
+        lineLabel: line.title.text,
+        lineDir: line.title.dir,
         originDir: line.origin.dir,
         targetId: group.id,
         targetDir: line.target.dir,

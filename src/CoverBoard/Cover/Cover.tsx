@@ -19,8 +19,8 @@ interface CoverImageProps {
   id: CoverSchema['id'];
   titleText: CoverSchema['title']['text'];
   subtitleText: CoverSchema['subtitle']['text'];
-  x: CoverSchema['x'];
-  y: CoverSchema['y'];
+  x: CoverSchema['pos']['x'];
+  y: CoverSchema['pos']['y'];
   titleDir: CoverSchema['title']['dir'];
   subTitleDir: CoverSchema['subtitle']['dir'];
   starDir: CoverSchema['star']['dir'];
@@ -44,15 +44,14 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
 }) => {
   const isLandscape = useIsLandscape();
   const color = useMainStore((state) => state.getCoverColor());
-  const showTitle = useMainStore((state) => state.configs.showTitle);
-  const showSubtitle = useMainStore((state) => state.configs.showSubtitle);
+  const showTitle = useMainStore((state) => state.configs.visibility.titles);
+  const showSubtitle = useMainStore(
+    (state) => state.configs.visibility.subtitles,
+  );
   const { fontSize, dragLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
-  const showStars = useMainStore((state) => state.configs.showStars);
+  const showStars = useMainStore((state) => state.configs.visibility.stars);
   const setSelected = useSetAtom(selectedAtom);
-  const updateCoverPosition = useMainStore(
-    (state) => state.updateCoverPosition,
-  );
   const updateCover = useMainStore((state) => state.updateCover);
 
   const removeCoverAndRelatedLines = useMainStore(
@@ -117,7 +116,7 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
   return (
     <>
       <CommonDraggable
-        updatePosition={updateCoverPosition}
+        updatePosition={(pos) => updateCover(id, { pos })}
         onDelete={removeCoverAndRelatedLines}
         id={id}
         x={x}

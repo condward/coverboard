@@ -9,7 +9,7 @@ import { useGetSizesContext } from 'providers';
 
 interface DraggableGroupProps {
   children: ReactNode;
-  dir: LineSchema['dir'];
+  dir: LineSchema['title']['dir'];
   setUpdate: (dir: PosTypes) => void;
   lineParams: LineParams;
 }

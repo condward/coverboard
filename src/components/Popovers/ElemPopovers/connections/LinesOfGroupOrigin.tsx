@@ -25,8 +25,8 @@ export const LinesOfGroupOrigin: FC<LinesOfGroupOriginProps> = ({
     if (group) {
       return {
         lineId: line.id,
-        lineLabel: line.text,
-        lineDir: line.dir,
+        lineLabel: line.title.text,
+        lineDir: line.title.dir,
         targetDir: line.target.dir,
         originId: group.id,
         originDir: line.origin.dir,

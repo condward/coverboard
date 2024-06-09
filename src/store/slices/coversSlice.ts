@@ -6,7 +6,7 @@ import { CoverSchema, CoversSchema, PosTypes, coversSchema } from 'types';
 export interface UseCoverParams {
   covers: CoversSchema;
   isCover: (coverId: CoverSchema['id']) => boolean;
-  updateCover: (
+  updateCoverSlice: (
     coverId: CoverSchema['id'],
     partial: DeepPartial<CoverSchema>,
   ) => void;
@@ -25,38 +25,37 @@ export const createCoversSlice: StateCreator<
 > = (set, get) => ({
   covers: [],
   isCover: (id) => get().covers.some((cov) => cov.id === id),
-  updateCover(coverId, partialCover) {
+  updateCoverSlice(coverId, partialCover) {
     set(({ covers }) => {
-      const coverIdx = covers.findIndex((cov) => cov.id === coverId);
+      const cover = covers.find((cov) => cov.id === coverId);
 
-      if (coverIdx > -1) {
-        const coverCopy = [...covers];
-        const cover = coverCopy[coverIdx];
+      if (!cover) return { covers };
 
-        coverCopy[coverIdx] = {
-          id: partialCover.id ?? cover.id,
-          x: partialCover.x ?? cover.x,
-          y: partialCover.y ?? cover.y,
-          link: partialCover.link ?? cover.link,
-          star: {
-            dir: partialCover.star?.dir ?? cover.star.dir,
-            count: partialCover.star?.count ?? cover.star.count,
-          },
-          title: {
-            dir: partialCover.title?.dir ?? cover.title.dir,
-            text: partialCover.title?.text ?? cover.title.text,
-            search: partialCover.title?.search ?? cover.title.search,
-          },
-          subtitle: {
-            dir: partialCover.subtitle?.dir ?? cover.subtitle.dir,
-            text: partialCover.subtitle?.text ?? cover.subtitle.text,
-            search: partialCover.subtitle?.search ?? cover.subtitle.search,
-          },
-        };
+      const coverCopy = covers.filter((cov) => cov.id !== coverId);
+      coverCopy.push({
+        id: partialCover.id ?? cover.id,
+        pos: {
+          x: partialCover.pos?.x ?? cover.pos.x,
+          y: partialCover.pos?.y ?? cover.pos.y,
+        },
+        link: partialCover.link ?? cover.link,
+        star: {
+          dir: partialCover.star?.dir ?? cover.star.dir,
+          count: partialCover.star?.count ?? cover.star.count,
+        },
+        title: {
+          dir: partialCover.title?.dir ?? cover.title.dir,
+          text: partialCover.title?.text ?? cover.title.text,
+          search: partialCover.title?.search ?? cover.title.search,
+        },
+        subtitle: {
+          dir: partialCover.subtitle?.dir ?? cover.subtitle.dir,
+          text: partialCover.subtitle?.text ?? cover.subtitle.text,
+          search: partialCover.subtitle?.search ?? cover.subtitle.search,
+        },
+      });
 
-        return { covers: coverCopy };
-      }
-      return { covers };
+      return { covers: coverCopy };
     });
   },
   updateAllCoversDir(dir) {

@@ -16,8 +16,8 @@ import { Media, SearchSchema } from 'types';
 export const useSearchValues = () => {
   const media = useMainStore((state) => state.configs.media);
   const covers = useMainStore((state) => state.covers);
-  const starsDir = useMainStore((state) => state.configs.starsDir);
-  const labelDir = useMainStore((state) => state.configs.labelDir);
+  const starsDir = useMainStore((state) => state.configs.dir.stars);
+  const labelDir = useMainStore((state) => state.configs.dir.covers);
   const addCovers = useMainStore((state) => state.addCovers);
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
@@ -53,8 +53,10 @@ export const useSearchValues = () => {
           filtereResults.map((filteredResult) => ({
             id: uuidv4(),
             link: filteredResult.link,
-            x: 0,
-            y: 0,
+            pos: {
+              x: 0,
+              y: 0,
+            },
             title: {
               search: filteredResult.title,
               text: filteredResult.title,

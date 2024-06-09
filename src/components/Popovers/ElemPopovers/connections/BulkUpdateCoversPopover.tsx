@@ -47,13 +47,13 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   );
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const updateCover = useMainStore((state) => state.updateCover);
-  const size = useMainStore((state) => state.configs.size);
+  const scale = useMainStore((state) => state.configs.layout.scale);
   const heightRatio = useMainStore((state) => state.getHeightRatio());
   const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const offLimitCovers = covers.flatMap((covers) => {
     if (
-      (covers.x > dragLimits.width && dragLimits.width > size) ||
-      (covers.y > dragLimits.height && dragLimits.height > size)
+      (covers.pos.x > dragLimits.width && dragLimits.width > scale) ||
+      (covers.pos.y > dragLimits.height && dragLimits.height > scale)
     ) {
       return covers;
     }
@@ -79,17 +79,21 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
         count: -1,
         dir: 'none',
       },
-      x: -1,
-      y: -1,
-      paceX: 0,
-      paceY: 0,
+      pos: {
+        x: -1,
+        y: -1,
+      },
+      pace: {
+        x: 0,
+        y: 0,
+      },
     },
   });
 
   const onSubmit = handleSubmit(
     (values) => {
-      const minValueX = values.x === 0 ? maxBounds.x + 1 : maxBounds.x;
-      const minValueY = values.y === 0 ? maxBounds.y + 1 : maxBounds.y;
+      const minValueX = values.pos.x === 0 ? maxBounds.x + 1 : maxBounds.x;
+      const minValueY = values.pos.y === 0 ? maxBounds.y + 1 : maxBounds.y;
 
       values.ids.forEach((id, index) =>
         updateCover(id, {
@@ -104,20 +108,22 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             count: values.star.count > -1 ? values.star.count : undefined,
             dir: values.star.dir !== 'none' ? values.star.dir : undefined,
           },
-          x:
-            values.x > -1
-              ? minValueX +
-                values.x +
-                (index <= values.paceX ? index * values.paceX * size : 0)
-              : undefined,
-          y:
-            values.y > -1
-              ? minValueY +
-                values.y +
-                (index <= values.paceY
-                  ? index * values.paceY * size * heightRatio
-                  : 0)
-              : undefined,
+          pos: {
+            x:
+              values.pos.x > -1
+                ? minValueX +
+                  values.pos.x +
+                  (index <= values.pace.x ? index * values.pace.x * scale : 0)
+                : undefined,
+            y:
+              values.pos.y > -1
+                ? minValueY +
+                  values.pos.y +
+                  (index <= values.pace.y
+                    ? index * values.pace.y * scale * heightRatio
+                    : 0)
+                : undefined,
+          },
         }),
       );
 
@@ -140,14 +146,16 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   const handleBringToScreen = () => {
     offLimitCovers.forEach((cover) => {
       updateCover(cover.id, {
-        x:
-          cover.x > dragLimits.width
-            ? dragLimits.width - coverSizeWidth
-            : cover.x,
-        y:
-          cover.y > dragLimits.height
-            ? dragLimits.height - coverSizeHeight
-            : cover.y,
+        pos: {
+          x:
+            cover.pos.x > dragLimits.width
+              ? dragLimits.width - coverSizeWidth
+              : cover.pos.x,
+          y:
+            cover.pos.y > dragLimits.height
+              ? dragLimits.height - coverSizeHeight
+              : cover.pos.y,
+        },
       });
     });
   };
@@ -271,7 +279,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             gap={SPACING_GAP / 2}
             flexWrap="nowrap">
             <Controller
-              name="x"
+              name="pos.x"
               control={control}
               render={({ field }) => (
                 <SliderInput
@@ -285,7 +293,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
               )}
             />
             <Controller
-              name="paceX"
+              name="pace.x"
               control={control}
               render={({ field }) => (
                 <SliderInput
@@ -294,7 +302,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
                   value={field.value}
                   onChange={field.onChange}
                   max={Math.floor(
-                    (maxBounds.width - maxBounds.x - watch('x')) / size,
+                    (maxBounds.width - maxBounds.x - watch('pos.x')) / scale,
                   )}
                 />
               )}
@@ -306,7 +314,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             gap={SPACING_GAP / 2}
             flexWrap="nowrap">
             <Controller
-              name="y"
+              name="pos.y"
               control={control}
               render={({ field }) => (
                 <SliderInput
@@ -320,7 +328,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
               )}
             />
             <Controller
-              name="paceY"
+              name="pace.y"
               control={control}
               render={({ field }) => (
                 <SliderInput
@@ -329,8 +337,8 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
                   value={field.value}
                   onChange={field.onChange}
                   max={Math.floor(
-                    (maxBounds.height - maxBounds.y - watch('y')) /
-                      (size + heightRatio),
+                    (maxBounds.height - maxBounds.y - watch('pos.y')) /
+                      (scale + heightRatio),
                   )}
                 />
               )}

@@ -8,21 +8,19 @@ import { BoundaryArrow } from './BoundaryArrow';
 export const BoundaryGroupArrows: FC = () => {
   const { dragLimits } = useGetSizesContext();
   const groups = useMainStore((state) => state.groups);
-  const size = useMainStore((state) => state.configs.size);
+  const scale = useMainStore((state) => state.configs.layout.scale);
 
   const offLimitGroups = groups.flatMap((group) => {
     if (
-      (group.x > dragLimits.width && dragLimits.width > size) ||
-      (group.y > dragLimits.height && dragLimits.height > size)
+      (group.pos.x > dragLimits.width && dragLimits.width > scale) ||
+      (group.pos.y > dragLimits.height && dragLimits.height > scale)
     ) {
       return group;
     }
 
     return [];
   });
-  const updateGroupPosition = useMainStore(
-    (state) => state.updateGroupPosition,
-  );
+  const updateGroup = useMainStore((state) => state.updateGroup);
   const removeGroupAndRelatedLines = useMainStore(
     (state) => state.removeGroupAndRelatedLines,
   );
@@ -33,13 +31,12 @@ export const BoundaryGroupArrows: FC = () => {
       {offLimitGroups.map((group) => (
         <BoundaryArrow
           color={groupColor}
-          updatePosition={updateGroupPosition}
+          updatePosition={(pos) => updateGroup(group.id, { pos })}
           removeCascade={removeGroupAndRelatedLines}
-          id={group.id}
-          x={group.x}
-          y={group.y}
-          scaleX={group.scaleX}
-          scaleY={group.scaleY}
+          x={group.pos.x}
+          y={group.pos.y}
+          scaleX={group.scale.x}
+          scaleY={group.scale.y}
           title={group.title.text}
           key={group.id}
         />

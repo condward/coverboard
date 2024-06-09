@@ -25,8 +25,8 @@ export const LinesOfCoverOrigin: FC<LinesOfCoverOriginProps> = ({
     if (cover) {
       return {
         lineId: line.id,
-        lineDir: line.dir,
-        lineLabel: line.text,
+        lineDir: line.title.dir,
+        lineLabel: line.title.text,
         targetDir: line.target.dir,
         originId: cover.id,
         originDir: line.origin.dir,

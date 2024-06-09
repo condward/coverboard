@@ -15,12 +15,12 @@ export const GroupCoversWithoutMemo: FC = () => {
           id={group.id}
           titleText={group.title.text}
           subtitleText={group.subtitle.text}
-          x={group.x}
-          y={group.y}
+          x={group.pos.x}
+          y={group.pos.y}
           dir={group.title.dir}
           subDir={group.subtitle.dir}
-          scaleX={group.scaleX}
-          scaleY={group.scaleY}
+          scaleX={group.scale.x}
+          scaleY={group.scale.y}
         />
       ))}
     </>

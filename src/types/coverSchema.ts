@@ -14,20 +14,25 @@ export const coverSchema = z.object({
       return validate(id);
     }, 'covers:id has invalid format'),
   link: z.string().url().or(z.literal('')),
-  x: z.coerce
-    .number({
-      invalid_type_error: 'covers:x position must be a number',
-      required_error: 'covers:x is required',
-    })
-    .min(0, 'covers:x position must be positive number')
-    .max(MAX_BOUNDARY, `covers:x position must be less than ${MAX_BOUNDARY}`),
-  y: z.coerce
-    .number({
-      invalid_type_error: 'covers:y position must be a number',
-      required_error: 'covers:y is required',
-    })
-    .min(0, 'covers:y position must be positive number')
-    .max(MAX_BOUNDARY, `covers:x position must be less than ${MAX_BOUNDARY}`),
+  pos: z.object({
+    x: z.coerce
+      .number({
+        invalid_type_error: 'covers:pos:x position must be a number',
+        required_error: 'covers:pos:x is required',
+      })
+      .min(0, 'covers:x position must be positive number')
+      .max(
+        MAX_BOUNDARY,
+        `covers:pos:x position must be less than ${MAX_BOUNDARY}`,
+      ),
+    y: z.coerce
+      .number({
+        invalid_type_error: 'covers:pos:y position must be a number',
+        required_error: 'covers:pos:y is required',
+      })
+      .min(0, 'covers:y position must be positive number')
+      .max(MAX_BOUNDARY, `covers:x position must be less than ${MAX_BOUNDARY}`),
+  }),
   title: z.object({
     search: z.string({
       invalid_type_error: 'covers:search must be a string',

@@ -160,8 +160,10 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
           count: values.star.count,
           dir: values.star.dir,
         },
-        x: values.x,
-        y: values.y,
+        pos: {
+          x: values.pos.x,
+          y: values.pos.y,
+        },
       });
       onClose();
     },
@@ -350,7 +352,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                     gap={SPACING_GAP / 2}
                     flexWrap="nowrap">
                     <Controller
-                      name="x"
+                      name="pos.x"
                       control={control}
                       render={({ field }) => (
                         <SliderInput
@@ -367,11 +369,11 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                       )}
                     />
                     <Controller
-                      name="y"
+                      name="pos.y"
                       control={control}
                       render={({ field }) => (
                         <SliderInput
-                          label="X"
+                          label="Y"
                           name={field.name}
                           value={field.value}
                           onChange={field.onChange}
@@ -387,29 +389,31 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                     />
                   </FieldSet>
                   {cover.link && (
-                    <FieldSet
-                      direction="row"
-                      label="Image Link"
-                      gap={SPACING_GAP / 2}
-                      flexWrap="nowrap">
-                      <TextField
-                        fullWidth
-                        disabled
-                        label="Link"
-                        value={cover.link}
-                      />
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        type="button"
-                        onClick={() =>
-                          updateCover(cover.id, {
-                            link: '',
-                          })
-                        }>
-                        Delete
-                      </Button>
-                    </FieldSet>
+                    <Controller
+                      name="link"
+                      control={control}
+                      render={({ field }) => (
+                        <FieldSet
+                          direction="row"
+                          label="Image Link"
+                          gap={SPACING_GAP / 2}
+                          flexWrap="nowrap">
+                          <TextField
+                            fullWidth
+                            disabled
+                            label="Link"
+                            value={field.value}
+                          />
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            type="button"
+                            onClick={() => field.onChange('')}>
+                            Delete
+                          </Button>
+                        </FieldSet>
+                      )}
+                    />
                   )}
                 </Stack>
               ),

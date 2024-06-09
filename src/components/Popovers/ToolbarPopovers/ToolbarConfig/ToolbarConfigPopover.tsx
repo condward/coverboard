@@ -15,7 +15,6 @@ import {
   ConfigSchema,
   ConfigSchemaOutput,
   ToolConfigIDs,
-  ToolbarConfigValues,
   configSchema,
   SPACING_GAP,
 } from 'types';
@@ -46,20 +45,30 @@ export const ToolbarConfigPopover: FC<{
     formState: { isDirty },
   } = useForm<ConfigSchema, unknown, ConfigSchemaOutput>({
     resolver: zodResolver(
-      configSchema.extend({ size: z.number().min(0.5).max(1.5) }),
+      configSchema.extend({
+        layout: configSchema.shape.layout.extend({
+          scale: z.number().min(0.5).max(1.5),
+        }),
+      }),
     ),
-    defaultValues: { ...configs, size: configs.size / 100 },
+    defaultValues: {
+      ...configs,
+      layout: { ...configs.layout, scale: configs.layout.scale / 100 },
+    },
   });
 
   const onSubmit = handleSubmit(
     (config) => {
-      updateAllCoversDir(config[ToolbarConfigValues.labelDir]);
-      updateAllStarsDir(config[ToolbarConfigValues.starsDir]);
-      updateAllGroupsDir(config[ToolbarConfigValues.groupDir]);
+      updateAllCoversDir(config.dir.covers);
+      updateAllStarsDir(config.dir.stars);
+      updateAllGroupsDir(config.dir.groups);
       updateConfigs({
         ...config,
-        title: config.title.trim(),
-        size: config.size * 100,
+        layout: {
+          ...config.layout,
+          title: config.layout.title.trim(),
+          scale: config.layout.scale * 100,
+        },
       });
       onClose();
     },

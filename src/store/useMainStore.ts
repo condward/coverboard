@@ -4,6 +4,7 @@ import { StateCreator, create } from 'zustand';
 import isDeepEqual from 'fast-deep-equal';
 import { temporal } from 'zundo';
 import throttle from 'just-throttle';
+import { DeepPartial } from 'react-hook-form';
 
 import { store } from 'store';
 
@@ -32,8 +33,15 @@ interface CoverContextData {
   getStoreValues: () => AppSchema;
   removeCoverAndRelatedLines: (id: string) => void;
   removeGroupAndRelatedLines: (id: string) => void;
+  updateCover: (
+    coverId: CoverSchema['id'],
+    partial: DeepPartial<CoverSchema>,
+  ) => void;
+  updateGroup: (
+    groupdId: GroupSchema['id'],
+    partial: DeepPartial<GroupSchema>,
+  ) => void;
   updateGroupPosition: (coverId: string, { x, y }: Vector2d) => void;
-  updateCoverPosition: (coverId: string, { x, y }: Vector2d) => void;
   updateGroupScale: (
     coverId: string,
     scale: { scaleX: number; scaleY: number },
@@ -79,13 +87,14 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
       (currentGroup) => currentGroup.id === groupId,
     );
 
-    if (!group) return undefined;
+    if (!group) return;
 
     return {
-      x: get().configs.size * group.scaleX - get().configs.size,
+      x:
+        get().configs.layout.scale * group.scale.x - get().configs.layout.scale,
       y:
-        get().configs.size * get().getHeightRatio() * group.scaleY -
-        get().configs.size,
+        get().configs.layout.scale * get().getHeightRatio() * group.scale.y -
+        get().configs.layout.scale,
     };
   },
   getCoversInsideGroup(groupId) {
@@ -96,13 +105,16 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
     return group
       ? get().covers.filter(
           (currentCover) =>
-            currentCover.x > group.x &&
-            currentCover.x + get().configs.size <
-              group.x + get().configs.size * group.scaleX &&
-            currentCover.y > group.y &&
-            currentCover.y + get().configs.size * get().getHeightRatio() <
-              group.y +
-                get().configs.size * get().getHeightRatio() * group.scaleY,
+            currentCover.pos.x > group.pos.x &&
+            currentCover.pos.x + get().configs.layout.scale <
+              group.pos.x + get().configs.layout.scale * group.scale.x &&
+            currentCover.pos.y > group.pos.y &&
+            currentCover.pos.y +
+              get().configs.layout.scale * get().getHeightRatio() <
+              group.pos.y +
+                get().configs.layout.scale *
+                  get().getHeightRatio() *
+                  group.scale.y,
         )
       : [];
   },
@@ -114,15 +126,16 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
     return cover
       ? get().groups.filter(
           (currentGroup) =>
-            cover.x > currentGroup.x &&
-            cover.x + get().configs.size <
-              currentGroup.x + get().configs.size * currentGroup.scaleX &&
-            cover.y > currentGroup.y &&
-            cover.y + get().configs.size * get().getHeightRatio() <
-              currentGroup.y +
-                get().configs.size *
+            cover.pos.x > currentGroup.pos.x &&
+            cover.pos.x + get().configs.layout.scale <
+              currentGroup.pos.x +
+                get().configs.layout.scale * currentGroup.scale.y &&
+            cover.pos.y > currentGroup.pos.y &&
+            cover.pos.y + get().configs.layout.scale * get().getHeightRatio() <
+              currentGroup.pos.y +
+                get().configs.layout.scale *
                   get().getHeightRatio() *
-                  currentGroup.scaleY,
+                  currentGroup.scale.y,
         )
       : [];
   },
@@ -134,15 +147,16 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
     return group
       ? get().groups.filter(
           (currentGroup) =>
-            group.x > currentGroup.x &&
-            group.x + get().configs.size <
-              currentGroup.x + get().configs.size * currentGroup.scaleX &&
-            group.y > currentGroup.y &&
-            group.y + get().configs.size * get().getHeightRatio() <
-              currentGroup.y +
-                get().configs.size *
+            group.pos.x > currentGroup.pos.x &&
+            group.pos.x + get().configs.layout.scale <
+              currentGroup.pos.x +
+                get().configs.layout.scale * currentGroup.scale.x &&
+            group.pos.y > currentGroup.pos.y &&
+            group.pos.y + get().configs.layout.scale * get().getHeightRatio() <
+              currentGroup.pos.y +
+                get().configs.layout.scale *
                   get().getHeightRatio() *
-                  currentGroup.scaleY,
+                  currentGroup.scale.y,
         )
       : [];
   },
@@ -155,16 +169,19 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
       ? get().groups.filter(
           (currentGroup) =>
             currentGroup.id !== group.id &&
-            currentGroup.x > group.x &&
-            currentGroup.x + get().configs.size * currentGroup.scaleX <
-              group.x + get().configs.size * group.scaleX &&
-            currentGroup.y > group.y &&
-            currentGroup.y +
-              get().configs.size *
+            currentGroup.pos.x > group.pos.x &&
+            currentGroup.pos.x +
+              get().configs.layout.scale * currentGroup.scale.x <
+              group.pos.x + get().configs.layout.scale * group.scale.x &&
+            currentGroup.pos.y > group.pos.y &&
+            currentGroup.pos.y +
+              get().configs.layout.scale *
                 get().getHeightRatio() *
-                currentGroup.scaleY <
-              group.y +
-                get().configs.size * get().getHeightRatio() * group.scaleY,
+                currentGroup.scale.y <
+              group.pos.y +
+                get().configs.layout.scale *
+                  get().getHeightRatio() *
+                  group.scale.y,
         )
       : [];
   },
@@ -183,22 +200,22 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
 
     const group = get().groups.find((group) => group.id === groupId);
 
-    if (group) {
-      const {
-        getGroupsInsideGroup,
-        removeGroupAndRelatedLines,
-        getCoversInsideGroup,
-        removeCoverAndRelatedLines,
-      } = get();
+    if (!group) return;
 
-      getGroupsInsideGroup(group.id).forEach((group) =>
-        removeGroupAndRelatedLines(group.id),
-      );
+    const {
+      getGroupsInsideGroup,
+      removeGroupAndRelatedLines,
+      getCoversInsideGroup,
+      removeCoverAndRelatedLines,
+    } = get();
 
-      getCoversInsideGroup(group.id).forEach((cover) =>
-        removeCoverAndRelatedLines(cover.id),
-      );
-    }
+    getGroupsInsideGroup(group.id).forEach((group) =>
+      removeGroupAndRelatedLines(group.id),
+    );
+
+    getCoversInsideGroup(group.id).forEach((cover) =>
+      removeCoverAndRelatedLines(cover.id),
+    );
 
     set(({ lines, groups }) => ({
       lines: lines.filter(
@@ -207,153 +224,151 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
       groups: groups.filter((c) => c.id !== groupId),
     }));
   },
-  updateCoverPosition(coverId, { x, y }) {
-    const cover = get().covers.find((cover) => cover.id === coverId);
+  updateCover(coverId, partialCover) {
+    const cover = get().covers.find((cov) => cov.id === coverId);
 
-    if (cover) {
-      const filteredCovers = get().covers.filter((cov) => cov.id !== coverId);
-      filteredCovers.push({ ...cover, x, y });
-
-      set({ covers: filteredCovers });
-
+    if ('pos' in partialCover && partialCover.pos !== undefined && cover) {
       get()
-        .getGroupsOfCover(cover.id)
+        .getGroupsOfCover(coverId)
         .forEach((group) => get().removeConnectedLine(coverId, group.id));
     }
+
+    get().updateCoverSlice(coverId, partialCover);
+  },
+  updateGroup(groupId, partialGroup) {
+    const group = get().groups.find((grp) => grp.id === groupId);
+
+    if ('pos' in partialGroup && partialGroup.pos !== undefined && group) {
+      get().updateGroupPosition(groupId, {
+        x: partialGroup.pos.x ?? group.pos.x,
+        y: partialGroup.pos.y ?? group.pos.y,
+      });
+    }
+
+    get().updateGroupSlice(groupId, partialGroup);
   },
   refreshGroups(groupId) {
-    const group = get().groups.find((cov) => cov.id === groupId);
+    get().updateGroup(groupId, {});
 
-    if (group) {
-      const filteredGroups = get().groups.filter((cov) => cov.id !== group.id);
-      filteredGroups.push(group);
+    const {
+      refreshGroups,
+      refreshCovers,
+      getGroupsInsideGroup,
+      getCoversInsideGroup,
+    } = get();
 
-      set({ groups: filteredGroups });
+    getGroupsInsideGroup(groupId).forEach((group) => refreshGroups(group.id));
 
-      const {
-        refreshGroups,
-        refreshCovers,
-        getGroupsInsideGroup,
-        getCoversInsideGroup,
-      } = get();
-
-      getGroupsInsideGroup(group.id).forEach((group) =>
-        refreshGroups(group.id),
-      );
-
-      getCoversInsideGroup(group.id).forEach((covers) =>
-        refreshCovers(covers.id),
-      );
-    }
+    getCoversInsideGroup(groupId).forEach((covers) => refreshCovers(covers.id));
   },
   updateGroupPosition(groupId, { x, y }) {
     const group = get().groups.find((group) => group.id === groupId);
 
-    if (group) {
-      const {
-        getCoversInsideGroup,
-        updateCoverPosition,
-        getGroupsInsideGroup,
-        getGroupsOfGroup,
-        removeConnectedLine,
-        refreshGroups,
-      } = get();
+    if (!group) return;
 
-      const prev = {
-        x: group.x,
-        y: group.y,
-      };
+    const {
+      getCoversInsideGroup,
+      updateCover,
+      getGroupsInsideGroup,
+      getGroupsOfGroup,
+      removeConnectedLine,
+      refreshGroups,
+    } = get();
 
-      getCoversInsideGroup(group.id).forEach((cover) => {
-        updateCoverPosition(cover.id, {
-          x: cover.x - (prev.x - x),
-          y: cover.y - (prev.y - y),
+    const prev = {
+      x: group.pos.x,
+      y: group.pos.y,
+    };
+
+    getCoversInsideGroup(group.id).forEach((cover) => {
+      updateCover(cover.id, {
+        pos: {
+          x: cover.pos.x - (prev.x - x),
+          y: cover.pos.y - (prev.y - y),
+        },
+      });
+    });
+
+    getGroupsInsideGroup(group.id).forEach((currentGroup) => {
+      set(({ groups }) => {
+        const newGroup = groups.filter((grp) => grp.id !== currentGroup.id);
+        newGroup.push({
+          ...currentGroup,
+          pos: {
+            x: currentGroup.pos.x - (prev.x - x),
+            y: currentGroup.pos.y - (prev.y - y),
+          },
         });
+
+        return {
+          groups: newGroup,
+        };
       });
+    });
 
-      getGroupsInsideGroup(group.id).forEach((currentGroup) => {
-        set(({ groups }) => {
-          const newGroup = groups.filter((grp) => grp.id !== currentGroup.id);
-          newGroup.push({
-            ...currentGroup,
-            x: currentGroup.x - (prev.x - x),
-            y: currentGroup.y - (prev.y - y),
-          });
+    getCoversInsideGroup(group.id).forEach((cover) => {
+      removeConnectedLine(group.id, cover.id);
+    });
 
-          return {
-            groups: newGroup,
-          };
-        });
-      });
+    getGroupsInsideGroup(group.id).forEach((currentGroup) => {
+      removeConnectedLine(group.id, currentGroup.id);
+    });
 
-      set(({ groups }) => ({
-        groups: groups.map((currentGroup) =>
-          currentGroup.id === group.id
-            ? { ...currentGroup, x, y }
-            : currentGroup,
-        ),
-      }));
+    getGroupsOfGroup(group.id).forEach((currentGroup) => {
+      removeConnectedLine(group.id, currentGroup.id);
+    });
 
-      getCoversInsideGroup(group.id).forEach((cover) => {
-        removeConnectedLine(group.id, cover.id);
-      });
-
-      getGroupsInsideGroup(group.id).forEach((currentGroup) => {
-        removeConnectedLine(group.id, currentGroup.id);
-      });
-
-      getGroupsOfGroup(group.id).forEach((currentGroup) => {
-        removeConnectedLine(group.id, currentGroup.id);
-      });
-
-      refreshGroups(group.id);
-    }
+    refreshGroups(group.id);
   },
   updateGroupScale(groupId, scale) {
     const group = get().groups.find((group) => group.id === groupId);
 
-    if (group) {
-      const newPos = {
-        x:
-          group.x -
-          (get().configs.size * scale.scaleX -
-            get().configs.size * group.scaleX) /
-            2,
-        y:
-          group.y -
-          (get().configs.size * get().getHeightRatio() * scale.scaleY -
-            get().configs.size * get().getHeightRatio() * group.scaleY) /
-            2,
-      };
+    if (!group) return;
 
-      const filteredGroups = get().groups.filter((cov) => cov.id !== groupId);
-      filteredGroups.push({
-        ...group,
-        scaleX: scale.scaleX,
-        scaleY: scale.scaleY,
+    const newPos = {
+      x:
+        group.pos.x -
+        (get().configs.layout.scale * scale.scaleX -
+          get().configs.layout.scale * group.scale.x) /
+          2,
+      y:
+        group.pos.y -
+        (get().configs.layout.scale * get().getHeightRatio() * scale.scaleY -
+          get().configs.layout.scale * get().getHeightRatio() * group.scale.y) /
+          2,
+    };
+
+    const filteredGroups = get().groups.filter((cov) => cov.id !== groupId);
+    filteredGroups.push({
+      ...group,
+      scale: {
+        x: scale.scaleX,
+        y: scale.scaleY,
+      },
+      pos: {
         x: newPos.x,
         y: newPos.y,
-      });
+      },
+    });
 
-      set({ groups: filteredGroups });
+    set({ groups: filteredGroups });
 
-      const {
-        getCoversInsideGroup,
-        removeConnectedLine,
-        getGroupsInsideGroup,
-        refreshGroups,
-      } = get();
+    const {
+      getCoversInsideGroup,
+      removeConnectedLine,
+      getGroupsInsideGroup,
+      refreshGroups,
+    } = get();
 
-      getCoversInsideGroup(group.id).forEach((cov) =>
-        removeConnectedLine(groupId, cov.id),
-      );
+    getCoversInsideGroup(group.id).forEach((cov) =>
+      removeConnectedLine(groupId, cov.id),
+    );
 
-      getGroupsInsideGroup(group.id).forEach((group) =>
-        removeConnectedLine(groupId, group.id),
-      );
+    getGroupsInsideGroup(group.id).forEach((group) =>
+      removeConnectedLine(groupId, group.id),
+    );
 
-      refreshGroups(group.id);
-    }
+    refreshGroups(group.id);
   },
 });
 

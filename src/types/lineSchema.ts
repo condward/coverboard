@@ -18,18 +18,20 @@ export const lineSchema = z.object({
     .refine((id) => {
       return validate(id);
     }, 'lines:id has invalid format'),
-  text: z
-    .string({
-      invalid_type_error: 'lines:text must be a string',
-      required_error: 'lines:text is required',
-    })
-    .trim(),
-  dir: z.nativeEnum(PosTypes, {
-    errorMap: () => {
-      return {
-        message: `lines:dir must be ${Object.values(PosTypes).join(' | ')}`,
-      };
-    },
+  title: z.object({
+    text: z
+      .string({
+        invalid_type_error: 'lines:title:text must be a string',
+        required_error: 'lines:title:text is required',
+      })
+      .trim(),
+    dir: z.nativeEnum(PosTypes, {
+      errorMap: () => {
+        return {
+          message: `lines:title:dir must be ${Object.values(PosTypes).join(' | ')}`,
+        };
+      },
+    }),
   }),
   origin: linePointSchema.extend({
     id: z

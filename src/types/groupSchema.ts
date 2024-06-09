@@ -13,34 +13,44 @@ export const groupSchema = z.object({
     .refine((id) => {
       return validate(id);
     }, 'groups:id has invalid format'),
-  x: z.coerce
-    .number({
-      invalid_type_error: 'groups:x position must be a number',
-      required_error: 'groups:x is required',
-    })
-    .min(0, 'groups:x position must be positive number')
-    .max(MAX_BOUNDARY, `groups:x position must be less than ${MAX_BOUNDARY}`),
-  y: z.coerce
-    .number({
-      invalid_type_error: 'groups:y position must be a number',
-      required_error: 'groups:y is required',
-    })
-    .min(0, 'groups:y position must be positive number')
-    .max(MAX_BOUNDARY, `groups:y position must be less than ${MAX_BOUNDARY}`),
-  scaleX: z
-    .number({
-      invalid_type_error: 'groups:x position must be a number',
-      required_error: 'groups:x is required',
-    })
-    .min(0, 'groups:x position must be positive number')
-    .max(10),
-  scaleY: z
-    .number({
-      invalid_type_error: 'groups:y position must be a number',
-      required_error: 'groups:y is required',
-    })
-    .min(0, 'groups:y position must be positive number')
-    .max(10),
+  pos: z.object({
+    x: z.coerce
+      .number({
+        invalid_type_error: 'groups:pos:x position must be a number',
+        required_error: 'groups:pos:x is required',
+      })
+      .min(0, 'groups:pos:x position must be positive number')
+      .max(
+        MAX_BOUNDARY,
+        `groups:pos:x position must be less than ${MAX_BOUNDARY}`,
+      ),
+    y: z.coerce
+      .number({
+        invalid_type_error: 'groups:pos:y position must be a number',
+        required_error: 'groups:pos:y is required',
+      })
+      .min(0, 'groups:pos:y position must be positive number')
+      .max(
+        MAX_BOUNDARY,
+        `groups:pos:y position must be less than ${MAX_BOUNDARY}`,
+      ),
+  }),
+  scale: z.object({
+    x: z
+      .number({
+        invalid_type_error: 'groups:scale:x position must be a number',
+        required_error: 'groups:scale:x is required',
+      })
+      .min(0, 'groups:x position must be positive number')
+      .max(10),
+    y: z
+      .number({
+        invalid_type_error: 'groups:scale:y position must be a number',
+        required_error: 'groups:scale:y is required',
+      })
+      .min(0, 'groups:y position must be positive number')
+      .max(10),
+  }),
   title: z.object({
     text: z.string({
       invalid_type_error: 'groups:title:text must be a string',

@@ -8,12 +8,12 @@ import { BoundaryArrow } from './BoundaryArrow';
 export const BoundaryCoverArrowsWithoutMemo: FC = () => {
   const { dragLimits } = useGetSizesContext();
   const covers = useMainStore((state) => state.covers);
-  const size = useMainStore((state) => state.configs.size);
+  const scale = useMainStore((state) => state.configs.layout.scale);
 
   const offLimitCovers = covers.flatMap((covers) => {
     if (
-      (covers.x > dragLimits.width && dragLimits.width > size) ||
-      (covers.y > dragLimits.height && dragLimits.height > size)
+      (covers.pos.x > dragLimits.width && dragLimits.width > scale) ||
+      (covers.pos.y > dragLimits.height && dragLimits.height > scale)
     ) {
       return covers;
     }
@@ -21,9 +21,7 @@ export const BoundaryCoverArrowsWithoutMemo: FC = () => {
     return [];
   });
 
-  const updateCoverPosition = useMainStore(
-    (state) => state.updateCoverPosition,
-  );
+  const updateGroup = useMainStore((state) => state.updateGroup);
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
   );
@@ -34,11 +32,10 @@ export const BoundaryCoverArrowsWithoutMemo: FC = () => {
       {offLimitCovers.map((cover) => (
         <BoundaryArrow
           color={coverColor}
-          updatePosition={updateCoverPosition}
+          updatePosition={(pos) => updateGroup(cover.id, { pos })}
           removeCascade={removeCoverAndRelatedLines}
-          id={cover.id}
-          x={cover.x}
-          y={cover.y}
+          x={cover.pos.x}
+          y={cover.pos.y}
           title={cover.subtitle.text}
           key={cover.id}
         />

@@ -15,8 +15,8 @@ export const CoversWithoutMemo: FC = () => {
           id={cover.id}
           titleText={cover.title.text}
           subtitleText={cover.subtitle.text}
-          x={cover.x}
-          y={cover.y}
+          x={cover.pos.x}
+          y={cover.pos.y}
           titleDir={cover.title.dir}
           subTitleDir={cover.subtitle.dir}
           starDir={cover.star.dir}

@@ -12,7 +12,7 @@ export const LineCircle: FC<{ id: LineSchema['id'] }> = ({ id }) => {
   const isSelected = useIsSelected(id);
   const setSelected = useSetAtom(selectedAtom);
   const color = useMainStore((state) => state.getArrowColor());
-  const showArrow = useMainStore((state) => state.configs.showArrow);
+  const showArrow = useMainStore((state) => state.configs.visibility.arrows);
 
   const handleSelect = () => {
     setSelected({ id, open: isSelected });

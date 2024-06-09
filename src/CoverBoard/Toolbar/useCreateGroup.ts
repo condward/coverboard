@@ -7,7 +7,7 @@ import { selectedAtom, useMainStore, useToastStore } from 'store';
 
 export const useCreateGroup = () => {
   const addGroups = useMainStore((state) => state.addGroups);
-  const groupDir = useMainStore((state) => state.configs.groupDir);
+  const groupDir = useMainStore((state) => state.configs.dir.groups);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const id = uuidv4();
   const setSelected = useSetAtom(selectedAtom);
@@ -18,12 +18,16 @@ export const useCreateGroup = () => {
         addGroups([
           {
             id,
-            x: 0,
-            y: 0,
+            pos: {
+              x: 0,
+              y: 0,
+            },
             title: { text: '', dir: groupDir },
             subtitle: { text: '', dir: groupDir },
-            scaleX: 3,
-            scaleY: 3,
+            scale: {
+              x: 3,
+              y: 3,
+            },
           },
         ]);
         setSelected({ id, open: false });

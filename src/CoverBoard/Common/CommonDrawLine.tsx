@@ -160,9 +160,9 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
       if (e.key === 'ArrowRight') {
         if (selection && selection === PosTypes.RIGHT) {
           if (cover) {
-            updateCover(cover.id, { x: cover.x + 1 });
+            updateCover(cover.id, { pos: { x: cover.pos.x + 1 } });
           } else if (group) {
-            updateGroup(group.id, { x: group.x + 1 });
+            updateGroup(group.id, { pos: { x: group.pos.x + 1 } });
           }
         } else {
           handleDrawLine(id, PosTypes.RIGHT);
@@ -172,9 +172,9 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
       } else if (e.key === 'ArrowLeft') {
         if (selection && selection === PosTypes.LEFT) {
           if (cover) {
-            updateCover(cover.id, { x: cover.x - 1 });
+            updateCover(cover.id, { pos: { x: cover.pos.x - 1 } });
           } else if (group) {
-            updateGroup(group.id, { x: group.x - 1 });
+            updateGroup(group.id, { pos: { x: group.pos.x - 1 } });
           }
         } else {
           handleDrawLine(id, PosTypes.LEFT);
@@ -183,9 +183,9 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
       } else if (e.key === 'ArrowUp') {
         if (selection && selection === PosTypes.TOP) {
           if (cover) {
-            updateCover(cover.id, { y: cover.y - 1 });
+            updateCover(cover.id, { pos: { y: cover.pos.y - 1 } });
           } else if (group) {
-            updateGroup(group.id, { y: group.y - 1 });
+            updateGroup(group.id, { pos: { y: group.pos.y - 1 } });
           }
         } else {
           handleDrawLine(id, PosTypes.TOP);
@@ -194,9 +194,9 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
       } else if (e.key === 'ArrowDown') {
         if (selection && selection === PosTypes.BOTTOM) {
           if (cover) {
-            updateCover(cover.id, { y: cover.y + 1 });
+            updateCover(cover.id, { pos: { y: cover.pos.y + 1 } });
           } else if (group) {
-            updateGroup(group.id, { y: group.y + 1 });
+            updateGroup(group.id, { pos: { y: group.pos.y + 1 } });
           }
         } else {
           handleDrawLine(id, PosTypes.BOTTOM);

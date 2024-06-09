@@ -13,7 +13,7 @@ export const App: FC = () => {
   const resetStoreValues = useMainStore((state) => state.resetStoreValues);
   const backColor = useMainStore((state) => state.getBackColor());
   const setWindowSize = useSetAtom(sizeAtom);
-  const fitToScreen = useMainStore((state) => state.configs.fitToScreen);
+  const fitToScreen = useMainStore((state) => state.configs.layout.fitToScreen);
   const { toolbarIconSize, stageLimits } = useGetSizesContext();
 
   useEffect(() => {

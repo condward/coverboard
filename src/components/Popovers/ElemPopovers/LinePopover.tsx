@@ -60,8 +60,10 @@ export const LinePopover: FC<LinePopoverProps> = ({
   const onSubmit = handleSubmit(
     (values) => {
       updateLine(line.id, {
-        text: values.text,
-        dir: values.dir,
+        title: {
+          text: values.title.text,
+          dir: values.title.dir,
+        },
         origin: { dir: values.origin.dir },
         target: { dir: values.target.dir },
       });
@@ -104,7 +106,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
           </Stack>
           <FieldSet direction="column" label="Label">
             <Controller
-              name="text"
+              name="title.text"
               control={control}
               render={({ field }) => (
                 <TextField
@@ -117,7 +119,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
               )}
             />
             <Controller
-              name="dir"
+              name="title.dir"
               control={control}
               render={({ field }) => (
                 <DirectionRadio

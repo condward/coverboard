@@ -10,8 +10,8 @@ import { useGetSizesContext } from 'providers';
 interface CommonDraggableProps {
   children: ReactNode;
   id: CoverSchema['id'] | GroupSchema['id'];
-  x: CoverSchema['x'] | GroupSchema['x'];
-  y: CoverSchema['y'] | GroupSchema['y'];
+  x: CoverSchema['pos']['x'] | GroupSchema['pos']['x'];
+  y: CoverSchema['pos']['y'] | GroupSchema['pos']['y'];
   min: {
     x: number;
     y: number;
@@ -20,7 +20,7 @@ interface CommonDraggableProps {
     x: number;
     y: number;
   };
-  updatePosition: (id: string, { x, y }: Vector2d) => void;
+  updatePosition: ({ x, y }: Vector2d) => void;
   onDelete?: (id: string) => void;
 }
 
@@ -86,11 +86,11 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
     const targetX = Math.round(e.target.x());
 
     const foundY =
-      covers.find((cover) => cover.id !== id && cover.y === targetY) ||
-      groups.find((group) => group.id !== id && group.y === targetY);
+      covers.find((cover) => cover.id !== id && cover.pos.y === targetY) ||
+      groups.find((group) => group.id !== id && group.pos.y === targetY);
     const foundX =
-      covers.find((cover) => cover.id !== id && cover.x === targetX) ||
-      groups.find((group) => group.id !== id && group.x === targetX);
+      covers.find((cover) => cover.id !== id && cover.pos.x === targetX) ||
+      groups.find((group) => group.id !== id && group.pos.x === targetX);
 
     if (
       (hintLines[0] === undefined && foundY) ||
@@ -115,7 +115,7 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
       container.style.cursor = 'pointer';
     }
 
-    updatePosition(id, {
+    updatePosition({
       x: Math.round(e.target.x()),
       y: Math.round(e.target.y()),
     });
@@ -125,14 +125,19 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
     <>
       {hintLines[0] && (
         <Line
-          points={[0, hintLines[0].y, dragLimits.width, hintLines[0].y]}
+          points={[0, hintLines[0].pos.y, dragLimits.width, hintLines[0].pos.y]}
           stroke={color}
           strokeWidth={2}
         />
       )}
       {hintLines[1] && (
         <Line
-          points={[hintLines[1].x, 0, hintLines[1].x, dragLimits.height]}
+          points={[
+            hintLines[1].pos.x,
+            0,
+            hintLines[1].pos.x,
+            dragLimits.height,
+          ]}
           stroke={color}
           strokeWidth={1}
         />

@@ -15,8 +15,8 @@ import { LineCircle, LineLabelDraggable } from '.';
 
 interface LineProps {
   id: LineSchema['id'];
-  dir: LineSchema['dir'];
-  text: LineSchema['text'];
+  dir: LineSchema['title']['dir'];
+  text: LineSchema['title']['text'];
   lineParams: LineParams;
 }
 
@@ -24,7 +24,7 @@ export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
   const { fontSize, coverSizeWidth } = useGetSizesContext();
   const color = useMainStore((state) => state.getArrowColor());
   const updateLine = useMainStore((state) => state.updateLine);
-  const showHelpers = useMainStore((state) => state.configs.showHelpers);
+  const showHelpers = useMainStore((state) => state.configs.visibility.helpers);
 
   const selected = useIsSelected(id);
   const setEditingText = useSetAtom(editingTextAtom);
@@ -51,7 +51,7 @@ export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
       <LineLabelDraggable
         dir={dir}
         lineParams={lineParams}
-        setUpdate={(dir) => updateLine(id, { dir })}>
+        setUpdate={(dir) => updateLine(id, { title: { dir } })}>
         <CommonTextLabel
           label={getLabel()}
           color={color}
@@ -59,7 +59,7 @@ export const LineLabel: FC<LineProps> = ({ id, dir, lineParams, text }) => {
           editable={true}
           setOpen={handleSetOpen}
           onReset={() => void 0}
-          setLabel={(text) => updateLine(id, { text })}
+          setLabel={(text) => updateLine(id, { title: { text } })}
           x={-coverSizeWidth}
           y={fontSize * 1.5}
           width={coverSizeWidth * 2}

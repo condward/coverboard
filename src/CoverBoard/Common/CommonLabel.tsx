@@ -17,8 +17,8 @@ interface CommonLabelProps {
   coverLabel: LabelTypes;
   text: string | null;
   fontStyle?: 'bold';
-  scaleX?: GroupSchema['scaleX'];
-  scaleY?: GroupSchema['scaleY'];
+  scaleX?: GroupSchema['scale']['x'];
+  scaleY?: GroupSchema['scale']['y'];
   dir: PosTypes;
   color: string;
   updateLabel: (label: string) => void;
@@ -53,7 +53,7 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
     id,
     text: coverLabel,
   });
-  const showHelpers = useMainStore((state) => state.configs.showHelpers);
+  const showHelpers = useMainStore((state) => state.configs.visibility.helpers);
 
   const handleSetOpen = (open: boolean) => {
     open ? setEditingText({ id, text: coverLabel }) : setEditingText(null);

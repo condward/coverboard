@@ -32,7 +32,7 @@ export const SizesContext = createContext<SizesProviderProps | null>(null);
 export const SizesProvider: FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const scale = useMainStore((state) => state.configs.size);
+  const scale = useMainStore((state) => state.configs.layout.scale);
   const heightRatio = useMainStore((state) => state.getHeightRatio());
   const screenSize = useAtomValue(sizeAtom);
   const isToolbarHidden = useAtomValue(hideToolbarAtom);

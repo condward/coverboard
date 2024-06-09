@@ -4,8 +4,8 @@ import { useMainStore } from 'store';
 import { CoverLabelValues } from 'types';
 
 export const useAddEmptyCover = () => {
-  const starsDir = useMainStore((state) => state.configs.starsDir);
-  const labelDir = useMainStore((state) => state.configs.labelDir);
+  const starsDir = useMainStore((state) => state.configs.dir.stars);
+  const labelDir = useMainStore((state) => state.configs.dir.covers);
   const addCovers = useMainStore((state) => state.addCovers);
 
   return (failedCovers: CoverLabelValues) => {
@@ -13,8 +13,10 @@ export const useAddEmptyCover = () => {
       failedCovers.map((filteredResult) => ({
         id: uuidv4(),
         link: '',
-        x: 0,
-        y: 0,
+        pos: {
+          x: 0,
+          y: 0,
+        },
         title: {
           search: filteredResult.title,
           text: filteredResult.title,

@@ -11,8 +11,8 @@ import { useGetSizesContext } from 'providers';
 interface DraggableGroupProps {
   children: ReactNode;
   id: CoverSchema['id'];
-  x: CoverSchema['x'];
-  y: CoverSchema['y'];
+  x: CoverSchema['pos']['x'];
+  y: CoverSchema['pos']['y'];
   starDir: CoverSchema['star']['dir'];
 }
 

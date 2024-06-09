@@ -8,8 +8,8 @@ import { useGetSizesContext } from 'providers';
 
 interface CoverImageProps {
   id: GroupSchema['id'];
-  scaleX: GroupSchema['scaleX'];
-  scaleY: GroupSchema['scaleY'];
+  scaleX: GroupSchema['scale']['x'];
+  scaleY: GroupSchema['scale']['y'];
 }
 
 export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
