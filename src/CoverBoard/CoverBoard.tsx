@@ -152,15 +152,17 @@ export const CoverBoardWithoutMemo: FC = () => {
               onDragEnd={(e) => {
                 e.currentTarget.opacity(1);
               }}>
-              <Rect
-                name="toolbarOutside"
-                fill={backColor}
-                listening={false}
-                x={outsideLimits.x}
-                y={outsideLimits.y}
-                width={outsideLimits.width}
-                height={outsideLimits.height}
-              />
+              {!toolbarDrag && (
+                <Rect
+                  name="toolbarOutside"
+                  fill={backColor}
+                  listening={false}
+                  x={outsideLimits.x}
+                  y={outsideLimits.y}
+                  width={outsideLimits.width}
+                  height={outsideLimits.height}
+                />
+              )}
               {showLogo &&
                 !toolbarDrag &&
                 (isLandscape

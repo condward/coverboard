@@ -23,7 +23,9 @@ export interface UseLinesParams {
     points: LinePointSchema,
     pos: PosTypes,
   ) => void;
+  addLine: (line: LineSchema) => void;
   removeConnectedLine: (id1: string, id2: string) => void;
+  checkIfLineAlreadyExists: (id1: string, id2: string) => boolean;
   getOriginRelatedLines: (id: string) => Array<LineSchema>;
   getTargetRelatedLines: (id: string) => Array<LineSchema>;
 }
@@ -36,6 +38,13 @@ export const createLinesSlice: StateCreator<
 > = (set, get) => ({
   lines: [],
   isLine: (id) => get().lines.some((line) => line.id === id),
+  addLine(line) {
+    if (!get().checkIfLineAlreadyExists(line.origin.id, line.target.id)) return;
+
+    set(({ lines }) => ({
+      lines: lineSchemas.parse([...lines, line]),
+    }));
+  },
   createLine(id, points, dir) {
     set(({ lines }) => {
       const lineCopy = [...lines];
@@ -132,5 +141,12 @@ export const createLinesSlice: StateCreator<
   },
   getTargetRelatedLines(elementId) {
     return get().lines.filter((line) => line.target.id === elementId);
+  },
+  checkIfLineAlreadyExists(id1, id2) {
+    return get().lines.some(
+      (l) =>
+        (l.origin.id === id1 && l.target.id === id2) ||
+        (l.origin.id === id2 && l.target.id === id1),
+    );
   },
 });

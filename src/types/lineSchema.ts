@@ -72,6 +72,7 @@ export const lineSchema = z.object({
     }),
   }),
 });
+
 export type LineSchema = z.input<typeof lineSchema>;
 export type LineSchemaOutput = z.output<typeof lineSchema>;
 

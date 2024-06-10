@@ -7,3 +7,4 @@ export * from './SliderField';
 export * from './FileImporter';
 export * from './FieldSet';
 export * from './SliderInput';
+export * from './InputAction';

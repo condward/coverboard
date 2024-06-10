@@ -13,7 +13,6 @@ export interface UseCoverParams {
   updateAllCoversDir: (dir: PosTypes) => void;
   updateAllStarsDir: (dir: PosTypes) => void;
   refreshCovers: (coverId: CoverSchema['id']) => void;
-  resetCoverLabels: (coverId: CoverSchema['id']) => void;
   addCovers: (filteredResults: CoversSchema) => void;
 }
 
@@ -79,26 +78,6 @@ export const createCoversSlice: StateCreator<
         ...star,
         starDir,
       })),
-    }));
-  },
-  resetCoverLabels(coverId) {
-    set(({ covers }) => ({
-      covers: covers.map((cover) =>
-        cover.id === coverId
-          ? {
-              ...cover,
-              title: {
-                ...cover.title,
-                text: cover.title.search,
-              },
-              subtitle: {
-                ...cover.subtitle,
-                text: cover.subtitle.search,
-              },
-              dir: PosTypes.BOTTOM,
-            }
-          : cover,
-      ),
     }));
   },
   addCovers(filteredResults) {

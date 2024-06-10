@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogActions,
   Stack,
-  Divider,
   Box,
 } from '@mui/material';
 import { useSetAtom } from 'jotai';
@@ -17,7 +16,12 @@ import { useEffect, ReactNode, FormEvent, FC } from 'react';
 
 import { selectedAtom } from 'store';
 import { clearHash, setHash } from 'utils';
-import { backColorMap, BackColors, SPACING_GAP } from 'types';
+import {
+  backColorMap,
+  BackColors,
+  POPOVER_BACK_COLOR,
+  SPACING_GAP,
+} from 'types';
 
 interface CommonDialogProps {
   onClose: () => void;
@@ -72,58 +76,61 @@ export const CommonDialog: FC<CommonDialogProps> = ({
       onSubmit={isForm ? onSubmit : undefined}
       PaperProps={{
         style: {
-          opacity: opaque ? 1 : 0.85,
           minWidth: fullScreen ? undefined : '35rem',
+          opacity: opaque ? 1 : 1,
         },
       }}>
-      <DialogTitle color={backColorMap[BackColors.DARKER]}>
-        <Stack
-          gap={SPACING_GAP}
-          direction="row"
-          alignItems="center"
-          style={{ textTransform: 'uppercase' }}>
-          {onReturn && (
-            <IconButton
-              aria-label="close"
-              title="Return"
-              color="inherit"
-              onClick={onReturn}>
-              <ArrowCircleLeft />
-            </IconButton>
-          )}
-          {title}
-          <Stack direction="row" justifyContent="flex-end">
-            <Box
-              sx={{
-                position: 'absolute',
-                right: 60,
-                top: 12,
-              }}>
-              {header}
-            </Box>
-            <IconButton
-              aria-label="close"
-              title="Close"
-              color="inherit"
-              onClick={handleClose}
-              sx={{
-                position: 'absolute',
-                right: 8,
-                top: 8,
-              }}>
-              <CloseIcon />
-            </IconButton>
+      <DialogTitle
+        color={backColorMap[BackColors.DARKER]}
+        bgcolor={POPOVER_BACK_COLOR}>
+        <Stack gap={SPACING_GAP}>
+          <Stack
+            gap={SPACING_GAP}
+            direction="row"
+            alignItems="center"
+            style={{ textTransform: 'uppercase' }}>
+            {onReturn && (
+              <IconButton
+                aria-label="close"
+                title="Return"
+                color="inherit"
+                onClick={onReturn}>
+                <ArrowCircleLeft />
+              </IconButton>
+            )}
+            {title}
+            <Stack direction="row" justifyContent="flex-end">
+              <Box
+                sx={{
+                  position: 'absolute',
+                  right: 60,
+                  top: 12,
+                }}>
+                {header}
+              </Box>
+              <IconButton
+                aria-label="close"
+                title="Close"
+                color="inherit"
+                onClick={handleClose}
+                sx={{
+                  position: 'absolute',
+                  right: 8,
+                  top: 8,
+                }}>
+                <CloseIcon />
+              </IconButton>
+            </Stack>
           </Stack>
-          <Divider />
         </Stack>
       </DialogTitle>
-      <DialogContent style={{ paddingTop: '0.4rem' }}>
-        <Stack gap={SPACING_GAP / 2}>
+      <DialogContent>
+        <Stack gap={SPACING_GAP / 2} pt={2}>
           {navigation}
           {content}
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ backgroundColor: '#F2F4F7' }}>
+      <DialogActions sx={{ backgroundColor: POPOVER_BACK_COLOR }}>
         {actions}
       </DialogActions>
     </Dialog>

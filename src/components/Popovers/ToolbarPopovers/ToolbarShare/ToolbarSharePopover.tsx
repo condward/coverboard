@@ -115,6 +115,7 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
             label={pages.length > 15 ? 'Only 15 pages allowed' : 'Add new page'}
             onChange={(evt) => setNewSave(evt.target.value.trim())}
             value={newSave}
+            sx={{ mt: '0.4rem' }}
             autoFocus
           />
           {newSave === '' && (

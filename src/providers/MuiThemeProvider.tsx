@@ -66,6 +66,13 @@ export const MuiThemeProvider: FC<{
           },
         },
       },
+      MuiButton: {
+        styleOverrides: {
+          outlined: {
+            backgroundColor: 'white',
+          },
+        },
+      },
     },
   });
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;

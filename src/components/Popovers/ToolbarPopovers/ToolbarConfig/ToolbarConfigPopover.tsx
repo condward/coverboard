@@ -135,20 +135,20 @@ export const ToolbarConfigPopover: FC<{
           <Button
             variant="outlined"
             color="secondary"
+            startIcon={<LinkOutlined />}
+            disabled={totalLength === 0}
+            onClick={() => setOverviewOpen(true)}>
+            Links
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
             startIcon={<HideSourceOutlined />}
             onClick={() => {
               setHideToolBar((t) => !t);
               onClose();
             }}>
             {isToolbarHidden ? 'Show Toolbar' : 'Hide Toolbar'}
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<LinkOutlined />}
-            disabled={totalLength === 0}
-            onClick={() => setOverviewOpen(true)}>
-            Overview
           </Button>
           <Button
             disabled={!isDirty}

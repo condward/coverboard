@@ -96,100 +96,102 @@ export const LinePopover: FC<LinePopoverProps> = ({
     <CommonDialog
       onClose={() => onClose(line.id)}
       onReturn={onReturn}
-      title="Edit Line"
+      title="Edit Arrow"
       opaque={configToolbarOpen}
       onSubmit={onSubmit}
       content={
-        <Stack direction="column" gap={SPACING_GAP}>
+        <>
           <Stack direction="row" justifyContent="end">
-            <legend>ID: {line.id.slice(0, 8).toUpperCase()}</legend>
+            <small>ID: {line.id.slice(0, 8).toUpperCase()}</small>
           </Stack>
-          <FieldSet direction="column" label="Label">
-            <Controller
-              name="title.text"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  autoFocus
-                  label="text"
-                  fullWidth
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            <Controller
-              name="title.dir"
-              control={control}
-              render={({ field }) => (
-                <DirectionRadio
-                  label="Position"
-                  id="line-position"
-                  name="lineRadio"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </FieldSet>
-          <Controller
-            name="origin.dir"
-            control={control}
-            render={({ field }) => {
-              return (
-                <FieldSet direction="column" label="Origin">
-                  <DirectionRadio
-                    label="Position"
-                    id="origin-position"
-                    name="originLineRadio"
+          <Stack direction="column" gap={SPACING_GAP}>
+            <FieldSet direction="column" label="Label">
+              <Controller
+                name="title.text"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    autoFocus
+                    label="text"
+                    fullWidth
                     value={field.value}
                     onChange={field.onChange}
                   />
-                  <Button
-                    variant="outlined"
-                    type="button"
-                    component="a"
-                    color="primary"
-                    startIcon={<ArrowCircleLeftOutlined />}
-                    onClick={() => onChange(line.id, line.origin.id)}>
-                    {formatLabel(originTitle, line.origin.id).slice(0, 50)}
-                  </Button>
-                </FieldSet>
-              );
-            }}
-          />
-          <Controller
-            name="target.dir"
-            control={control}
-            render={({ field }) => {
-              return (
-                <FieldSet direction="column" label="Target">
+                )}
+              />
+              <Controller
+                name="title.dir"
+                control={control}
+                render={({ field }) => (
                   <DirectionRadio
                     label="Position"
-                    id="target-position"
-                    name="targetLineRadio"
+                    id="line-position"
+                    name="lineRadio"
                     value={field.value}
                     onChange={field.onChange}
                   />
-                  <Button
-                    variant="outlined"
-                    type="button"
-                    color="primary"
-                    component="a"
-                    startIcon={<ArrowCircleRightOutlined />}
-                    onClick={() => onChange(line.id, line.target.id)}>
-                    {formatLabel(targetTitle, line.target.id).slice(0, 50)}
-                  </Button>
-                </FieldSet>
-              );
-            }}
-          />
-        </Stack>
+                )}
+              />
+            </FieldSet>
+            <Controller
+              name="origin.dir"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <FieldSet direction="column" label="Origin">
+                    <DirectionRadio
+                      label="Position"
+                      id="origin-position"
+                      name="originLineRadio"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                    <Button
+                      variant="outlined"
+                      type="button"
+                      component="a"
+                      color="primary"
+                      startIcon={<ArrowCircleLeftOutlined />}
+                      onClick={() => onChange(line.id, line.origin.id)}>
+                      {formatLabel(originTitle, line.origin.id).slice(0, 50)}
+                    </Button>
+                  </FieldSet>
+                );
+              }}
+            />
+            <Controller
+              name="target.dir"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <FieldSet direction="column" label="Target">
+                    <DirectionRadio
+                      label="Position"
+                      id="target-position"
+                      name="targetLineRadio"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                    <Button
+                      variant="outlined"
+                      type="button"
+                      color="primary"
+                      component="a"
+                      startIcon={<ArrowCircleRightOutlined />}
+                      onClick={() => onChange(line.id, line.target.id)}>
+                      {formatLabel(targetTitle, line.target.id).slice(0, 50)}
+                    </Button>
+                  </FieldSet>
+                );
+              }}
+            />
+          </Stack>
+        </>
       }
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
           <Button
-            variant="outlined"
+            variant="contained"
             color="error"
             type="button"
             startIcon={<DeleteOutline />}
@@ -197,7 +199,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
             Delete
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
             color="secondary"
             type="button"
             startIcon={<SwapHorizOutlined />}

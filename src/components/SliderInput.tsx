@@ -1,9 +1,8 @@
-import { Stack, Box, TextField, FormLabel, FormGroup } from '@mui/material';
+import { TextField, FormLabel, FormGroup } from '@mui/material';
 import { ChangeEventHandler, FC } from 'react';
 
-import { SPACING_GAP } from 'types';
-
 import { SliderField } from './SliderField';
+import { InputAction } from './InputAction';
 
 interface SliderInputProp {
   value: number;
@@ -29,23 +28,26 @@ export const SliderInput: FC<SliderInputProp> = ({
   step = 1,
 }) => (
   <FormGroup>
-    <Stack direction="row" gap={SPACING_GAP} justifyContent="space-between">
-      <Box flex="6">
-        <FormLabel id={`${name}-slider-label`}>{label}</FormLabel>
-        <SliderField
-          id={`${name}-slider-id`}
-          labelId={`${name}-slider-label`}
-          name={name}
-          value={value}
-          onChange={onChange}
-          min={min}
-          max={max}
-          step={step}
-          hidehandle={value === -1}
-        />
-      </Box>
-      <Box flex="2">
+    <InputAction
+      input={
+        <>
+          <FormLabel id={`${name}-slider-label`}>{label}</FormLabel>
+          <SliderField
+            id={`${name}-slider-id`}
+            labelId={`${name}-slider-label`}
+            name={name}
+            value={value}
+            onChange={onChange}
+            min={min}
+            max={max}
+            step={step}
+            hidehandle={value === -1}
+          />
+        </>
+      }
+      action={
         <TextField
+          fullWidth
           id={`${name}-number-id`}
           type="number"
           name={name}
@@ -66,7 +68,7 @@ export const SliderInput: FC<SliderInputProp> = ({
             },
           }}
         />
-      </Box>
-    </Stack>
+      }
+    />
   </FormGroup>
 );

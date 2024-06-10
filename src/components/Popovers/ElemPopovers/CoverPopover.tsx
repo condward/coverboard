@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { TextField, Button, Link, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -6,7 +6,6 @@ import { ZodError } from 'zod';
 import {
   DeleteOutline,
   LinkOutlined,
-  RefreshOutlined,
   SaveOutlined,
   SearchOutlined,
 } from '@mui/icons-material';
@@ -23,17 +22,17 @@ import {
 
 import {
   CommonDialog,
-  CommonTabs,
   SliderInput,
   DirectionRadio,
   FieldSet,
+  InputAction,
 } from 'components';
 import { configAtom, useMainStore, useToastStore } from 'store';
 import { useGetSizesContext } from 'providers';
 import { useIsLandscape } from 'utils';
 
 import { useSearchValue } from './useSearchValue';
-import { CoverConnections } from './connections';
+import { CoverConnectionPopover } from './connections';
 
 const getButtons = (media: Media, currentCover: CoverSchema) => {
   if (media === Media.MUSIC) {
@@ -117,16 +116,19 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   onChange,
   onReturn,
 }) => {
+  const [conn, setOpenConn] = useState(false);
   const titleLabel = useMainStore((state) => state.getTitleLabel().label);
   const subTitleLabel = useMainStore((state) => state.getSubTitleLabel().label);
   const media = useMainStore((state) => state.configs.media);
   const removeCoverAndRelatedLines = useMainStore(
     (state) => state.removeCoverAndRelatedLines,
   );
+  const totalElements = useMainStore(
+    (state) => state.covers.length + state.groups.length,
+  );
   const configToolbarOpen = useAtomValue(configAtom);
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const resetCoverLabels = useMainStore((state) => state.resetCoverLabels);
   const updateCover = useMainStore((state) => state.updateCover);
 
   const buttons = getButtons(media, cover);
@@ -137,7 +139,6 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   const {
     control,
     handleSubmit,
-    reset,
     getValues,
     formState: { isDirty },
   } = useForm<CoverSchema, unknown, CoverSchemaOutput>({
@@ -175,12 +176,6 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
       }
     },
   );
-
-  const handleReset = () => {
-    resetCoverLabels(cover.id);
-    reset();
-    onClose();
-  };
 
   const handleDelete = () => {
     removeCoverAndRelatedLines(cover.id);
@@ -239,199 +234,242 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
         </Stack>
       }
       content={
-        <CommonTabs
-          tabs={[
-            {
-              label: 'Edit',
-              value: 'edit',
-              component: (
-                <Stack direction="column" gap={SPACING_GAP}>
-                  <Stack direction="row" justifyContent="end">
-                    <legend>ID: {cover.id.slice(0, 8).toUpperCase()}</legend>
-                  </Stack>
-                  <FieldSet
-                    label={
-                      cover.title.search
-                        ? `${titleLabel} (searched: ${cover.title.search})`
-                        : titleLabel
+        <>
+          <Stack direction="row" justifyContent="end">
+            <small>ID: {cover.id.slice(0, 8).toUpperCase()}</small>
+          </Stack>
+          <Stack direction="column" gap={SPACING_GAP}>
+            <FieldSet
+              label={
+                cover.title.search
+                  ? `${titleLabel} (searched: ${cover.title.search})`
+                  : titleLabel
+              }
+              direction="column">
+              <Controller
+                name="title.text"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <InputAction
+                    input={
+                      <TextField
+                        label={`text`}
+                        autoFocus
+                        fullWidth
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     }
-                    direction="column">
-                    <Controller
-                      name="title.text"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          label={`text`}
-                          autoFocus
-                          fullWidth
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="title.dir"
-                      control={control}
-                      render={({ field }) => (
-                        <DirectionRadio
-                          label="Position"
-                          id="cover-title"
-                          name="titleRadio"
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    />
-                  </FieldSet>
-                  <FieldSet
-                    label={
-                      cover.subtitle.search
-                        ? `${subTitleLabel} (searched: ${cover.subtitle.search})`
-                        : subTitleLabel
+                    action={
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        type="button"
+                        fullWidth
+                        sx={{ height: '100%' }}
+                        disabled={!fieldState.isDirty}
+                        onClick={() =>
+                          field.onChange(getValues('title.search'))
+                        }>
+                        Reset
+                      </Button>
                     }
-                    direction="column">
-                    <Controller
-                      name="subtitle.text"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          label="text"
-                          autoFocus
-                          fullWidth
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="subtitle.dir"
-                      control={control}
-                      render={({ field }) => (
-                        <DirectionRadio
-                          label="Position"
-                          id="cover-subtitle"
-                          name="subtitleRadio"
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    />
-                  </FieldSet>
-                  <FieldSet label="Rating" direction="column">
-                    <Controller
-                      name="star.count"
-                      control={control}
-                      render={({ field }) => (
-                        <SliderInput
-                          label="Rating"
-                          name={field.name}
-                          value={field.value}
-                          onChange={field.onChange}
-                          max={5}
-                          step={0.5}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="star.dir"
-                      control={control}
-                      render={({ field }) => (
-                        <DirectionRadio
-                          label="Position"
-                          id="star-rating"
-                          name="starRadio"
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    />
-                  </FieldSet>
-                  <FieldSet
-                    direction="column"
+                  />
+                )}
+              />
+              <Controller
+                name="title.dir"
+                control={control}
+                render={({ field }) => (
+                  <DirectionRadio
                     label="Position"
-                    gap={SPACING_GAP / 2}
-                    flexWrap="nowrap">
-                    <Controller
-                      name="pos.x"
-                      control={control}
-                      render={({ field }) => (
-                        <SliderInput
-                          label="X"
-                          name={field.name}
+                    id="cover-title"
+                    name="titleRadio"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+            </FieldSet>
+            <FieldSet
+              label={
+                cover.subtitle.search
+                  ? `${subTitleLabel} (searched: ${cover.subtitle.search})`
+                  : subTitleLabel
+              }
+              direction="column">
+              <Controller
+                name="subtitle.text"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <InputAction
+                    input={
+                      <TextField
+                        label="text"
+                        autoFocus
+                        fullWidth
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    }
+                    action={
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        type="button"
+                        fullWidth
+                        sx={{ height: '100%' }}
+                        disabled={!fieldState.isDirty}
+                        onClick={() =>
+                          field.onChange(getValues('subtitle.search'))
+                        }>
+                        Reset
+                      </Button>
+                    }
+                  />
+                )}
+              />
+              <Controller
+                name="subtitle.dir"
+                control={control}
+                render={({ field }) => (
+                  <DirectionRadio
+                    label="Position"
+                    id="cover-subtitle"
+                    name="subtitleRadio"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+            </FieldSet>
+            <FieldSet label="Rating" direction="column">
+              <Controller
+                name="star.count"
+                control={control}
+                render={({ field }) => (
+                  <SliderInput
+                    label="Rating"
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                    max={5}
+                    step={0.5}
+                  />
+                )}
+              />
+              <Controller
+                name="star.dir"
+                control={control}
+                render={({ field }) => (
+                  <DirectionRadio
+                    label="Position"
+                    id="star-rating"
+                    name="starRadio"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+            </FieldSet>
+            <FieldSet
+              direction="column"
+              label="Position"
+              gap={SPACING_GAP / 2}
+              flexWrap="nowrap">
+              <Controller
+                name="pos.x"
+                control={control}
+                render={({ field }) => (
+                  <SliderInput
+                    label="X"
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                    max={
+                      isLandscape
+                        ? dragLimits.width - dragLimits.x
+                        : dragLimits.width - dragLimits.x - coverSizeWidth
+                    }
+                  />
+                )}
+              />
+              <Controller
+                name="pos.y"
+                control={control}
+                render={({ field }) => (
+                  <SliderInput
+                    label="Y"
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                    max={
+                      isLandscape
+                        ? dragLimits.height - coverSizeHeight
+                        : dragLimits.height + dragLimits.y - 2 * coverSizeHeight
+                    }
+                  />
+                )}
+              />
+            </FieldSet>
+            {cover.link && (
+              <FieldSet
+                direction="column"
+                label="Image Link"
+                gap={SPACING_GAP}
+                flexWrap="nowrap">
+                <Controller
+                  name="link"
+                  control={control}
+                  render={({ field }) => (
+                    <InputAction
+                      input={
+                        <TextField
+                          fullWidth
+                          disabled
+                          label="Link"
                           value={field.value}
-                          onChange={field.onChange}
-                          max={
-                            isLandscape
-                              ? dragLimits.width - dragLimits.x
-                              : dragLimits.width - dragLimits.x - coverSizeWidth
-                          }
                         />
-                      )}
-                    />
-                    <Controller
-                      name="pos.y"
-                      control={control}
-                      render={({ field }) => (
-                        <SliderInput
-                          label="Y"
-                          name={field.name}
-                          value={field.value}
-                          onChange={field.onChange}
-                          max={
-                            isLandscape
-                              ? dragLimits.height - coverSizeHeight
-                              : dragLimits.height +
-                                dragLimits.y -
-                                2 * coverSizeHeight
-                          }
-                        />
-                      )}
-                    />
-                  </FieldSet>
-                  {cover.link && (
-                    <Controller
-                      name="link"
-                      control={control}
-                      render={({ field }) => (
-                        <FieldSet
-                          direction="row"
-                          label="Image Link"
-                          gap={SPACING_GAP / 2}
-                          flexWrap="nowrap">
-                          <TextField
-                            fullWidth
-                            disabled
-                            label="Link"
-                            value={field.value}
-                          />
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            type="button"
-                            onClick={() => field.onChange('')}>
-                            Delete
-                          </Button>
-                        </FieldSet>
-                      )}
+                      }
+                      action={
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          type="button"
+                          fullWidth
+                          sx={{ height: '100%' }}
+                          onClick={() => field.onChange('')}>
+                          Delete
+                        </Button>
+                      }
                     />
                   )}
-                </Stack>
-              ),
-            },
-            {
-              label: 'Connections',
-              value: 'connections',
-              component: (
-                <CoverConnections coverId={cover.id} onChange={onChange} />
-              ),
-            },
-          ]}
-        />
+                />
+              </FieldSet>
+            )}
+          </Stack>
+        </>
       }
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
           <Button
             variant="outlined"
+            color="secondary"
+            type="button"
+            startIcon={<LinkOutlined />}
+            disabled={totalElements < 2}
+            onClick={() => setOpenConn(true)}>
+            Links
+          </Button>
+          {conn && (
+            <CoverConnectionPopover
+              onClose={() => setOpenConn(false)}
+              onChange={onChange}
+              cover={cover}
+            />
+          )}
+          <Button
+            variant="contained"
             color="error"
             type="button"
             startIcon={<DeleteOutline />}
@@ -439,16 +477,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
             Delete
           </Button>
           <Button
-            disabled={!isDirty}
-            variant="outlined"
-            color="secondary"
-            type="button"
-            startIcon={<RefreshOutlined />}
-            onClick={handleReset}>
-            Reset
-          </Button>
-          <Button
-            variant="outlined"
+            variant="contained"
             color="secondary"
             startIcon={<SearchOutlined />}
             onClick={handleSearchAgain}>
