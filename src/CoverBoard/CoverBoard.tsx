@@ -38,8 +38,14 @@ export const CoverBoardWithoutMemo: FC = () => {
   const isLandscape = useIsLandscape();
 
   const windowSize = useAtomValue(sizeAtom);
-  const { dragLimits, toolbarLimits, stageLimits, toolbarIconSize } =
-    useGetSizesContext();
+  const {
+    dragLimits,
+    toolbarLimits,
+    stageLimits,
+    toolbarIconSize,
+    outsideLimits,
+    toolbarBorderLimits,
+  } = useGetSizesContext();
   const isToolbarHidden = useAtomValue(hideToolbarAtom);
 
   const stageRef: RefObject<Konva.Stage> = useRef(null);
@@ -150,16 +156,10 @@ export const CoverBoardWithoutMemo: FC = () => {
                 name="toolbarOutside"
                 fill={backColor}
                 listening={false}
-                x={0}
-                y={0}
-                width={
-                  toolbarIconSize / 2 +
-                  (isLandscape ? toolbarLimits.width : windowSize.width)
-                }
-                height={
-                  toolbarIconSize / 2 +
-                  (isLandscape ? windowSize.height : toolbarLimits.width)
-                }
+                x={outsideLimits.x}
+                y={outsideLimits.y}
+                width={outsideLimits.width}
+                height={outsideLimits.height}
               />
               {showLogo &&
                 !toolbarDrag &&
@@ -172,14 +172,10 @@ export const CoverBoardWithoutMemo: FC = () => {
               <Rect
                 name="toolbarBorder"
                 fill={backColor}
-                x={1}
-                y={1}
-                width={
-                  (isLandscape ? toolbarLimits.width : toolbarLimits.height) - 2
-                }
-                height={
-                  (isLandscape ? toolbarLimits.height : toolbarLimits.width) - 2
-                }
+                x={toolbarBorderLimits.x}
+                y={toolbarBorderLimits.y}
+                width={toolbarBorderLimits.width}
+                height={toolbarBorderLimits.height}
                 stroke={color}
               />
               <Toolbar

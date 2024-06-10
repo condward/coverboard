@@ -17,6 +17,8 @@ interface SizesProviderProps {
   fontSize: number;
   dragLimits: DragLimits;
   toolbarLimits: DragLimits;
+  outsideLimits: DragLimits;
+  toolbarBorderLimits: DragLimits;
   coverSizeWidth: number;
   coverSizeHeight: number;
   stageLimits: {
@@ -42,15 +44,28 @@ export const SizesProvider: FC<{
   const baseScales = useMemo(
     () => ({
       toolbarIconSize: scale / 2.5,
-      circleRadius: scale / 7 / 1.5,
     }),
     [scale],
   );
 
+  const padding = baseScales.toolbarIconSize / 2;
+  const outsideScreenWidth = 2.5 * baseScales.toolbarIconSize;
+  const width = screenSize.width - padding;
+  const height = screenSize.height - padding;
+
   const getCurrentY = useCallback(
-    (index: number) =>
-      0 + index * (baseScales.toolbarIconSize + baseScales.toolbarIconSize / 2),
-    [baseScales.toolbarIconSize],
+    (index: number) => 0 + index * (baseScales.toolbarIconSize + padding),
+    [baseScales.toolbarIconSize, padding],
+  );
+
+  const toolbarLimits = useMemo(
+    () => ({
+      x: 0,
+      y: 0,
+      width: padding * 4,
+      height: getCurrentY(Object.keys(ToolConfigIDs).length - 1) + padding * 4,
+    }),
+    [getCurrentY, padding],
   );
 
   return (
@@ -58,54 +73,63 @@ export const SizesProvider: FC<{
       value={useMemo(
         () => ({
           toolbarIconSize: baseScales.toolbarIconSize,
-          circleRadius: baseScales.circleRadius,
+          circleRadius: scale / 10,
           getCurrentY,
           fontSize: scale / 7,
-          starRadius: baseScales.circleRadius * 0.8,
+          starRadius: (scale / 10) * 0.8,
           stageLimits: {
-            width: screenSize.width - baseScales.toolbarIconSize / 2,
-            height: screenSize.height - baseScales.toolbarIconSize / 2,
-            padding: baseScales.toolbarIconSize / 2,
+            width,
+            height,
+            padding,
           },
           dragLimits:
             isToolbarHidden || toolbarDrag
               ? {
                   x: 0,
                   y: 0,
-                  width: screenSize.width - baseScales.toolbarIconSize / 2,
-                  height: screenSize.height - baseScales.toolbarIconSize / 2,
+                  width,
+                  height,
                 }
               : {
-                  x: isLandscape ? 2.5 * baseScales.toolbarIconSize : 0,
-                  y: isLandscape ? 0 : 2.5 * baseScales.toolbarIconSize,
-                  width: isLandscape
-                    ? screenSize.width - 3 * baseScales.toolbarIconSize
-                    : screenSize.width - baseScales.toolbarIconSize / 2,
-                  height: isLandscape
-                    ? screenSize.height - baseScales.toolbarIconSize / 2
-                    : screenSize.height - 3 * baseScales.toolbarIconSize,
+                  x: isLandscape ? outsideScreenWidth : 0,
+                  y: isLandscape ? 0 : outsideScreenWidth,
+                  width: isLandscape ? width - outsideScreenWidth : width,
+                  height: isLandscape ? height : height - outsideScreenWidth,
                 },
-          toolbarLimits: {
+          toolbarLimits,
+          toolbarBorderLimits: {
+            x: 1,
+            y: 1,
+            width:
+              (isLandscape ? toolbarLimits.width : toolbarLimits.height) - 2,
+            height:
+              (isLandscape ? toolbarLimits.height : toolbarLimits.width) - 2,
+          },
+          outsideLimits: {
             x: 0,
             y: 0,
-            width: baseScales.toolbarIconSize * 2,
+            width:
+              padding + (isLandscape ? toolbarLimits.width : screenSize.width),
             height:
-              getCurrentY(Object.keys(ToolConfigIDs).length - 1) +
-              2 * baseScales.toolbarIconSize,
+              padding + (isLandscape ? screenSize.height : toolbarLimits.width),
           },
           coverSizeWidth: scale,
           coverSizeHeight: scale * heightRatio,
         }),
         [
           baseScales.toolbarIconSize,
-          baseScales.circleRadius,
-          getCurrentY,
           scale,
-          screenSize.width,
-          screenSize.height,
+          getCurrentY,
+          width,
+          height,
+          padding,
           isToolbarHidden,
           toolbarDrag,
           isLandscape,
+          outsideScreenWidth,
+          toolbarLimits,
+          screenSize.width,
+          screenSize.height,
           heightRatio,
         ],
       )}>

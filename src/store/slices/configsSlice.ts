@@ -14,14 +14,11 @@ import {
   mediaMap,
 } from 'types';
 
-const getScale = () => {
-  const scale = Math.min(150, Math.max(70, window.innerWidth / 20));
-  return Math.ceil(scale / 10) * 10;
-};
 export const initialConfigValues = (): ConfigSchema => ({
   media: Media.MUSIC,
   layout: {
-    scale: getScale(),
+    scale:
+      Math.ceil(Math.min(150, Math.max(70, window.innerWidth / 20)) / 10) * 10,
     width: 500,
     height: 500,
     fitToScreen: true,
