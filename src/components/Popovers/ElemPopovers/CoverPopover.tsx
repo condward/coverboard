@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { ZodError } from 'zod';
 import {
-  DeleteOutline,
+  DeleteOutlined,
   LinkOutlined,
   SaveOutlined,
   SearchOutlined,
@@ -120,8 +120,8 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   const titleLabel = useMainStore((state) => state.getTitleLabel().label);
   const subTitleLabel = useMainStore((state) => state.getSubTitleLabel().label);
   const media = useMainStore((state) => state.configs.media);
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeCoverAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeCoverAndRelatedArrows,
   );
   const totalElements = useMainStore(
     (state) => state.covers.length + state.groups.length,
@@ -178,7 +178,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   );
 
   const handleDelete = () => {
-    removeCoverAndRelatedLines(cover.id);
+    removeCoverAndRelatedArrows(cover.id);
     onClose();
   };
 
@@ -282,9 +282,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                 control={control}
                 render={({ field }) => (
                   <DirectionRadio
-                    label="Position"
-                    id="cover-title"
-                    name="titleRadio"
+                    name={field.name}
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -334,9 +332,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                 control={control}
                 render={({ field }) => (
                   <DirectionRadio
-                    label="Position"
-                    id="cover-subtitle"
-                    name="subtitleRadio"
+                    name={field.name}
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -363,9 +359,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                 control={control}
                 render={({ field }) => (
                   <DirectionRadio
-                    label="Position"
-                    id="star-rating"
-                    name="starRadio"
+                    name={field.name}
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -472,7 +466,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
             variant="contained"
             color="error"
             type="button"
-            startIcon={<DeleteOutline />}
+            startIcon={<DeleteOutlined />}
             onClick={handleDelete}>
             Delete
           </Button>

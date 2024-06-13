@@ -14,8 +14,8 @@ import { DEFAULT_KEY, NAME_SPACE } from 'utils';
 import {
   UseCoverParams,
   createCoversSlice,
-  UseLinesParams,
-  createLinesSlice,
+  UseArrowsParams,
+  createArrowsSlice,
   UseGrouspParams,
   createGroupsSlice,
   UseConfigsParams,
@@ -31,8 +31,8 @@ interface CoverContextData {
   updateStoreValues: (items: AppSchema) => void;
   resetStoreValues: () => void;
   getStoreValues: () => AppSchema;
-  removeCoverAndRelatedLines: (id: string) => void;
-  removeGroupAndRelatedLines: (id: string) => void;
+  removeCoverAndRelatedArrows: (id: string) => void;
+  removeGroupAndRelatedArrows: (id: string) => void;
   updateCover: (
     coverId: CoverSchema['id'],
     partial: DeepPartial<CoverSchema>,
@@ -55,29 +55,29 @@ interface CoverContextData {
 }
 
 type MainStoreUnion = UseCoverParams &
-  UseLinesParams &
+  UseArrowsParams &
   UseConfigsParams &
   UseGrouspParams &
   CoverContextData;
 
 const defaultValues = (): AppSchema => ({
   configs: initialConfigValues(),
-  lines: [],
+  arrows: [],
   covers: [],
   groups: [],
 });
 
 const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
   ...createConfigsSlice((value) => set(value), get, api),
-  ...createLinesSlice((value) => set(value), get, api),
+  ...createArrowsSlice((value) => set(value), get, api),
   ...createCoversSlice((value) => set(value), get, api),
   ...createGroupsSlice((value) => set(value), get, api),
   getStoreValues() {
-    const { configs, lines, covers, groups } = get();
-    return { configs, lines, covers, groups };
+    const { configs, arrows, covers, groups } = get();
+    return { configs, arrows, covers, groups };
   },
-  updateStoreValues({ configs, lines, covers, groups }) {
-    set({ configs, lines, covers, groups });
+  updateStoreValues({ configs, arrows, covers, groups }) {
+    set({ configs, arrows, covers, groups });
   },
   resetStoreValues() {
     set(defaultValues());
@@ -185,17 +185,17 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
         )
       : [];
   },
-  removeCoverAndRelatedLines(coverId) {
+  removeCoverAndRelatedArrows(coverId) {
     store.set(pointsAtom, null);
 
-    set(({ covers, lines }) => ({
+    set(({ covers, arrows }) => ({
       covers: covers.filter((c) => c.id !== coverId),
-      lines: lines.filter(
+      arrows: arrows.filter(
         (l) => l.origin.id !== coverId && l.target.id !== coverId,
       ),
     }));
   },
-  removeGroupAndRelatedLines(groupId) {
+  removeGroupAndRelatedArrows(groupId) {
     store.set(pointsAtom, null);
 
     const group = get().groups.find((group) => group.id === groupId);
@@ -204,21 +204,21 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
 
     const {
       getGroupsInsideGroup,
-      removeGroupAndRelatedLines,
+      removeGroupAndRelatedArrows,
       getCoversInsideGroup,
-      removeCoverAndRelatedLines,
+      removeCoverAndRelatedArrows,
     } = get();
 
     getGroupsInsideGroup(group.id).forEach((group) =>
-      removeGroupAndRelatedLines(group.id),
+      removeGroupAndRelatedArrows(group.id),
     );
 
     getCoversInsideGroup(group.id).forEach((cover) =>
-      removeCoverAndRelatedLines(cover.id),
+      removeCoverAndRelatedArrows(cover.id),
     );
 
-    set(({ lines, groups }) => ({
-      lines: lines.filter(
+    set(({ arrows, groups }) => ({
+      arrows: arrows.filter(
         (l) => l.origin.id !== groupId && l.target.id !== groupId,
       ),
       groups: groups.filter((c) => c.id !== groupId),
@@ -230,7 +230,7 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
     if ('pos' in partialCover && partialCover.pos !== undefined && cover) {
       get()
         .getGroupsOfCover(coverId)
-        .forEach((group) => get().removeConnectedLine(coverId, group.id));
+        .forEach((group) => get().removeConnectedArrow(coverId, group.id));
     }
 
     get().updateCoverSlice(coverId, partialCover);
@@ -271,7 +271,7 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
       updateCover,
       getGroupsInsideGroup,
       getGroupsOfGroup,
-      removeConnectedLine,
+      removeConnectedArrow,
       refreshGroups,
     } = get();
 
@@ -307,15 +307,15 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
     });
 
     getCoversInsideGroup(group.id).forEach((cover) => {
-      removeConnectedLine(group.id, cover.id);
+      removeConnectedArrow(group.id, cover.id);
     });
 
     getGroupsInsideGroup(group.id).forEach((currentGroup) => {
-      removeConnectedLine(group.id, currentGroup.id);
+      removeConnectedArrow(group.id, currentGroup.id);
     });
 
     getGroupsOfGroup(group.id).forEach((currentGroup) => {
-      removeConnectedLine(group.id, currentGroup.id);
+      removeConnectedArrow(group.id, currentGroup.id);
     });
 
     refreshGroups(group.id);
@@ -355,17 +355,17 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
 
     const {
       getCoversInsideGroup,
-      removeConnectedLine,
+      removeConnectedArrow,
       getGroupsInsideGroup,
       refreshGroups,
     } = get();
 
     getCoversInsideGroup(group.id).forEach((cov) =>
-      removeConnectedLine(groupId, cov.id),
+      removeConnectedArrow(groupId, cov.id),
     );
 
     getGroupsInsideGroup(group.id).forEach((group) =>
-      removeConnectedLine(groupId, group.id),
+      removeConnectedArrow(groupId, group.id),
     );
 
     refreshGroups(group.id);
@@ -377,7 +377,7 @@ export const useMainStore = create<MainStoreUnion>()(
     temporal(mainStoreFn, {
       partialize: (state) => ({
         configs: state.configs,
-        lines: state.lines,
+        arrows: state.arrows,
         covers: state.covers,
         groups: state.groups,
       }),
@@ -386,13 +386,13 @@ export const useMainStore = create<MainStoreUnion>()(
         isDeepEqual(
           {
             configs: pastState.configs,
-            lines: pastState.lines.toSorted(sortById),
+            arrows: pastState.arrows.toSorted(sortById),
             covers: pastState.covers.toSorted(sortById),
             groups: pastState.groups.toSorted(sortById),
           },
           {
             configs: currentState.configs,
-            lines: currentState.lines.toSorted(sortById),
+            arrows: currentState.arrows.toSorted(sortById),
             covers: currentState.covers.toSorted(sortById),
             groups: currentState.groups.toSorted(sortById),
           },
@@ -409,14 +409,14 @@ export const useMainStore = create<MainStoreUnion>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         configs: state.configs,
-        lines: state.lines,
+        arrows: state.arrows,
         covers: state.covers,
         groups: state.groups,
       }),
       onRehydrateStorage: (state) => {
         try {
-          const { configs, lines, covers, groups } = state;
-          appSchema.parse({ configs, lines, covers, groups });
+          const { configs, arrows, covers, groups } = state;
+          appSchema.parse({ configs, arrows, covers, groups });
         } catch (error) {
           console.error(error);
           state.resetStoreValues();

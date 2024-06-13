@@ -18,5 +18,5 @@ export enum LabelTypes {
 }
 
 export enum TextTypes {
-  LINELABEL = 'linelabel',
+  ArrowLABEL = 'Arrowlabel',
 }

@@ -25,8 +25,8 @@ export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
   const coverSizeWidthScaled = coverSizeWidth * scaleX;
   const coverSizeHeightScaled = coverSizeHeight * scaleY;
 
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeGroupAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeGroupAndRelatedArrows,
   );
 
   const rectRef = useRef<Konva.Rect>(null);
@@ -36,7 +36,7 @@ export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
     if (trRef.current && rectRef.current && isSelected) {
       trRef.current.nodes([rectRef.current]);
     }
-  }, [isSelected, removeCoverAndRelatedLines]);
+  }, [isSelected, removeCoverAndRelatedArrows]);
 
   const handleTransform = () => {
     if (rectRef.current && boxRef.current) {

@@ -22,28 +22,50 @@ export const initialConfigValues = (): ConfigSchema => ({
     width: 500,
     height: 500,
     fitToScreen: true,
-    title: '',
-  },
-  colors: {
-    main: Colors.YELLOW,
-    arrows: Colors.YELLOW,
-    covers: Colors.ORANGE,
-    groups: Colors.GREEN,
-    mainBack: BackColors.DARK,
-    groupsBack: BackColors.DARK,
-  },
-  visibility: {
-    titles: true,
-    subtitles: true,
-    arrows: true,
-    mainTitle: true,
-    stars: true,
     helpers: true,
+    color: Colors.YELLOW,
+    backColor: BackColors.DARK,
   },
-  dir: {
-    covers: PosTypes.BOTTOM,
-    stars: PosTypes.BOTTOM,
-    groups: PosTypes.TOP,
+  title: {
+    text: '',
+    show: true,
+  },
+  covers: {
+    color: Colors.ORANGE,
+    title: {
+      show: true,
+      dir: PosTypes.BOTTOM,
+    },
+    subtitle: {
+      show: true,
+      dir: PosTypes.BOTTOM,
+    },
+    rating: {
+      show: true,
+      dir: PosTypes.BOTTOM,
+    },
+  },
+  groups: {
+    color: Colors.GREEN,
+    backColor: BackColors.DARK,
+    title: {
+      show: true,
+      dir: PosTypes.BOTTOM,
+    },
+    subtitle: {
+      show: true,
+      dir: PosTypes.BOTTOM,
+    },
+  },
+  arrows: {
+    color: Colors.YELLOW,
+    title: {
+      show: true,
+      dir: PosTypes.BOTTOM,
+    },
+    circle: {
+      show: true,
+    },
   },
 });
 
@@ -72,59 +94,78 @@ export const createConfigsSlice: StateCreator<
   resetConfigs: () => {
     set({ configs: initialConfigValues() });
   },
-  updateConfigs: (newConfig) => {
+  updateConfigs: ({ media, title, layout, covers, groups, arrows }) => {
     set(({ configs }) => ({
       configs: {
-        media: newConfig.media ?? configs.media,
+        media: media ?? configs.media,
         layout: {
-          title: newConfig.layout?.title ?? configs.layout.title,
-          scale: newConfig.layout?.scale ?? configs.layout.scale,
-          fitToScreen:
-            newConfig.layout?.fitToScreen ?? configs.layout.fitToScreen,
-          width: newConfig.layout?.width ?? configs.layout.width,
-          height: newConfig.layout?.height ?? configs.layout.height,
+          scale: layout?.scale ?? configs.layout.scale,
+          fitToScreen: layout?.fitToScreen ?? configs.layout.fitToScreen,
+          width: layout?.width ?? configs.layout.width,
+          height: layout?.height ?? configs.layout.height,
+          color: layout?.color ?? configs.layout.color,
+          backColor: layout?.backColor ?? configs.layout.backColor,
+          helpers: layout?.helpers ?? configs.layout.helpers,
         },
-        colors: {
-          main: newConfig.colors?.main ?? configs.colors.main,
-          arrows: newConfig.colors?.arrows ?? configs.colors.arrows,
-          covers: newConfig.colors?.covers ?? configs.colors.covers,
-          groups: newConfig.colors?.groups ?? configs.colors.groups,
-          mainBack: newConfig.colors?.mainBack ?? configs.colors.mainBack,
-          groupsBack: newConfig.colors?.groupsBack ?? configs.colors.groupsBack,
+        title: {
+          text: title?.text ?? configs.title.text,
+          show: title?.show ?? configs.title.show,
         },
-        visibility: {
-          titles: newConfig.visibility?.titles ?? configs.visibility.titles,
-          arrows: newConfig.visibility?.arrows ?? configs.visibility.arrows,
-          subtitles:
-            newConfig.visibility?.subtitles ?? configs.visibility.subtitles,
-          mainTitle:
-            newConfig.visibility?.mainTitle ?? configs.visibility.mainTitle,
-          stars: newConfig.visibility?.stars ?? configs.visibility.stars,
-          helpers: newConfig.visibility?.helpers ?? configs.visibility.helpers,
+        covers: {
+          color: covers?.color ?? configs.covers.color,
+          title: {
+            show: covers?.title?.show ?? configs.covers.title.show,
+            dir: covers?.title?.dir ?? configs.covers.title.dir,
+          },
+          subtitle: {
+            show: covers?.subtitle?.show ?? configs.covers.subtitle.show,
+            dir: covers?.subtitle?.dir ?? configs.covers.subtitle.dir,
+          },
+          rating: {
+            show: covers?.rating?.show ?? configs.covers.rating.show,
+            dir: covers?.rating?.dir ?? configs.covers.rating.dir,
+          },
         },
-        dir: {
-          covers: newConfig.dir?.covers ?? configs.dir.covers,
-          stars: newConfig.dir?.stars ?? configs.dir.stars,
-          groups: newConfig.dir?.groups ?? configs.dir.groups,
+        groups: {
+          title: {
+            show: groups?.title?.show ?? configs.groups.title.show,
+            dir: groups?.title?.dir ?? configs.groups.title.dir,
+          },
+          subtitle: {
+            show: groups?.subtitle?.show ?? configs.groups.subtitle.show,
+            dir: groups?.subtitle?.dir ?? configs.groups.subtitle.dir,
+          },
+          color: groups?.color ?? configs.groups.color,
+          backColor: groups?.backColor ?? configs.groups.backColor,
+        },
+        arrows: {
+          color: arrows?.color ?? configs.arrows.color,
+          title: {
+            show: arrows?.title?.show ?? configs.arrows.title.show,
+            dir: arrows?.title?.dir ?? configs.arrows.title.dir,
+          },
+          circle: {
+            show: arrows?.circle?.show ?? configs.arrows.circle.show,
+          },
         },
       },
     }));
 
-    if ('layout' in newConfig && newConfig.layout !== undefined) {
+    if (layout !== undefined) {
       if (
-        newConfig.layout.width !== undefined ||
-        newConfig.layout.height !== undefined ||
-        newConfig.layout.fitToScreen !== undefined
+        layout.width !== undefined ||
+        layout.height !== undefined ||
+        layout.fitToScreen !== undefined
       ) {
-        if (newConfig.layout.fitToScreen) {
+        if (layout.fitToScreen) {
           store.set(sizeAtom, {
             width: window.innerWidth,
             height: window.innerHeight,
           });
         } else {
           store.set(sizeAtom, {
-            width: newConfig.layout.width ?? get().configs.layout.width,
-            height: newConfig.layout.height ?? get().configs.layout.height,
+            width: layout.width ?? get().configs.layout.width,
+            height: layout.height ?? get().configs.layout.height,
           });
         }
       }
@@ -133,10 +174,10 @@ export const createConfigsSlice: StateCreator<
   getTitleLabel: () => mediaMap[get().configs.media].title,
   getSubTitleLabel: () => mediaMap[get().configs.media].subtitle,
   getHeightRatio: () => mediaMap[get().configs.media].heightRatio,
-  getColor: () => colorMap[get().configs.colors.main],
-  getArrowColor: () => colorMap[get().configs.colors.arrows],
-  getCoverColor: () => colorMap[get().configs.colors.covers],
-  getGroupColor: () => colorMap[get().configs.colors.groups],
-  getBackColor: () => backColorMap[get().configs.colors.mainBack],
-  getGroupBackColor: () => backColorMap[get().configs.colors.groupsBack],
+  getColor: () => colorMap[get().configs.layout.color],
+  getArrowColor: () => colorMap[get().configs.arrows.color],
+  getCoverColor: () => colorMap[get().configs.covers.color],
+  getGroupColor: () => colorMap[get().configs.groups.color],
+  getBackColor: () => backColorMap[get().configs.groups.backColor],
+  getGroupBackColor: () => backColorMap[get().configs.layout.backColor],
 });

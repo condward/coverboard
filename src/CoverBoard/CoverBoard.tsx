@@ -19,7 +19,7 @@ import { useGetSizesContext } from 'providers';
 import {
   Covers,
   GroupCovers,
-  Lines,
+  Arrows,
   Toolbar,
   TitleLabel,
   BoundaryCoverArrows,
@@ -111,7 +111,7 @@ export const CoverBoardWithoutMemo: FC = () => {
           )}
           <Group name="board" x={dragLimits.x} y={dragLimits.y}>
             <GroupCovers />
-            <Lines />
+            <Arrows />
             <Covers />
             <TitleLabel />
             <BoundaryCoverArrows />

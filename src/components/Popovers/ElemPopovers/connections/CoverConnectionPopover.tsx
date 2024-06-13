@@ -7,7 +7,7 @@ import { CoverSchema, SPACING_GAP } from 'types';
 import { CommonDialog } from 'components';
 import { useMainStore } from 'store';
 
-import { AddLinePopover } from '../AddLinePopover';
+import { AddArrowPopover } from '../AddArrowPopover';
 import { CoverConnections } from './CoverConnections';
 
 interface CoverPopoverProps {
@@ -34,7 +34,7 @@ export const CoverConnectionPopover: FC<CoverPopoverProps> = ({
         <>
           <CoverConnections coverId={cover.id} onChange={onChange} />
           {openConn && (
-            <AddLinePopover
+            <AddArrowPopover
               originId={cover.id}
               onClose={() => setOpenConn(false)}
             />

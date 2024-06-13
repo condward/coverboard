@@ -16,8 +16,11 @@ import { Media, SearchSchema } from 'types';
 export const useSearchValues = () => {
   const media = useMainStore((state) => state.configs.media);
   const covers = useMainStore((state) => state.covers);
-  const starsDir = useMainStore((state) => state.configs.dir.stars);
-  const labelDir = useMainStore((state) => state.configs.dir.covers);
+  const starsDir = useMainStore((state) => state.configs.covers.rating.dir);
+  const labelDir = useMainStore((state) => state.configs.covers.title.dir);
+  const labelSubDir = useMainStore(
+    (state) => state.configs.covers.subtitle.dir,
+  );
   const addCovers = useMainStore((state) => state.addCovers);
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
@@ -65,7 +68,7 @@ export const useSearchValues = () => {
             subtitle: {
               search: filteredResult.subtitle,
               text: filteredResult.subtitle,
-              dir: labelDir,
+              dir: labelSubDir,
             },
             star: {
               dir: starsDir,

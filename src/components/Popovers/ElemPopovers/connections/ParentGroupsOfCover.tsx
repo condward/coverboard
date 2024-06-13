@@ -19,8 +19,8 @@ export const ParentGroupsOfCover: FC<ParentGroupsOfCoverProps> = ({
   const groupsOfCover = useMainStore((state) =>
     state.getGroupsOfCover(coverId),
   );
-  const removeGroupAndRelatedLines = useMainStore(
-    (state) => state.removeGroupAndRelatedLines,
+  const removeGroupAndRelatedArrows = useMainStore(
+    (state) => state.removeGroupAndRelatedArrows,
   );
 
   if (groupsOfCover.length === 0) return null;
@@ -42,7 +42,7 @@ export const ParentGroupsOfCover: FC<ParentGroupsOfCoverProps> = ({
               onClick={() => onChange(coverId, group.id)}
               onDelete={(evt) => {
                 evt.preventDefault();
-                removeGroupAndRelatedLines(group.id);
+                removeGroupAndRelatedArrows(group.id);
               }}
             />
           );

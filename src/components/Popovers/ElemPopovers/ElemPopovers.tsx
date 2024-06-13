@@ -5,7 +5,7 @@ import { parentSelectedAtom, selectedAtom, useMainStore } from 'store';
 
 import { CoverPopover } from './CoverPopover';
 import { GroupPopover } from './GroupPopover';
-import { LinePopover } from './LinePopover';
+import { ArrowPopover } from './ArrowPopover';
 
 export const ElemPopovers: FC<{ id: string }> = ({ id }) => {
   const setSelected = useSetAtom(selectedAtom);
@@ -13,8 +13,8 @@ export const ElemPopovers: FC<{ id: string }> = ({ id }) => {
   const currentCover = useMainStore((state) =>
     state.covers.find((cov) => cov.id === id),
   );
-  const currentLine = useMainStore((state) =>
-    state.lines.find((line) => line.id === id),
+  const currentArrow = useMainStore((state) =>
+    state.arrows.find((arrow) => arrow.id === id),
   );
   const currentGroup = useMainStore((state) =>
     state.groups.find((cov) => cov.id === id),
@@ -52,9 +52,9 @@ export const ElemPopovers: FC<{ id: string }> = ({ id }) => {
           onReturn={parentSelected.length > 0 ? handleReturn : undefined}
         />
       )}
-      {currentLine && (
-        <LinePopover
-          line={currentLine}
+      {currentArrow && (
+        <ArrowPopover
+          arrow={currentArrow}
           onClose={handleClose}
           onChange={handleChange}
           onReturn={parentSelected.length > 0 ? handleReturn : undefined}

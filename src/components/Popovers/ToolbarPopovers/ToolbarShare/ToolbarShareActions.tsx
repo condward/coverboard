@@ -2,8 +2,8 @@ import { FC } from 'react';
 import { Button, Stack } from '@mui/material';
 import { ZodError } from 'zod';
 import {
-  CopyAllOutlined,
   DownloadOutlined,
+  FolderCopyOutlined,
   RefreshOutlined,
   SaveOutlined,
 } from '@mui/icons-material';
@@ -84,7 +84,7 @@ export const ToolbarShareActions: FC<ToolbarShareActionsProps> = ({
             color="secondary"
             onClick={handleCopyText}
             disabled={!isValidJSON}
-            startIcon={<CopyAllOutlined />}>
+            startIcon={<FolderCopyOutlined />}>
             Copy
           </Button>
           <Button

@@ -27,21 +27,21 @@ export const useKeysListener = ({
   const { undo: undoAction } = useStore(useMainStore.temporal);
   const covers = useMainStore((state) => state.covers);
   const groups = useMainStore((state) => state.groups);
-  const lines = useMainStore((state) => state.lines);
+  const arrows = useMainStore((state) => state.arrows);
 
   const isCover = useMainStore((state) => state.isCover);
   const isGroup = useMainStore((state) => state.isGroup);
-  const isLine = useMainStore((state) => state.isLine);
+  const isArrow = useMainStore((state) => state.isArrow);
 
   const fitToScreen = useMainStore((state) => state.configs.layout.fitToScreen);
   const updateConfigs = useMainStore((state) => state.updateConfigs);
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeCoverAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeCoverAndRelatedArrows,
   );
-  const removeGroupAndRelatedLines = useMainStore(
-    (state) => state.removeGroupAndRelatedLines,
+  const removeGroupAndRelatedArrows = useMainStore(
+    (state) => state.removeGroupAndRelatedArrows,
   );
-  const removeLine = useMainStore((state) => state.removeLine);
+  const removeArrow = useMainStore((state) => state.removeArrow);
 
   const openPopup = useIsPopOpen();
 
@@ -115,11 +115,11 @@ export const useKeysListener = ({
       if (!editTitle && !openPopup && !isContextModalOpen && selected) {
         if (e.key === 'Delete' || e.key === 'd') {
           if (isGroup(selected.id)) {
-            removeGroupAndRelatedLines(selected.id);
+            removeGroupAndRelatedArrows(selected.id);
           } else if (isCover(selected.id)) {
-            removeCoverAndRelatedLines(selected.id);
-          } else if (isLine(selected.id)) {
-            removeLine(selected.id);
+            removeCoverAndRelatedArrows(selected.id);
+          } else if (isArrow(selected.id)) {
+            removeArrow(selected.id);
           }
           e.preventDefault();
         } else if (e.key === 'Escape') {
@@ -225,15 +225,15 @@ export const useKeysListener = ({
     isContextModalOpen,
     isCover,
     isGroup,
-    isLine,
+    isArrow,
     isTextSelected,
-    lines,
+    arrows,
     openPopup,
     points,
     preventKeys,
-    removeCoverAndRelatedLines,
-    removeGroupAndRelatedLines,
-    removeLine,
+    removeCoverAndRelatedArrows,
+    removeGroupAndRelatedArrows,
+    removeArrow,
     selected,
     setEditTitle,
     setHideToolBar,

@@ -4,8 +4,11 @@ import { useMainStore } from 'store';
 import { CoverLabelValues } from 'types';
 
 export const useAddEmptyCover = () => {
-  const starsDir = useMainStore((state) => state.configs.dir.stars);
-  const labelDir = useMainStore((state) => state.configs.dir.covers);
+  const starsDir = useMainStore((state) => state.configs.covers.rating.dir);
+  const labelDir = useMainStore((state) => state.configs.covers.title.dir);
+  const labelSubDir = useMainStore(
+    (state) => state.configs.covers.subtitle.dir,
+  );
   const addCovers = useMainStore((state) => state.addCovers);
 
   return (failedCovers: CoverLabelValues) => {
@@ -25,7 +28,7 @@ export const useAddEmptyCover = () => {
         subtitle: {
           search: filteredResult.subtitle,
           text: filteredResult.subtitle,
-          dir: labelDir,
+          dir: labelSubDir,
         },
         star: {
           dir: starsDir,

@@ -1,7 +1,7 @@
 import { StateCreator } from 'zustand';
 import { DeepPartial } from 'react-hook-form';
 
-import { CoverSchema, CoversSchema, PosTypes, coversSchema } from 'types';
+import { CoverSchema, CoversSchema, coversSchema } from 'types';
 
 export interface UseCoverParams {
   covers: CoversSchema;
@@ -10,8 +10,7 @@ export interface UseCoverParams {
     coverId: CoverSchema['id'],
     partial: DeepPartial<CoverSchema>,
   ) => void;
-  updateAllCoversDir: (dir: PosTypes) => void;
-  updateAllStarsDir: (dir: PosTypes) => void;
+  updateAllCovers: (dir: DeepPartial<CoverSchema>) => void;
   refreshCovers: (coverId: CoverSchema['id']) => void;
   addCovers: (filteredResults: CoversSchema) => void;
 }
@@ -57,28 +56,8 @@ export const createCoversSlice: StateCreator<
       return { covers: coverCopy };
     });
   },
-  updateAllCoversDir(dir) {
-    set(({ covers }) => ({
-      covers: covers.map((cover) => ({
-        ...cover,
-        title: {
-          ...cover.title,
-          dir,
-        },
-        subtitle: {
-          ...cover.subtitle,
-          dir,
-        },
-      })),
-    }));
-  },
-  updateAllStarsDir(starDir) {
-    set(({ covers }) => ({
-      covers: covers.map((star) => ({
-        ...star,
-        starDir,
-      })),
-    }));
+  updateAllCovers(newCover) {
+    get().covers.forEach((cover) => get().updateCoverSlice(cover.id, newCover));
   },
   addCovers(filteredResults) {
     set(({ covers }) => ({

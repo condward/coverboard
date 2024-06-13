@@ -5,13 +5,13 @@ import { useSetAtom } from 'jotai';
 import { selectedAtom, useIsSelected, useMainStore } from 'store';
 import {
   CommonDraggable,
-  CommonDrawLine,
+  CommonDrawArrow,
   CommonLabelDraggable,
   CommonLabel,
 } from 'CoverBoard/Common';
-import { CoverSchema, LabelTypes, PosTypes } from 'types';
+import { CoverSchema, LabelTypes } from 'types';
 import { useGetSizesContext } from 'providers';
-import { useIsLandscape } from 'utils';
+import { useGetElementSizes } from 'utils';
 
 import { CoverLoadImage, CoverStar, CoverStarDraggable } from '.';
 
@@ -29,6 +29,12 @@ interface CoverImageProps {
   renderTime: number;
 }
 
+enum Offsets {
+  TITLE = LabelTypes.TITLE,
+  SUBTITLE = LabelTypes.SUBTITLE,
+  STAR = 'star',
+}
+
 const CoverWithoutMemo: FC<CoverImageProps> = ({
   id,
   titleText,
@@ -42,68 +48,27 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
   link,
   renderTime,
 }) => {
-  const isLandscape = useIsLandscape();
   const color = useMainStore((state) => state.getCoverColor());
-  const showTitle = useMainStore((state) => state.configs.visibility.titles);
+  const showTitle = useMainStore((state) => state.configs.covers.title.show);
   const showSubtitle = useMainStore(
-    (state) => state.configs.visibility.subtitles,
+    (state) => state.configs.covers.subtitle.show,
   );
-  const { fontSize, dragLimits, coverSizeWidth, coverSizeHeight } =
-    useGetSizesContext();
-  const showStars = useMainStore((state) => state.configs.visibility.stars);
+  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const showStars = useMainStore((state) => state.configs.covers.rating.show);
   const setSelected = useSetAtom(selectedAtom);
   const updateCover = useMainStore((state) => state.updateCover);
 
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeCoverAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeCoverAndRelatedArrows,
   );
 
-  let titleOffset = 0;
-  let subtitleOffset = 0;
-  let starOffset = 0;
-
-  if (
-    titleText &&
-    showTitle &&
-    subtitleText &&
-    showSubtitle &&
-    titleDir === subTitleDir &&
-    showStars &&
-    starDir === titleDir
-  ) {
-    titleOffset = titleDir === PosTypes.TOP ? -fontSize * 1.5 * 2 : -fontSize;
-    titleOffset = titleDir === PosTypes.BOTTOM ? 0 : titleOffset;
-    subtitleOffset = titleOffset + fontSize * 1.5;
-    starOffset = subtitleOffset + fontSize * 1.5;
-  } else if (
-    titleText &&
-    showTitle &&
-    subtitleText &&
-    showSubtitle &&
-    titleDir === subTitleDir &&
-    (!showStars || starDir !== titleDir)
-  ) {
-    titleOffset = titleDir === PosTypes.TOP ? -fontSize * 1.5 : 0;
-    subtitleOffset = titleOffset + fontSize * 1.5;
-  } else if (
-    titleText &&
-    showTitle &&
-    showStars &&
-    starDir === titleDir &&
-    (!subtitleText || !showSubtitle || titleDir !== subTitleDir)
-  ) {
-    titleOffset = starDir === PosTypes.TOP ? -fontSize * 1.5 : 0;
-    starOffset = titleOffset + fontSize * 1.5;
-  } else if (
-    subtitleText &&
-    showSubtitle &&
-    showStars &&
-    starDir === subTitleDir &&
-    (!titleText || !showTitle || titleDir !== subTitleDir)
-  ) {
-    subtitleOffset = starDir === PosTypes.TOP ? -fontSize * 1.5 : 0;
-    starOffset = subtitleOffset + fontSize * 1.5;
-  }
+  const { getOffset, getMaxBoundaries } = useGetElementSizes<Offsets>([
+    ...(titleText && showTitle ? [{ dir: titleDir, type: Offsets.TITLE }] : []),
+    ...(subtitleText && showSubtitle
+      ? [{ dir: subTitleDir, type: Offsets.SUBTITLE }]
+      : []),
+    ...(showStars ? [{ dir: starDir, type: Offsets.STAR }] : []),
+  ]);
 
   const isSelected = useIsSelected(id);
 
@@ -117,7 +82,7 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
     <>
       <CommonDraggable
         updatePosition={(pos) => updateCover(id, { pos })}
-        onDelete={removeCoverAndRelatedLines}
+        onDelete={removeCoverAndRelatedArrows}
         id={id}
         x={x}
         y={y}
@@ -125,13 +90,8 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
           x: dragLimits.x,
           y: dragLimits.y,
         }}
-        max={{
-          x: isLandscape ? dragLimits.width : dragLimits.width - coverSizeWidth,
-          y: isLandscape
-            ? dragLimits.height - coverSizeHeight
-            : dragLimits.height + dragLimits.y - coverSizeHeight,
-        }}>
-        <CommonDrawLine id={id} />
+        max={getMaxBoundaries()}>
+        <CommonDrawArrow id={id} />
 
         <Group>
           <Group onClick={handleSelect} onTap={handleSelect}>
@@ -153,7 +113,10 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
                 fontStyle="bold"
                 color={color}
                 x={-coverSizeWidth}
-                y={coverSizeHeight + titleOffset}
+                y={
+                  coverSizeHeight +
+                  getOffset({ dir: titleDir, type: Offsets.TITLE })
+                }
                 width={coverSizeWidth * 3}
               />
             </CommonLabelDraggable>
@@ -173,7 +136,10 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
                 id={id}
                 color={color}
                 x={-coverSizeWidth}
-                y={coverSizeHeight + subtitleOffset}
+                y={
+                  coverSizeHeight +
+                  getOffset({ dir: subTitleDir, type: Offsets.SUBTITLE })
+                }
                 width={coverSizeWidth * 3}
               />
             </CommonLabelDraggable>
@@ -181,7 +147,11 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
 
           {showStars && (
             <CoverStarDraggable id={id} x={x} y={y} starDir={starDir}>
-              <CoverStar id={id} offset={starOffset} starCount={starCount} />
+              <CoverStar
+                id={id}
+                offset={getOffset({ dir: starDir, type: Offsets.STAR })}
+                starCount={starCount}
+              />
             </CoverStarDraggable>
           )}
         </Group>

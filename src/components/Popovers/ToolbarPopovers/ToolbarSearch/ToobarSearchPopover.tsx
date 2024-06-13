@@ -100,7 +100,6 @@ export const ToolbarSearchPopover: FC<{
   const importCSV = (str: string) => {
     Papa.parse(str, {
       header: true,
-      skipEmptyLines: true,
       dynamicTyping: true,
       complete(results: ParseResult<CoverLabelValue>) {
         reset({ search: results.data.slice(0, 5) });

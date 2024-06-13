@@ -48,12 +48,6 @@ export const backColorMap = {
 export const configSchema = z.object(
   {
     layout: z.object({
-      title: z
-        .string({
-          invalid_type_error: 'configs:title must be a string',
-          required_error: 'configs:title is required',
-        })
-        .trim(),
       scale: z
         .number({
           invalid_type_error: 'configs:layout.scale must be a number',
@@ -82,6 +76,26 @@ export const configSchema = z.object(
           MAX_BOUNDARY,
           `configs:layout.height must be a number lower than ${MAX_BOUNDARY}`,
         ),
+      color: z.nativeEnum(Colors, {
+        errorMap: () => {
+          return {
+            message: `configs:layout:color must be ${Object.values(Colors).join(' | ')}`,
+          };
+        },
+      }),
+      backColor: z.nativeEnum(BackColors, {
+        errorMap: () => {
+          return {
+            message: `configs:layout:backColor must be ${Object.values(
+              BackColors,
+            ).join(' | ')}`,
+          };
+        },
+      }),
+      helpers: z.boolean({
+        invalid_type_error: 'configs:show:helpers must be a boolean',
+        required_error: 'configs:show:helpers is required',
+      }),
     }),
     media: z.nativeEnum(Media, {
       errorMap: () => {
@@ -90,42 +104,85 @@ export const configSchema = z.object(
         };
       },
     }),
-    colors: z.object({
-      main: z.nativeEnum(Colors, {
+    title: z.object({
+      text: z
+        .string({
+          invalid_type_error: 'configs:title:text must be a string',
+          required_error: 'configs:title:text is required',
+        })
+        .trim(),
+      show: z.boolean({
+        invalid_type_error: 'configs:title:show must be a boolean',
+        required_error: 'configs:title:show is required',
+      }),
+    }),
+    covers: z.object({
+      color: z.nativeEnum(Colors, {
         errorMap: () => {
           return {
-            message: `configs:colors:main must be ${Object.values(Colors).join(' | ')}`,
+            message: `configs:covers:color must be ${Object.values(Colors).join(
+              ' | ',
+            )}`,
           };
         },
       }),
-      arrows: z.nativeEnum(Colors, {
+      title: z.object({
+        show: z.boolean({
+          invalid_type_error: 'configs:covers:title:show must be a boolean',
+          required_error: 'configs:covers:title:show is required',
+        }),
+        dir: z.nativeEnum(PosTypes, {
+          errorMap: () => {
+            return {
+              message: `configs:covers:title:dir must be ${Object.values(
+                PosTypes,
+              ).join(' | ')}`,
+            };
+          },
+        }),
+      }),
+      subtitle: z.object({
+        show: z.boolean({
+          invalid_type_error: 'configs:covers:suntitle:show must be a boolean',
+          required_error: 'configs:covers:subtitle:show is required',
+        }),
+        dir: z.nativeEnum(PosTypes, {
+          errorMap: () => {
+            return {
+              message: `configs:covers:subtitle:dir must be ${Object.values(
+                PosTypes,
+              ).join(' | ')}`,
+            };
+          },
+        }),
+      }),
+      rating: z.object({
+        show: z.boolean({
+          invalid_type_error: 'configs:covers:rating:show must be a boolean',
+          required_error: 'configs:covers:rating:show is required',
+        }),
+        dir: z.nativeEnum(PosTypes, {
+          errorMap: () => {
+            return {
+              message: `configs:covers:rating:dir must be ${Object.values(
+                PosTypes,
+              ).join(' | ')}`,
+            };
+          },
+        }),
+      }),
+    }),
+    groups: z.object({
+      color: z.nativeEnum(Colors, {
         errorMap: () => {
           return {
-            message: `configs:colors:arrows must be ${Object.values(
+            message: `configs:groups:title:show must be ${Object.values(
               Colors,
             ).join(' | ')}`,
           };
         },
       }),
-      covers: z.nativeEnum(Colors, {
-        errorMap: () => {
-          return {
-            message: `configs:colors:covers must be ${Object.values(
-              Colors,
-            ).join(' | ')}`,
-          };
-        },
-      }),
-      groups: z.nativeEnum(Colors, {
-        errorMap: () => {
-          return {
-            message: `configs:colors:groups must be ${Object.values(
-              Colors,
-            ).join(' | ')}`,
-          };
-        },
-      }),
-      groupsBack: z.nativeEnum(BackColors, {
+      backColor: z.nativeEnum(BackColors, {
         errorMap: () => {
           return {
             message: `configs:colors:groupBack must be ${Object.values(
@@ -134,69 +191,67 @@ export const configSchema = z.object(
           };
         },
       }),
-      mainBack: z.nativeEnum(BackColors, {
+      title: z.object({
+        show: z.boolean({
+          invalid_type_error: 'configs:groups:title:show must be a boolean',
+          required_error: 'configs:groups:title:show is required',
+        }),
+        dir: z.nativeEnum(PosTypes, {
+          errorMap: () => {
+            return {
+              message: `configs:groups:title:dir must be ${Object.values(
+                PosTypes,
+              ).join(' | ')}`,
+            };
+          },
+        }),
+      }),
+      subtitle: z.object({
+        show: z.boolean({
+          invalid_type_error: 'configs:covers:subtitle:show must be a boolean',
+          required_error: 'configs:covers:subtitle:show is required',
+        }),
+        dir: z.nativeEnum(PosTypes, {
+          errorMap: () => {
+            return {
+              message: `configs:covers:subtitle:dir must be ${Object.values(
+                PosTypes,
+              ).join(' | ')}`,
+            };
+          },
+        }),
+      }),
+    }),
+    arrows: z.object({
+      color: z.nativeEnum(Colors, {
         errorMap: () => {
           return {
-            message: `configs:colors:mainBack must be ${Object.values(
-              BackColors,
+            message: `configs:colors:arrows must be ${Object.values(
+              Colors,
             ).join(' | ')}`,
           };
         },
       }),
-    }),
-    visibility: z.object({
-      titles: z.boolean({
-        invalid_type_error: 'configs:visibility:titles must be a boolean',
-        required_error: 'configs:visibility:titles is required',
+      title: z.object({
+        show: z.boolean({
+          invalid_type_error: 'configs:arrows:title:show must be a boolean',
+          required_error: 'configs:arrows:title:show is required',
+        }),
+        dir: z.nativeEnum(PosTypes, {
+          errorMap: () => {
+            return {
+              message: `configs:arrows:title:dir must be ${Object.values(
+                PosTypes,
+              ).join(' | ')}`,
+            };
+          },
+        }),
       }),
-      arrows: z.boolean({
-        invalid_type_error: 'configs:visibility:arrows must be a boolean',
-        required_error: 'configs:visibility:arrows is required',
-      }),
-      subtitles: z.boolean({
-        invalid_type_error: 'configs:visibility:subtitles must be a boolean',
-        required_error: 'configs:visibility:subtitles is required',
-      }),
-      mainTitle: z.boolean({
-        invalid_type_error: 'configs:visibility:mainTitle must be a boolean',
-        required_error: 'configs:visibility:mainTitle is required',
-      }),
-      stars: z.boolean({
-        invalid_type_error: 'configs:visibility:stars must be a boolean',
-        required_error: 'configs:visibility:stars is required',
-      }),
-      helpers: z.boolean({
-        invalid_type_error: 'configs:visibility:helpers must be a boolean',
-        required_error: 'configs:visibility:helpers is required',
-      }),
-    }),
-    dir: z.object({
-      covers: z.nativeEnum(PosTypes, {
-        errorMap: () => {
-          return {
-            message: `configs:dir:covers must be ${Object.values(PosTypes).join(
-              ' | ',
-            )}`,
-          };
-        },
-      }),
-      stars: z.nativeEnum(PosTypes, {
-        errorMap: () => {
-          return {
-            message: `configs:dir:stars must be ${Object.values(PosTypes).join(
-              ' | ',
-            )}`,
-          };
-        },
-      }),
-      groups: z.nativeEnum(PosTypes, {
-        errorMap: () => {
-          return {
-            message: `configs:dir:groups must be ${Object.values(PosTypes).join(
-              ' | ',
-            )}`,
-          };
-        },
+      circle: z.object({
+        show: z.boolean({
+          invalid_type_error: 'configs:show:arrows:circle must be a boolean',
+          required_error: 'configs:show:arrows:circle is required',
+        }),
       }),
     }),
   },

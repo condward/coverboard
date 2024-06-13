@@ -3,12 +3,12 @@ import { z } from 'zod';
 import { coversSchema } from './coverSchema';
 import { groupsSchema } from './groupSchema';
 import { configSchema } from './configSchema';
-import { lineSchemas } from './lineSchema';
+import { ArrowSchemas } from './arrowSchema';
 
 export const appSchema = z.object({
   configs: configSchema,
   covers: coversSchema,
   groups: groupsSchema,
-  lines: lineSchemas,
+  arrows: ArrowSchemas,
 });
 export type AppSchema = z.infer<typeof appSchema>;

@@ -1,5 +1,5 @@
 export * from './CommonDraggable';
-export * from './CommonDrawLine';
+export * from './CommonDrawArrow';
 export * from './CommonLabelDraggable';
 export * from './CommonLabel';
 export * from './CommonTextLabel';

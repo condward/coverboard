@@ -29,12 +29,12 @@ const useGetNewPos = ({ dir, scaleX, scaleY }: UseGetNewPos) => {
   if (dir === PosTypes.BOTTOM) {
     return {
       x: 0,
-      y: fontSize / 2,
+      y: fontSize,
     };
   } else if (dir === PosTypes.TOP) {
     return {
       x: 0,
-      y: -coverSizeHeight * scaleY - 2 * fontSize,
+      y: -coverSizeHeight * scaleY - fontSize - fontSize,
     };
   } else if (dir === PosTypes.RIGHT) {
     return {

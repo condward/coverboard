@@ -14,16 +14,14 @@ interface DirectionRadioProps {
   value: PosTypes | 'none';
   onChange: (event: ChangeEvent<HTMLInputElement>, value: string) => void;
   name: string;
-  id: string;
-  label: string;
+  label?: string;
 }
 
 export const DirectionRadio: FC<DirectionRadioProps> = ({
   value,
   onChange,
   name,
-  id,
-  label,
+  label = 'Position',
 }) => {
   return (
     <FormControl component="fieldset">
@@ -33,13 +31,16 @@ export const DirectionRadio: FC<DirectionRadioProps> = ({
         gap={SPACING_GAP}
         justifyContent="space-between"
         flexWrap="wrap">
-        <FormLabel component="legend" id={id}>
+        <FormLabel
+          component="legend"
+          id={name}
+          sx={{ textTransform: 'capitalize' }}>
           {label}:
         </FormLabel>
         <RadioGroup
           row
           aria-label="position"
-          aria-labelledby={id}
+          aria-labelledby={name}
           name={name}
           value={value}
           onChange={onChange}>

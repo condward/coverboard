@@ -3,7 +3,7 @@ import { TextField, Button, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import {
-  DeleteOutline,
+  DeleteOutlined,
   LinkOutlined,
   SaveOutlined,
   UpdateOutlined,
@@ -55,11 +55,11 @@ export const GroupPopover: FC<GroupPopover> = ({
   );
   const groupBound = useMainStore((state) => state.getGroupBounds(group.id));
 
-  const removeGroupAndRelatedLines = useMainStore(
-    (state) => state.removeGroupAndRelatedLines,
+  const removeGroupAndRelatedArrows = useMainStore(
+    (state) => state.removeGroupAndRelatedArrows,
   );
   const handleDelete = () => {
-    removeGroupAndRelatedLines(group.id);
+    removeGroupAndRelatedArrows(group.id);
     onClose();
   };
 
@@ -138,9 +138,7 @@ export const GroupPopover: FC<GroupPopover> = ({
                 control={control}
                 render={({ field }) => (
                   <DirectionRadio
-                    label="Position"
-                    id="group-title"
-                    name="titleRadio"
+                    name={field.name}
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -165,9 +163,7 @@ export const GroupPopover: FC<GroupPopover> = ({
                 control={control}
                 render={({ field }) => (
                   <DirectionRadio
-                    label="Position"
-                    id="group-subtitle"
-                    name="subtitleRadio"
+                    name={field.name}
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -270,7 +266,7 @@ export const GroupPopover: FC<GroupPopover> = ({
             variant="contained"
             color="error"
             type="button"
-            startIcon={<DeleteOutline />}
+            startIcon={<DeleteOutlined />}
             onClick={handleDelete}>
             Delete
           </Button>

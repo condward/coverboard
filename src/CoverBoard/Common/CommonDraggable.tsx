@@ -1,4 +1,4 @@
-import { Group, Line } from 'react-konva';
+import { Group, Arrow } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
 import { useState, ReactNode, FC } from 'react';
@@ -38,7 +38,7 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
   const color = useMainStore((state) => state.getColor());
 
   const { dragLimits } = useGetSizesContext();
-  const [hintLines, setHintLines] = useState<
+  const [hintArrows, setHintArrows] = useState<
     [
       CoverSchema | GroupSchema | undefined,
       CoverSchema | GroupSchema | undefined,
@@ -93,21 +93,21 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
       groups.find((group) => group.id !== id && group.pos.x === targetX);
 
     if (
-      (hintLines[0] === undefined && foundY) ||
-      (hintLines[1] === undefined && foundX)
+      (hintArrows[0] === undefined && foundY) ||
+      (hintArrows[1] === undefined && foundX)
     ) {
-      setHintLines([foundY, foundX]);
+      setHintArrows([foundY, foundX]);
     } else if (
-      (hintLines[0] !== undefined && !foundY) ||
-      (hintLines[1] !== undefined && !foundX)
+      (hintArrows[0] !== undefined && !foundY) ||
+      (hintArrows[1] !== undefined && !foundX)
     ) {
-      setHintLines([undefined, undefined]);
+      setHintArrows([undefined, undefined]);
     }
   };
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent>) => {
     e.cancelBubble = true;
-    setHintLines([undefined, undefined]);
+    setHintArrows([undefined, undefined]);
     e.currentTarget.opacity(1);
     const container = e.target.getStage()?.container();
 
@@ -123,19 +123,24 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
 
   return (
     <>
-      {hintLines[0] && (
-        <Line
-          points={[0, hintLines[0].pos.y, dragLimits.width, hintLines[0].pos.y]}
+      {hintArrows[0] && (
+        <Arrow
+          points={[
+            0,
+            hintArrows[0].pos.y,
+            dragLimits.width,
+            hintArrows[0].pos.y,
+          ]}
           stroke={color}
           strokeWidth={2}
         />
       )}
-      {hintLines[1] && (
-        <Line
+      {hintArrows[1] && (
+        <Arrow
           points={[
-            hintLines[1].pos.x,
+            hintArrows[1].pos.x,
             0,
-            hintLines[1].pos.x,
+            hintArrows[1].pos.x,
             dragLimits.height,
           ]}
           stroke={color}

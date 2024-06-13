@@ -4,15 +4,15 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { useSetAtom } from 'jotai';
 
 import { selectedAtom, useIsSelected, useMainStore } from 'store';
-import { LineSchema } from 'types';
+import { ArrowSchema } from 'types';
 import { useGetSizesContext } from 'providers';
 
-export const LineCircle: FC<{ id: LineSchema['id'] }> = ({ id }) => {
+export const ArrowCircle: FC<{ id: ArrowSchema['id'] }> = ({ id }) => {
   const { circleRadius } = useGetSizesContext();
   const isSelected = useIsSelected(id);
   const setSelected = useSetAtom(selectedAtom);
   const color = useMainStore((state) => state.getArrowColor());
-  const showArrow = useMainStore((state) => state.configs.visibility.arrows);
+  const showArrow = useMainStore((state) => state.configs.arrows.circle.show);
 
   const handleSelect = () => {
     setSelected({ id, open: isSelected });

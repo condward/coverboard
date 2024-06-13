@@ -28,10 +28,10 @@ interface CommonLabelProps {
 }
 
 export const CommonLabel: FC<CommonLabelProps> = (props) => {
-  const editLines = useAtomValue(pointsAtom);
+  const editArrows = useAtomValue(pointsAtom);
   const isSelected = useIsSelected(props.id);
 
-  if (editLines || isSelected) return null;
+  if (editArrows || isSelected) return null;
 
   return <CommonLabelChild {...props} />;
 };
@@ -53,7 +53,7 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
     id,
     text: coverLabel,
   });
-  const showHelpers = useMainStore((state) => state.configs.visibility.helpers);
+  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
 
   const handleSetOpen = (open: boolean) => {
     open ? setEditingText({ id, text: coverLabel }) : setEditingText(null);

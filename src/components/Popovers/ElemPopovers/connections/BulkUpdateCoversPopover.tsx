@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import {
   AddOutlined,
-  DeleteOutline,
+  DeleteOutlined,
   HideSourceOutlined,
   SaveOutlined,
 } from '@mui/icons-material';
@@ -42,8 +42,8 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   maxBounds,
 }) => {
   const media = useMainStore((state) => state.configs.media);
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeCoverAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeCoverAndRelatedArrows,
   );
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const updateCover = useMainStore((state) => state.updateCover);
@@ -139,7 +139,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   );
 
   const handleDelete = () => {
-    getValues('ids').forEach((id) => removeCoverAndRelatedLines(id));
+    getValues('ids').forEach((id) => removeCoverAndRelatedArrows(id));
     onClose();
   };
 
@@ -219,9 +219,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
               control={control}
               render={({ field }) => (
                 <DirectionRadio
-                  label="Position"
-                  id="cover-title"
-                  name="titleRadio"
+                  name={field.name}
                   value={field.value}
                   onChange={field.onChange}
                 />
@@ -234,9 +232,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
               control={control}
               render={({ field }) => (
                 <DirectionRadio
-                  label="Position"
-                  id="cover-subtitle"
-                  name="subtitleRadio"
+                  name={field.name}
                   value={field.value}
                   onChange={field.onChange}
                 />
@@ -264,9 +260,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
               control={control}
               render={({ field }) => (
                 <DirectionRadio
-                  label="Position"
-                  id="star-rating"
-                  name="starRadio"
+                  name={field.name}
                   value={field.value}
                   onChange={field.onChange}
                 />
@@ -352,7 +346,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             variant="outlined"
             color="error"
             type="button"
-            startIcon={<DeleteOutline />}
+            startIcon={<DeleteOutlined />}
             onClick={handleDelete}>
             Delete
           </Button>

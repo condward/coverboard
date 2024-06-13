@@ -33,9 +33,10 @@ export const ToolbarConfigPopover: FC<{
   const totalLength = groupsLength + coversLength;
 
   const updateConfigs = useMainStore((state) => state.updateConfigs);
-  const updateAllCoversDir = useMainStore((state) => state.updateAllCoversDir);
-  const updateAllStarsDir = useMainStore((state) => state.updateAllStarsDir);
-  const updateAllGroupsDir = useMainStore((state) => state.updateAllGroupsDir);
+  const updateAllCovers = useMainStore((state) => state.updateAllCovers);
+  const updateAllGroups = useMainStore((state) => state.updateAllGroups);
+  const updateAllArrows = useMainStore((state) => state.updateAllArrows);
+
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const [isToolbarHidden, setHideToolBar] = useAtom(hideToolbarAtom);
 
@@ -59,14 +60,25 @@ export const ToolbarConfigPopover: FC<{
 
   const onSubmit = handleSubmit(
     (config) => {
-      updateAllCoversDir(config.dir.covers);
-      updateAllStarsDir(config.dir.stars);
-      updateAllGroupsDir(config.dir.groups);
+      updateAllCovers({
+        title: { dir: config.covers.title.dir },
+        subtitle: { dir: config.covers.subtitle.dir },
+      });
+      updateAllGroups({
+        title: { dir: config.groups.title.dir },
+        subtitle: { dir: config.groups.subtitle.dir },
+      });
+      updateAllArrows({
+        title: { dir: config.covers.title.dir },
+      });
       updateConfigs({
         ...config,
+        title: {
+          ...config.title,
+          text: config.title.text.trim(),
+        },
         layout: {
           ...config.layout,
-          title: config.layout.title.trim(),
           scale: config.layout.scale * 100,
         },
       });

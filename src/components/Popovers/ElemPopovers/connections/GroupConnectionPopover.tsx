@@ -7,7 +7,7 @@ import { GroupSchema, SPACING_GAP } from 'types';
 import { CommonDialog } from 'components';
 import { useMainStore } from 'store';
 
-import { AddLinePopover } from '../AddLinePopover';
+import { AddArrowPopover } from '../AddArrowPopover';
 import { GroupConnections } from './GroupConnections';
 
 interface GroupPopoverProps {
@@ -34,7 +34,7 @@ export const GroupConnectionPopover: FC<GroupPopoverProps> = ({
         <>
           <GroupConnections groupId={group.id} onChange={onChange} />
           {openConn && (
-            <AddLinePopover
+            <AddArrowPopover
               originId={group.id}
               onClose={() => setOpenConn(false)}
             />

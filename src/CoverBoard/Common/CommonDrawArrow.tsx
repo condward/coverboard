@@ -3,6 +3,7 @@ import { Group, Rect } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useAtom, useAtomValue } from 'jotai';
 import { ZodError } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 
 import { CoverSchema, PosTypes } from 'types';
 import {
@@ -14,13 +15,13 @@ import {
 } from 'store';
 import { useGetSizesContext } from 'providers';
 
-interface CommonDrawLineProps {
+interface CommonDrawArrowProps {
   id: CoverSchema['id'];
   scaleX?: number;
   scaleY?: number;
 }
 
-const useShowArrow = (id: CommonDrawLineProps['id']) => {
+const useShowArrow = (id: CommonDrawArrowProps['id']) => {
   const covers = useMainStore((state) => state.covers);
   const points = useAtomValue(pointsAtom);
   const groups = useMainStore((state) => state.groups);
@@ -51,7 +52,7 @@ const useShowArrow = (id: CommonDrawLineProps['id']) => {
   return true;
 };
 
-export const CommonDrawLine: FC<CommonDrawLineProps> = ({
+export const CommonDrawArrow: FC<CommonDrawArrowProps> = ({
   id,
   scaleX = 1,
   scaleY = 1,
@@ -62,10 +63,10 @@ export const CommonDrawLine: FC<CommonDrawLineProps> = ({
 
   if ((!points && !isSelected) || !showArrow) return null;
 
-  return <CommonDrawLineChild id={id} scaleX={scaleX} scaleY={scaleY} />;
+  return <CommonDrawArrowChild id={id} scaleX={scaleX} scaleY={scaleY} />;
 };
 
-const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
+const CommonDrawArrowChild: FC<CommonDrawArrowProps> = ({
   id,
   scaleX = 1,
   scaleY = 1,
@@ -74,7 +75,10 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
   const isSelected = useIsSelected(id);
   const selected = useAtomValue(selectedAtom);
 
-  const createLine = useMainStore((state) => state.createLine);
+  const arrows = useMainStore((state) => state.arrows);
+  const addArrow = useMainStore((state) => state.addArrow);
+  const updateArrow = useMainStore((state) => state.updateArrow);
+  const labelDir = useMainStore((state) => state.configs.arrows.title.dir);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const cover = useMainStore((state) =>
     selected?.id
@@ -94,14 +98,56 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
 
   const square = 25 + (coverSizeWidth * scaleX) / 20;
 
-  const handleDrawLine = useCallback(
+  const handleDrawArrow = useCallback(
     (id: string, dir: PosTypes) => {
       if (!points) {
         setPoints({ id, dir });
       } else if (points.id !== id) {
         try {
-          createLine(id, points, dir);
-          setPoints(null);
+          if (
+            arrows.some(
+              (currentArrow) =>
+                currentArrow.target.id === id && points.id === id,
+            )
+          ) {
+            return;
+          }
+
+          const foundArrow = arrows.find(
+            (currentArrow) =>
+              currentArrow.target.id === id &&
+              points.id === currentArrow.origin.id,
+          );
+          if (foundArrow) {
+            updateArrow(foundArrow.id, {
+              origin: points,
+              target: { id, dir },
+            });
+            return;
+          }
+
+          const foundArrowReverse = arrows.find(
+            (currentArrow) =>
+              currentArrow.origin.id === id &&
+              points.id === currentArrow.target.id,
+          );
+          if (foundArrowReverse) {
+            updateArrow(foundArrowReverse.id, {
+              origin: points,
+              target: { id, dir },
+            });
+            return;
+          }
+
+          addArrow({
+            title: {
+              text: '',
+              dir: labelDir,
+            },
+            origin: { ...points },
+            target: { id, dir },
+            id: uuidv4(),
+          });
         } catch (error) {
           if (error instanceof ZodError) {
             const tooBig = error.issues.find((msg) => msg.code === 'too_big');
@@ -110,16 +156,26 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
               showErrorMessage(tooBig.message);
               return;
             }
-            showErrorMessage('Bad formatted line');
+            showErrorMessage('Bad formatted arrow');
             return;
           }
           throw error;
+        } finally {
+          setPoints(null);
         }
       } else if (points.id === id) {
         setPoints(null);
       }
     },
-    [createLine, points, setPoints, showErrorMessage],
+    [
+      addArrow,
+      labelDir,
+      arrows,
+      points,
+      setPoints,
+      showErrorMessage,
+      updateArrow,
+    ],
   );
 
   const posArray = [
@@ -165,7 +221,7 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
             updateGroup(group.id, { pos: { x: group.pos.x + 1 } });
           }
         } else {
-          handleDrawLine(id, PosTypes.RIGHT);
+          handleDrawArrow(id, PosTypes.RIGHT);
         }
 
         e.preventDefault();
@@ -177,7 +233,7 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
             updateGroup(group.id, { pos: { x: group.pos.x - 1 } });
           }
         } else {
-          handleDrawLine(id, PosTypes.LEFT);
+          handleDrawArrow(id, PosTypes.LEFT);
         }
         e.preventDefault();
       } else if (e.key === 'ArrowUp') {
@@ -188,7 +244,7 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
             updateGroup(group.id, { pos: { y: group.pos.y - 1 } });
           }
         } else {
-          handleDrawLine(id, PosTypes.TOP);
+          handleDrawArrow(id, PosTypes.TOP);
         }
         e.preventDefault();
       } else if (e.key === 'ArrowDown') {
@@ -199,7 +255,7 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
             updateGroup(group.id, { pos: { y: group.pos.y + 1 } });
           }
         } else {
-          handleDrawLine(id, PosTypes.BOTTOM);
+          handleDrawArrow(id, PosTypes.BOTTOM);
         }
         e.preventDefault();
       } else if (e.key === 'Escape') {
@@ -213,7 +269,7 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
   }, [
     cover,
     group,
-    handleDrawLine,
+    handleDrawArrow,
     id,
     isSelected,
     selection,
@@ -235,8 +291,8 @@ const CommonDrawLineChild: FC<CommonDrawLineProps> = ({
           rotation={45}
           opacity={selection === pos.dir ? 0.3 : 0.05}
           visible={!(!!selection && selection !== pos.dir)}
-          onClick={() => handleDrawLine(id, pos.dir)}
-          onTap={() => handleDrawLine(id, pos.dir)}
+          onClick={() => handleDrawArrow(id, pos.dir)}
+          onTap={() => handleDrawArrow(id, pos.dir)}
           onMouseMove={(evt: KonvaEventObject<MouseEvent>) => {
             if (selection !== pos.dir) {
               evt.currentTarget.opacity(0.3);

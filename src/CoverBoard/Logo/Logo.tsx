@@ -61,7 +61,7 @@ const LogoWithoutMemo: FC = () => {
           fill="white"
           align="center"
           text="powered"
-          textDecoration="underline"
+          textDecoration="underArrow"
         />
         <Text
           y={fontSize}
@@ -70,7 +70,7 @@ const LogoWithoutMemo: FC = () => {
           fill="white"
           align="center"
           text="by"
-          textDecoration="underline"
+          textDecoration="underArrow"
         />
         <Text
           y={fontSize * 2}
@@ -79,7 +79,7 @@ const LogoWithoutMemo: FC = () => {
           fill="white"
           align="center"
           text="AudioScrobbler"
-          textDecoration="underline"
+          textDecoration="underArrow"
         />
       </Group>
     );

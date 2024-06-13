@@ -10,13 +10,11 @@ import { useGetSizesContext } from 'providers';
 const TitleLabelWithoutMemo: FC = () => {
   const isLandscape = useIsLandscape();
   const updateConfigs = useMainStore((state) => state.updateConfigs);
-  const title = useMainStore((state) => state.configs.layout.title);
-  const showMainTitle = useMainStore(
-    (state) => state.configs.visibility.mainTitle,
-  );
+  const title = useMainStore((state) => state.configs.title.text);
+  const showMainTitle = useMainStore((state) => state.configs.title.show);
   const saveId = useSaveId();
   const color = useMainStore((state) => state.getColor());
-  const showHelpers = useMainStore((state) => state.configs.visibility.helpers);
+  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
   const { toolbarIconSize, dragLimits } = useGetSizesContext();
 
   const [open, setOpen] = useAtom(editTitleAtom);
@@ -34,9 +32,9 @@ const TitleLabelWithoutMemo: FC = () => {
         setHideToolBar(false);
         setOpen(val);
       }}
-      onReset={() => updateConfigs({ layout: { title: '' } })}
+      onReset={() => updateConfigs({ title: { text: '' } })}
       label={titleMode}
-      setLabel={(text) => updateConfigs({ layout: { title: text } })}
+      setLabel={(text) => updateConfigs({ title: { text } })}
       x={
         isLandscape ? dragLimits.width / 21 : dragLimits.x + toolbarIconSize / 2
       }

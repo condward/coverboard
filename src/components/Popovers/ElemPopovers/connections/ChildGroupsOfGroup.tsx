@@ -20,8 +20,8 @@ export const ChildGroupsOfGroup: FC<ChildGroupsOfGroupProps> = ({
     state.getGroupsInsideGroup(groupId),
   );
 
-  const removeGroupAndRelatedLines = useMainStore(
-    (state) => state.removeGroupAndRelatedLines,
+  const removeGroupAndRelatedArrows = useMainStore(
+    (state) => state.removeGroupAndRelatedArrows,
   );
 
   if (groupsInsideGroup.length === 0) return null;
@@ -43,7 +43,7 @@ export const ChildGroupsOfGroup: FC<ChildGroupsOfGroupProps> = ({
               onClick={() => onChange(groupId, group.id)}
               onDelete={(evt) => {
                 evt.preventDefault();
-                removeGroupAndRelatedLines(group.id);
+                removeGroupAndRelatedArrows(group.id);
               }}
             />
           );

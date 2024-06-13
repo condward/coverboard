@@ -1,7 +1,7 @@
 import { StateCreator } from 'zustand';
 import { DeepPartial } from 'react-hook-form';
 
-import { GroupSchema, GroupsSchema, PosTypes, groupsSchema } from 'types';
+import { GroupSchema, GroupsSchema, groupsSchema } from 'types';
 
 export interface UseGrouspParams {
   groups: GroupsSchema;
@@ -10,7 +10,7 @@ export interface UseGrouspParams {
     groupdId: GroupSchema['id'],
     partial: DeepPartial<GroupSchema>,
   ) => void;
-  updateAllGroupsDir: (dir: PosTypes) => void;
+  updateAllGroups: (group: DeepPartial<GroupSchema>) => void;
   addGroups: (filteredResults: GroupsSchema) => void;
 }
 
@@ -52,20 +52,8 @@ export const createGroupsSlice: StateCreator<
       return { groups: groupCopy };
     });
   },
-  updateAllGroupsDir(dir) {
-    set(({ groups }) => ({
-      groups: groups.map((group) => ({
-        ...group,
-        title: {
-          ...group.title,
-          dir,
-        },
-        subtitle: {
-          ...group.subtitle,
-          dir,
-        },
-      })),
-    }));
+  updateAllGroups(groupDir) {
+    get().groups.forEach((group) => get().updateGroupSlice(group.id, groupDir));
   },
   addGroups(filteredResults) {
     set(({ groups }) => ({

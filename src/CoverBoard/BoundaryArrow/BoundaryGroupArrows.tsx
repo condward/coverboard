@@ -21,8 +21,8 @@ export const BoundaryGroupArrows: FC = () => {
     return [];
   });
   const updateGroup = useMainStore((state) => state.updateGroup);
-  const removeGroupAndRelatedLines = useMainStore(
-    (state) => state.removeGroupAndRelatedLines,
+  const removeGroupAndRelatedArrows = useMainStore(
+    (state) => state.removeGroupAndRelatedArrows,
   );
   const groupColor = useMainStore((state) => state.getGroupColor());
 
@@ -32,7 +32,7 @@ export const BoundaryGroupArrows: FC = () => {
         <BoundaryArrow
           color={groupColor}
           updatePosition={(pos) => updateGroup(group.id, { pos })}
-          removeCascade={removeGroupAndRelatedLines}
+          removeCascade={removeGroupAndRelatedArrows}
           x={group.pos.x}
           y={group.pos.y}
           scaleX={group.scale.x}

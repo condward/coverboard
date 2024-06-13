@@ -1,6 +1,6 @@
 import { atom, useAtomValue } from 'jotai';
 
-import { LabelTypes, LinePointSchema, TextTypes } from 'types';
+import { LabelTypes, ArrowPointSchema, TextTypes } from 'types';
 
 type SelectedText = {
   id: string;
@@ -12,7 +12,7 @@ type SelectedElement = {
   open: boolean;
 };
 
-export const pointsAtom = atom<LinePointSchema | null>(null);
+export const pointsAtom = atom<ArrowPointSchema | null>(null);
 
 export const parentSelectedAtom = atom<Array<string>>([]);
 

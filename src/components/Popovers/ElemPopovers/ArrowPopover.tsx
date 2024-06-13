@@ -6,43 +6,43 @@ import { useAtomValue } from 'jotai';
 import {
   ArrowCircleLeftOutlined,
   ArrowCircleRightOutlined,
-  DeleteOutline,
+  DeleteOutlined,
   SaveOutlined,
   SwapHorizOutlined,
 } from '@mui/icons-material';
 
-import { LineSchema, LineSchemaOutput, lineSchema, SPACING_GAP } from 'types';
+import { ArrowSchema, ArrowSchemaOutput, SPACING_GAP } from 'types';
 import { CommonDialog, DirectionRadio, FieldSet } from 'components';
 import { configAtom, useMainStore, useToastStore } from 'store';
 
 import { formatLabel } from 'utils';
 
-interface LinePopoverProps {
+interface ArrowPopoverProps {
   onClose: (id?: string) => void;
   onChange: (from: string, to: string) => void;
   onReturn?: () => void;
-  line: LineSchema;
+  arrow: ArrowSchema;
 }
 
-export const LinePopover: FC<LinePopoverProps> = ({
-  line,
+export const ArrowPopover: FC<ArrowPopoverProps> = ({
+  arrow,
   onClose,
   onChange,
   onReturn,
 }) => {
-  const updateLine = useMainStore((state) => state.updateLine);
+  const updateArrow = useMainStore((state) => state.updateArrow);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const covers = useMainStore((state) => state.covers);
   const groups = useMainStore((state) => state.groups);
   const configToolbarOpen = useAtomValue(configAtom);
 
-  const originCoverTitle = covers.find((cov) => cov.id === line.origin.id)
+  const originCoverTitle = covers.find((cov) => cov.id === arrow.origin.id)
     ?.title.text;
-  const targetCoverTitle = covers.find((cov) => cov.id === line.target.id)
+  const targetCoverTitle = covers.find((cov) => cov.id === arrow.target.id)
     ?.title.text;
-  const originGroupTitle = groups.find((grp) => grp.id === line.origin.id)
+  const originGroupTitle = groups.find((grp) => grp.id === arrow.origin.id)
     ?.title.text;
-  const targetGroupTitle = groups.find((grp) => grp.id === line.target.id)
+  const targetGroupTitle = groups.find((grp) => grp.id === arrow.target.id)
     ?.title.text;
 
   const originTitle = originCoverTitle || originGroupTitle || '';
@@ -52,14 +52,14 @@ export const LinePopover: FC<LinePopoverProps> = ({
     control,
     handleSubmit,
     formState: { isDirty },
-  } = useForm<LineSchema, unknown, LineSchemaOutput>({
-    resolver: zodResolver(lineSchema),
-    defaultValues: line,
+  } = useForm<ArrowSchema, unknown, ArrowSchemaOutput>({
+    resolver: zodResolver(ArrowSchema),
+    defaultValues: arrow,
   });
 
   const onSubmit = handleSubmit(
     (values) => {
-      updateLine(line.id, {
+      updateArrow(arrow.id, {
         title: {
           text: values.title.text,
           dir: values.title.dir,
@@ -78,23 +78,23 @@ export const LinePopover: FC<LinePopoverProps> = ({
     },
   );
 
-  const removeLine = useMainStore((state) => state.removeLine);
+  const removeArrow = useMainStore((state) => state.removeArrow);
   const handleDelete = () => {
-    removeLine(line.id);
+    removeArrow(arrow.id);
     onClose();
   };
 
   const handleSwapDirection = () => {
-    updateLine(line.id, {
-      origin: { id: line.target.id, dir: line.target.dir },
-      target: { id: line.origin.id, dir: line.origin.dir },
+    updateArrow(arrow.id, {
+      origin: { id: arrow.target.id, dir: arrow.target.dir },
+      target: { id: arrow.origin.id, dir: arrow.origin.dir },
     });
     onClose();
   };
 
   return (
     <CommonDialog
-      onClose={() => onClose(line.id)}
+      onClose={() => onClose(arrow.id)}
       onReturn={onReturn}
       title="Edit Arrow"
       opaque={configToolbarOpen}
@@ -102,7 +102,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
       content={
         <>
           <Stack direction="row" justifyContent="end">
-            <small>ID: {line.id.slice(0, 8).toUpperCase()}</small>
+            <small>ID: {arrow.id.slice(0, 8).toUpperCase()}</small>
           </Stack>
           <Stack direction="column" gap={SPACING_GAP}>
             <FieldSet direction="column" label="Label">
@@ -124,9 +124,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
                 control={control}
                 render={({ field }) => (
                   <DirectionRadio
-                    label="Position"
-                    id="line-position"
-                    name="lineRadio"
+                    name={field.name}
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -140,9 +138,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
                 return (
                   <FieldSet direction="column" label="Origin">
                     <DirectionRadio
-                      label="Position"
-                      id="origin-position"
-                      name="originLineRadio"
+                      name={field.name}
                       value={field.value}
                       onChange={field.onChange}
                     />
@@ -152,8 +148,8 @@ export const LinePopover: FC<LinePopoverProps> = ({
                       component="a"
                       color="primary"
                       startIcon={<ArrowCircleLeftOutlined />}
-                      onClick={() => onChange(line.id, line.origin.id)}>
-                      {formatLabel(originTitle, line.origin.id).slice(0, 50)}
+                      onClick={() => onChange(arrow.id, arrow.origin.id)}>
+                      {formatLabel(originTitle, arrow.origin.id).slice(0, 50)}
                     </Button>
                   </FieldSet>
                 );
@@ -166,9 +162,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
                 return (
                   <FieldSet direction="column" label="Target">
                     <DirectionRadio
-                      label="Position"
-                      id="target-position"
-                      name="targetLineRadio"
+                      name={field.name}
                       value={field.value}
                       onChange={field.onChange}
                     />
@@ -178,8 +172,8 @@ export const LinePopover: FC<LinePopoverProps> = ({
                       color="primary"
                       component="a"
                       startIcon={<ArrowCircleRightOutlined />}
-                      onClick={() => onChange(line.id, line.target.id)}>
-                      {formatLabel(targetTitle, line.target.id).slice(0, 50)}
+                      onClick={() => onChange(arrow.id, arrow.target.id)}>
+                      {formatLabel(targetTitle, arrow.target.id).slice(0, 50)}
                     </Button>
                   </FieldSet>
                 );
@@ -194,7 +188,7 @@ export const LinePopover: FC<LinePopoverProps> = ({
             variant="contained"
             color="error"
             type="button"
-            startIcon={<DeleteOutline />}
+            startIcon={<DeleteOutlined />}
             onClick={handleDelete}>
             Delete
           </Button>

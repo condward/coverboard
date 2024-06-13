@@ -10,7 +10,7 @@ import { formatLabel } from 'utils';
 import { FieldSet } from 'components/FieldSet';
 import { CommonDialog } from 'components/CommonDialog';
 
-import { AddLinePopover } from '../AddLinePopover';
+import { AddArrowPopover } from '../AddArrowPopover';
 import { AddGroupPopover } from '../AddGroupPopover';
 
 type RecursiveTypeGroup = Record<
@@ -28,17 +28,17 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
   const setSelected = useSetAtom(selectedAtom);
   const covers = useMainStore((state) => state.covers);
   const groups = useMainStore((state) => state.groups);
-  const lines = useMainStore((state) => state.lines);
+  const arrows = useMainStore((state) => state.arrows);
   const groupsInsideGroup = useMainStore((state) => state.getGroupsInsideGroup);
   const coversInsideGroup = useMainStore((state) => state.getCoversInsideGroup);
-  const removeGroupAndRelatedLines = useMainStore(
-    (state) => state.removeGroupAndRelatedLines,
+  const removeGroupAndRelatedArrows = useMainStore(
+    (state) => state.removeGroupAndRelatedArrows,
   );
   const totalElements = covers.length + groups.length;
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeCoverAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeCoverAndRelatedArrows,
   );
-  const removeLine = useMainStore((state) => state.removeLine);
+  const removeArrow = useMainStore((state) => state.removeArrow);
 
   const groupConnections: RecursiveTypeGroup = {};
   groups.forEach((group) => {
@@ -67,7 +67,7 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
     }
   });
 
-  const [openAddLine, setOpenAddLine] = useState(false);
+  const [openAddArrow, setOpenAddArrow] = useState(false);
   const [openAddGrp, setOpenAddGrp] = useState(false);
 
   return (
@@ -84,7 +84,7 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
             type="button"
             startIcon={<AddOutlined />}
             disabled={totalElements < 2}
-            onClick={() => setOpenAddLine(true)}>
+            onClick={() => setOpenAddArrow(true)}>
             Add Arrow
           </Button>
           <Button
@@ -100,8 +100,8 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
       }
       content={
         <>
-          {openAddLine && (
-            <AddLinePopover onClose={() => setOpenAddLine(false)} />
+          {openAddArrow && (
+            <AddArrowPopover onClose={() => setOpenAddArrow(false)} />
           )}
           {openAddGrp && (
             <AddGroupPopover onClose={() => setOpenAddGrp(false)} />
@@ -129,7 +129,7 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
                       onClick={() => setSelected({ id: group.id, open: true })}
                       onDelete={(evt) => {
                         evt.preventDefault();
-                        removeGroupAndRelatedLines(group.id);
+                        removeGroupAndRelatedArrows(group.id);
                       }}
                     />
                   );
@@ -154,7 +154,7 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
                       onClick={() => setSelected({ id: cover.id, open: true })}
                       onDelete={(evt) => {
                         evt.preventDefault();
-                        removeGroupAndRelatedLines(cover.id);
+                        removeGroupAndRelatedArrows(cover.id);
                       }}
                     />
                   );
@@ -192,9 +192,9 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
                             onDelete={(evt) => {
                               evt.preventDefault();
                               if (foundGroupElem) {
-                                removeGroupAndRelatedLines(childGroupId);
+                                removeGroupAndRelatedArrows(childGroupId);
                               } else {
-                                removeCoverAndRelatedLines(childGroupId);
+                                removeCoverAndRelatedArrows(childGroupId);
                               }
                             }}
                           />
@@ -206,24 +206,24 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
               );
             },
           )}
-          {lines.length > 0 && (
+          {arrows.length > 0 && (
             <FieldSet
               direction="column"
-              label={`All Arrows (${lines.length})`}
+              label={`All Arrows (${arrows.length})`}
               gap={SPACING_GAP}
               flexWrap="nowrap">
               <Stack direction="row" flexWrap="wrap" gap={SPACING_GAP / 2}>
-                {lines.map((line) => {
+                {arrows.map((arrow) => {
                   return (
                     <Chip
-                      key={line.id}
+                      key={arrow.id}
                       icon={<LinkOutlined />}
                       component="a"
-                      label={formatLabel(line.title.text, line.id)}
-                      onClick={() => setSelected({ id: line.id, open: true })}
+                      label={formatLabel(arrow.title.text, arrow.id)}
+                      onClick={() => setSelected({ id: arrow.id, open: true })}
                       onDelete={(evt) => {
                         evt.preventDefault();
-                        removeLine(line.id);
+                        removeArrow(arrow.id);
                       }}
                     />
                   );

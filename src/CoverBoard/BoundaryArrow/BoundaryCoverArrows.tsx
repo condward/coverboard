@@ -22,8 +22,8 @@ export const BoundaryCoverArrowsWithoutMemo: FC = () => {
   });
 
   const updateGroup = useMainStore((state) => state.updateGroup);
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeCoverAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeCoverAndRelatedArrows,
   );
   const coverColor = useMainStore((state) => state.getCoverColor());
 
@@ -33,7 +33,7 @@ export const BoundaryCoverArrowsWithoutMemo: FC = () => {
         <BoundaryArrow
           color={coverColor}
           updatePosition={(pos) => updateGroup(cover.id, { pos })}
-          removeCascade={removeCoverAndRelatedLines}
+          removeCascade={removeCoverAndRelatedArrows}
           x={cover.pos.x}
           y={cover.pos.y}
           title={cover.subtitle.text}

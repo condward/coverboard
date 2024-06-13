@@ -26,14 +26,21 @@ export const CommonTabs: FC<CommonTabsProps> = ({ tabs }) => {
 
   return (
     <Stack gap={SPACING_GAP}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs onChange={(_, val: string) => setTabsState(val)} value={tabState}>
-          {tabs.map((tab) => (
-            <Tab label={tab.label} value={tab.value} key={tab.value} />
-          ))}
-        </Tabs>
-      </Box>
-      <Stack direction="column" gap={SPACING_GAP}>
+      <Tabs
+        onChange={(_, val: string) => setTabsState(val)}
+        value={tabState}
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        variant="scrollable"
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}>
+        {tabs.map((tab) => (
+          <Tab label={tab.label} value={tab.value} key={tab.value} />
+        ))}
+      </Tabs>
+      <Stack direction="column" gap={SPACING_GAP} mt={1}>
         {tabs.map((tab) => (
           <Box
             key={tab.value}

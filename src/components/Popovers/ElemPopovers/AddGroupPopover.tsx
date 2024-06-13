@@ -28,7 +28,10 @@ export const AddGroupPopover: FC<AddGroupPopover> = ({ onClose }) => {
   const addGroups = useMainStore((state) => state.addGroups);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
-  const groupDir = useMainStore((state) => state.configs.dir.groups);
+  const groupTitleDir = useMainStore((state) => state.configs.groups.title.dir);
+  const groupSubTitleDir = useMainStore(
+    (state) => state.configs.groups.subtitle.dir,
+  );
   const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
   const {
@@ -46,11 +49,11 @@ export const AddGroupPopover: FC<AddGroupPopover> = ({ onClose }) => {
       },
       title: {
         text: '',
-        dir: groupDir,
+        dir: groupTitleDir,
       },
       subtitle: {
         text: '',
-        dir: groupDir,
+        dir: groupSubTitleDir,
       },
       scale: {
         x: 3,
@@ -100,9 +103,7 @@ export const AddGroupPopover: FC<AddGroupPopover> = ({ onClose }) => {
               control={control}
               render={({ field }) => (
                 <DirectionRadio
-                  label="Position"
-                  id="group-title"
-                  name="titleRadio"
+                  name={field.name}
                   value={field.value}
                   onChange={field.onChange}
                 />
@@ -127,9 +128,7 @@ export const AddGroupPopover: FC<AddGroupPopover> = ({ onClose }) => {
               control={control}
               render={({ field }) => (
                 <DirectionRadio
-                  label="Position"
-                  id="group-subtitle"
-                  name="subtitleRadio"
+                  name={field.name}
                   value={field.value}
                   onChange={field.onChange}
                 />

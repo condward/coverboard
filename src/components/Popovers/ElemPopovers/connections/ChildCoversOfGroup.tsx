@@ -20,8 +20,8 @@ export const ChildCoversOfGroup: FC<ChildCoversOfGroupProps> = ({
     state.getCoversInsideGroup(groupId),
   );
 
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeCoverAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeCoverAndRelatedArrows,
   );
 
   if (coversInsideGroup.length === 0) return null;
@@ -43,7 +43,7 @@ export const ChildCoversOfGroup: FC<ChildCoversOfGroupProps> = ({
               onClick={() => onChange(groupId, cover.id)}
               onDelete={(evt) => {
                 evt.preventDefault();
-                removeCoverAndRelatedLines(cover.id);
+                removeCoverAndRelatedArrows(cover.id);
               }}
             />
           );

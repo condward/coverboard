@@ -48,47 +48,47 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
   showTooltips,
   createGroup,
 }) => {
-  const editLines = useAtomValue(pointsAtom);
+  const editArrows = useAtomValue(pointsAtom);
   const [openConfig, setOpenConfig] = useAtom(configAtom);
   const [openSearch, setOpenSearch] = useAtom(searchAtom);
   const [openShare, setOpenShare] = useAtom(shareAtom);
   const [selected, setSelected] = useAtom(selectedAtom);
   const coversLength = useMainStore((state) => state.covers.length);
   const groupsLength = useMainStore((state) => state.groups.length);
-  const linesLength = useMainStore((state) => state.lines.length);
+  const ArrowsLength = useMainStore((state) => state.arrows.length);
   const { coverSizeWidth } = useGetSizesContext();
 
-  const removeCoverAndRelatedLines = useMainStore(
-    (state) => state.removeCoverAndRelatedLines,
+  const removeCoverAndRelatedArrows = useMainStore(
+    (state) => state.removeCoverAndRelatedArrows,
   );
-  const removeGroupAndRelatedLines = useMainStore(
-    (state) => state.removeGroupAndRelatedLines,
+  const removeGroupAndRelatedArrows = useMainStore(
+    (state) => state.removeGroupAndRelatedArrows,
   );
 
   const isCover = useMainStore((state) => state.isCover);
   const isGroup = useMainStore((state) => state.isGroup);
-  const isLine = useMainStore((state) => state.isLine);
+  const isArrow = useMainStore((state) => state.isArrow);
 
   const getElemName = () => {
     if (!selected) return '';
 
     if (isCover(selected.id)) return '(cover)';
     if (isGroup(selected.id)) return '(group)';
-    if (isLine(selected.id)) return '(arrow)';
+    if (isArrow(selected.id)) return '(arrow)';
 
     return '';
   };
 
-  const removeLine = useMainStore((state) => state.removeLine);
+  const removeArrow = useMainStore((state) => state.removeArrow);
   const deleteElem = () => {
     if (!selected) return;
 
     if (isGroup(selected.id)) {
-      removeGroupAndRelatedLines(selected.id);
+      removeGroupAndRelatedArrows(selected.id);
     } else if (isCover(selected.id)) {
-      removeCoverAndRelatedLines(selected.id);
-    } else if (isLine(selected.id)) {
-      removeLine(selected.id);
+      removeCoverAndRelatedArrows(selected.id);
+    } else if (isArrow(selected.id)) {
+      removeArrow(selected.id);
     }
     setSelected(null);
   };
@@ -150,21 +150,21 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
       emoji: '🗑️',
       value: !selected,
       valueModifier: deleteElem,
-      badge: groupsLength + coversLength + linesLength,
+      badge: groupsLength + coversLength + ArrowsLength,
       enabled: !!selected,
       shortcut: 'D',
     },
     {
       id: ToolConfigIDs.SCREENSHOT,
       tooltip: `Download board (elems: ${
-        groupsLength + coversLength + linesLength
+        groupsLength + coversLength + ArrowsLength
       })`,
       color: colorMap[Colors.ORANGE],
       emoji: '📷',
-      value: !!editLines || !showTooltips || !!selected,
+      value: !!editArrows || !showTooltips || !!selected,
       valueModifier: takeScreenshot,
-      badge: groupsLength + coversLength + linesLength,
-      enabled: showTooltips && !editLines && !selected,
+      badge: groupsLength + coversLength + ArrowsLength,
+      enabled: showTooltips && !editArrows && !selected,
       shortcut: 'C',
     },
   ];

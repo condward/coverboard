@@ -5,10 +5,10 @@ import { SPACING_GAP } from 'types';
 import { useMainStore } from 'store';
 
 import { NavigationBar } from './NavigationBar';
-import { LinesOfCoverOrigin } from './LinesOfCoverOrigin';
-import { LinesOfCoverTarget } from './LinesOfCoverTarget';
-import { LinesOfGroupOrigin } from './LinesOfGroupOrigin';
-import { LinesOfGroupTarget } from './LinesOfGroupTarget';
+import { ArrowsOfCoverOrigin } from './ArrowsOfCoverOrigin';
+import { ArrowsOfCoverTarget } from './ArrowsOfCoverTarget';
+import { ArrowsOfGroupOrigin } from './ArrowsOfGroupOrigin';
+import { ArrowsOfGroupTarget } from './ArrowsOfGroupTarget';
 import { ChildCoversOfGroup } from './ChildCoversOfGroup';
 import { ChildGroupsOfGroup } from './ChildGroupsOfGroup';
 import { ParentGroupsOfGroup } from './ParentGroupsOfGroup';
@@ -55,10 +55,10 @@ export const GroupConnections: FC<GroupConnectionsProps> = ({
       <ChildCoversOfGroup groupId={groupId} onChange={onChange} />
       <ChildGroupsOfGroup groupId={groupId} onChange={onChange} />
       <ParentGroupsOfGroup groupId={groupId} onChange={onChange} />
-      <LinesOfCoverOrigin id={groupId} onChange={onChange} />
-      <LinesOfCoverTarget id={groupId} onChange={onChange} />
-      <LinesOfGroupOrigin id={groupId} onChange={onChange} />
-      <LinesOfGroupTarget id={groupId} onChange={onChange} />
+      <ArrowsOfCoverOrigin id={groupId} onChange={onChange} />
+      <ArrowsOfCoverTarget id={groupId} onChange={onChange} />
+      <ArrowsOfGroupOrigin id={groupId} onChange={onChange} />
+      <ArrowsOfGroupTarget id={groupId} onChange={onChange} />
     </Stack>
   );
 };
