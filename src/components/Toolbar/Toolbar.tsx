@@ -1,10 +1,16 @@
 import { FC, memo } from 'react';
-
 import { useAtom, useAtomValue } from 'jotai';
 import { useStore } from 'zustand';
+import { Stack } from '@mui/material';
 
-import { colorMap, Colors, ToolConfig, ToolConfigIDs } from 'types';
-import { haxPrefix } from 'utils';
+import {
+  colorMap,
+  Colors,
+  SPACING_GAP,
+  ToolConfig,
+  ToolConfigIDs,
+} from 'types';
+import { haxPrefix, useIsLandscape } from 'utils';
 
 import {
   useMainStore,
@@ -16,12 +22,11 @@ import {
 } from 'store';
 import { useGetSizesContext } from 'providers';
 
-import { ToolbarIcon, ToolbarTooltip } from '.';
+import { ToolbarIcon } from '.';
 
 interface ToolbarProps {
   takeScreenshot: () => void;
   createGroup: () => void;
-  showTooltips: boolean;
 }
 
 const ToolbarActionIcon: FC = () => {
@@ -45,9 +50,10 @@ const ToolbarActionIcon: FC = () => {
 
 const ToolbarWithoutMemo: FC<ToolbarProps> = ({
   takeScreenshot,
-  showTooltips,
   createGroup,
 }) => {
+  const isLandscape = useIsLandscape();
+  const color = useMainStore((state) => state.getColor());
   const editArrows = useAtomValue(pointsAtom);
   const [openConfig, setOpenConfig] = useAtom(configAtom);
   const [openSearch, setOpenSearch] = useAtom(searchAtom);
@@ -161,22 +167,25 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
       })`,
       color: colorMap[Colors.ORANGE],
       emoji: '📷',
-      value: !!editArrows || !showTooltips || !!selected,
+      value: !!editArrows || !!selected,
       valueModifier: takeScreenshot,
       badge: groupsLength + coversLength + ArrowsLength,
-      enabled: showTooltips && !editArrows && !selected,
+      enabled: !editArrows && !selected,
       shortcut: 'C',
     },
   ];
 
   return (
-    <>
+    <Stack
+      direction={isLandscape ? 'column' : 'row'}
+      gap={SPACING_GAP}
+      border={`2px solid ${color}`}
+      padding={2}>
       {configTools.map((config, index) => (
         <ToolbarIcon config={config} key={config.id} index={index} />
       ))}
       <ToolbarActionIcon />
-      {showTooltips && <ToolbarTooltip />}
-    </>
+    </Stack>
   );
 };
 

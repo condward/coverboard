@@ -71,7 +71,6 @@ export const initialConfigValues = (): ConfigSchema => ({
 
 export interface UseConfigsParams {
   configs: ConfigSchema;
-  resetConfigs: () => void;
   updateConfigs: (newConfig: DeepPartial<ConfigSchema>) => void;
   getColor: () => string;
   getArrowColor: () => string;
@@ -91,9 +90,6 @@ export const createConfigsSlice: StateCreator<
   UseConfigsParams
 > = (set, get) => ({
   configs: initialConfigValues(),
-  resetConfigs: () => {
-    set({ configs: initialConfigValues() });
-  },
   updateConfigs: ({ media, title, layout, covers, groups, arrows }) => {
     set(({ configs }) => ({
       configs: {

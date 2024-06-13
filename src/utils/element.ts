@@ -44,11 +44,11 @@ export const useGetElementSizes = <T>(totalDirArray: Array<OffsetCalc<T>>) => {
     getMaxBoundaries(scale = { x: 1, y: 1 }) {
       return {
         x: isLandscape
-          ? dragLimits.width - coverSizeWidth * scale.x + coverSizeWidth
+          ? dragLimits.width - coverSizeWidth * scale.x
           : dragLimits.width - coverSizeWidth * scale.x,
         y: isLandscape
           ? dragLimits.height - coverSizeHeight * scale.y
-          : dragLimits.height + dragLimits.y - coverSizeHeight * scale.y,
+          : dragLimits.height - coverSizeHeight * scale.y,
       };
     },
   };

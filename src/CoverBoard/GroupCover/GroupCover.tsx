@@ -39,7 +39,7 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
   scaleY,
 }) => {
   const color = useMainStore((state) => state.getGroupColor());
-  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const setSelected = useSetAtom(selectedAtom);
   const updateGroup = useMainStore((state) => state.updateGroup);
 
@@ -75,10 +75,6 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
         id={id}
         x={x}
         y={y}
-        min={{
-          x: dragLimits.x,
-          y: dragLimits.y,
-        }}
         max={getMaxBoundaries({ x: scaleX, y: scaleY })}>
         <CommonDrawArrow id={id} scaleX={scaleX} scaleY={scaleY} />
         <>

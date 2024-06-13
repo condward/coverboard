@@ -60,7 +60,7 @@ export const CoverStarDraggable = ({
   children,
 }: DraggableGroupProps) => {
   const updateCover = useMainStore((state) => state.updateCover);
-  const { dragLimits, coverSizeHeight } = useGetSizesContext();
+  const { coverSizeHeight } = useGetSizesContext();
   const [randId, setId] = useState(uuidv4());
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent | TouchEvent>) => {
@@ -74,11 +74,11 @@ export const CoverStarDraggable = ({
     const { x: xAbs, y: yAbs } = getClientPosition(e);
 
     let newDir: PosTypes;
-    if (yAbs > dragLimits.y + y + coverSizeHeight) {
+    if (yAbs > y + coverSizeHeight) {
       newDir = PosTypes.BOTTOM;
-    } else if (yAbs < y + dragLimits.y) {
+    } else if (yAbs < y) {
       newDir = PosTypes.TOP;
-    } else if (xAbs < x + dragLimits.x) {
+    } else if (xAbs < x) {
       newDir = PosTypes.LEFT;
     } else {
       newDir = PosTypes.RIGHT;

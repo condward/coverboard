@@ -12,10 +12,6 @@ interface CommonDraggableProps {
   id: CoverSchema['id'] | GroupSchema['id'];
   x: CoverSchema['pos']['x'] | GroupSchema['pos']['x'];
   y: CoverSchema['pos']['y'] | GroupSchema['pos']['y'];
-  min: {
-    x: number;
-    y: number;
-  };
   max: {
     x: number;
     y: number;
@@ -28,7 +24,6 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
   id,
   x,
   y,
-  min,
   max,
   children,
   updatePosition,
@@ -51,8 +46,8 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
     const maxY = Math.min(pos.y, max.y);
 
     // Lower limit, pos or min
-    const newX = Math.max(min.x, maxX);
-    const newY = Math.max(min.y, maxY);
+    const newX = Math.max(0, maxX);
+    const newY = Math.max(0, maxY);
 
     return {
       x: newX,

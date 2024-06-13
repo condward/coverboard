@@ -72,9 +72,9 @@ export const ArrowLabelDraggable: FC<DraggableGroupProps> = ({
     const { x, y } = getClientPosition(e);
 
     let dir: PosTypes;
-    if (y > dragLimits.y + ArrowParams.midY + 2 * fontSize) {
+    if (y > ArrowParams.midY + 2 * fontSize) {
       dir = PosTypes.BOTTOM;
-    } else if (y < dragLimits.y + ArrowParams.midY - 1.2 * fontSize) {
+    } else if (y < ArrowParams.midY - 1.2 * fontSize) {
       dir = PosTypes.TOP;
     } else if (x < dragLimits.x + ArrowParams.midX) {
       dir = PosTypes.LEFT;

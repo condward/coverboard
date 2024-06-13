@@ -14,7 +14,7 @@ export const App: FC = () => {
   const backColor = useMainStore((state) => state.getBackColor());
   const setWindowSize = useSetAtom(sizeAtom);
   const fitToScreen = useMainStore((state) => state.configs.layout.fitToScreen);
-  const { toolbarIconSize, stageLimits } = useGetSizesContext();
+  const { toolbarIconSize, appLimits, padding } = useGetSizesContext();
 
   useEffect(() => {
     if (!window.localStorage.getItem(addPrefix(saveId))) {
@@ -48,10 +48,10 @@ export const App: FC = () => {
     <main
       id="App"
       style={{
-        width: stageLimits.width - 1,
-        height: stageLimits.height - 1,
+        width: appLimits.width - 1,
+        height: appLimits.height - 1,
         backgroundColor: backColor,
-        padding: stageLimits.padding,
+        padding: padding,
       }}>
       <CoverBoard />
       <Toast />

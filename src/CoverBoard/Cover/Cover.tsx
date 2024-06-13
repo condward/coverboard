@@ -53,7 +53,7 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
   const showSubtitle = useMainStore(
     (state) => state.configs.covers.subtitle.show,
   );
-  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const showStars = useMainStore((state) => state.configs.covers.rating.show);
   const setSelected = useSetAtom(selectedAtom);
   const updateCover = useMainStore((state) => state.updateCover);
@@ -86,10 +86,6 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
         id={id}
         x={x}
         y={y}
-        min={{
-          x: dragLimits.x,
-          y: dragLimits.y,
-        }}
         max={getMaxBoundaries()}>
         <CommonDrawArrow id={id} />
 

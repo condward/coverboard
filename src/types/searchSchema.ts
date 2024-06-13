@@ -85,6 +85,8 @@ type MediaMapRecord = Record<
     heightRatio: number;
     apiName: ApiKeys | null;
     baseUrl: string | null;
+    logoUrl: string;
+    siteUrl: string;
   }
 >;
 
@@ -104,6 +106,9 @@ export const mediaMap: MediaMapRecord = {
     heightRatio: 1,
     apiName: ApiKeys.LAST_FM,
     baseUrl: '/api/get-album',
+    logoUrl:
+      'https://www.last.fm/static/images/footer_logo@2x.49ca51948b0a.png',
+    siteUrl: 'https://www.last.fm',
   },
   [Media.MOVIE]: {
     emoji: '🎬',
@@ -120,6 +125,9 @@ export const mediaMap: MediaMapRecord = {
     heightRatio: 1.5,
     apiName: ApiKeys.TMDB,
     baseUrl: '/api/get-movie',
+    logoUrl:
+      'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg',
+    siteUrl: 'https://www.themoviedb.org/',
   },
   [Media.TVSHOW]: {
     emoji: '📺',
@@ -136,6 +144,9 @@ export const mediaMap: MediaMapRecord = {
     heightRatio: 1.5,
     apiName: ApiKeys.TMDB,
     baseUrl: '/api/get-movie',
+    logoUrl:
+      'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg',
+    siteUrl: 'https://www.themoviedb.org/',
   },
   [Media.BOOK]: {
     emoji: '📚',
@@ -152,6 +163,9 @@ export const mediaMap: MediaMapRecord = {
     heightRatio: 1.5,
     apiName: null,
     baseUrl: null,
+    logoUrl:
+      'https://blog.openlibrary.org/files/2016/02/Open-Library-Logo-1.jpg',
+    siteUrl: 'https://openlibrary.org/',
   },
   [Media.GAME]: {
     emoji: '🎮',
@@ -168,6 +182,9 @@ export const mediaMap: MediaMapRecord = {
     heightRatio: 0.7,
     apiName: ApiKeys.RAWG,
     baseUrl: '/api/get-game',
+    logoUrl:
+      'https://rapidapi-prod-apis.s3.amazonaws.com/aa/5f399a9426449aac6954ffc8c0b481/ce9eeca1905fdb11890f3afc10724191.png',
+    siteUrl: 'https://rawg.io/',
   },
 };
 

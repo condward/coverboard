@@ -400,7 +400,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                     max={
                       isLandscape
                         ? dragLimits.height - coverSizeHeight
-                        : dragLimits.height + dragLimits.y - 2 * coverSizeHeight
+                        : dragLimits.height - 2 * coverSizeHeight
                     }
                   />
                 )}

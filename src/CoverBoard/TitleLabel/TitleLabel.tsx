@@ -35,12 +35,8 @@ const TitleLabelWithoutMemo: FC = () => {
       onReset={() => updateConfigs({ title: { text: '' } })}
       label={titleMode}
       setLabel={(text) => updateConfigs({ title: { text } })}
-      x={
-        isLandscape ? dragLimits.width / 21 : dragLimits.x + toolbarIconSize / 2
-      }
-      y={
-        isLandscape ? dragLimits.y + toolbarIconSize / 2 : dragLimits.width / 21
-      }
+      x={isLandscape ? dragLimits.width / 21 : toolbarIconSize / 2}
+      y={isLandscape ? toolbarIconSize / 2 : dragLimits.width / 21}
       width={dragLimits.width * 0.9}
       dir={PosTypes.TOP}
       labelSize={2}

@@ -22,7 +22,7 @@ export const ToolbarConfigForm: FC<{
     control,
     name: 'layout.fitToScreen',
   });
-  const { stageLimits } = useGetSizesContext();
+  const { dragLimits } = useGetSizesContext();
   const media = useMainStore((state) => state.configs.media);
 
   return (
@@ -69,9 +69,7 @@ export const ToolbarConfigForm: FC<{
                         type="number"
                         label="Width"
                         disabled={showScreenSizes}
-                        value={
-                          showScreenSizes ? stageLimits.width : field.value
-                        }
+                        value={showScreenSizes ? dragLimits.width : field.value}
                         onChange={field.onChange}
                         InputProps={{
                           inputProps: {
@@ -93,7 +91,7 @@ export const ToolbarConfigForm: FC<{
                         label="height"
                         disabled={showScreenSizes}
                         value={
-                          showScreenSizes ? stageLimits.height : field.value
+                          showScreenSizes ? dragLimits.height : field.value
                         }
                         onChange={field.onChange}
                         InputProps={{

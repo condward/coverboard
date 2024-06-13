@@ -67,7 +67,7 @@ export const CommonLabelDraggable = ({
   scaleY = 1,
   updateDir,
 }: CommonLabelDraggableProps) => {
-  const { dragLimits, coverSizeHeight } = useGetSizesContext();
+  const { coverSizeHeight } = useGetSizesContext();
   const [randId, setId] = useState(uuidv4());
 
   const newPos = useGetNewPos({ dir, scaleX, scaleY });
@@ -83,11 +83,11 @@ export const CommonLabelDraggable = ({
     const { x: xAbs, y: yAbs } = getClientPosition(e);
 
     let newDir: PosTypes;
-    if (yAbs > dragLimits.y + y + coverSizeHeight * scaleY) {
+    if (yAbs > y + coverSizeHeight * scaleY) {
       newDir = PosTypes.BOTTOM;
-    } else if (yAbs < y + dragLimits.y) {
+    } else if (yAbs < y) {
       newDir = PosTypes.TOP;
-    } else if (xAbs < x + dragLimits.x) {
+    } else if (xAbs < x) {
       newDir = PosTypes.LEFT;
     } else {
       newDir = PosTypes.RIGHT;

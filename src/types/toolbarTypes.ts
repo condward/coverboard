@@ -1,9 +1,3 @@
-export interface TooltipValues {
-  text: string;
-  x: number;
-  y: number;
-}
-
 export enum ToolConfigIDs {
   SEARCH = 'search',
   CONFIG = 'config',
