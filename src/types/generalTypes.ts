@@ -5,13 +5,6 @@ export enum PosTypes {
   BOTTOM = 'bottom',
 }
 
-export interface DragLimits {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 export enum LabelTypes {
   TITLE = 'title',
   SUBTITLE = 'subtitle',

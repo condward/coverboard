@@ -56,7 +56,7 @@ export const ArrowLabelDraggable: FC<DraggableGroupProps> = ({
   setUpdate,
   children,
 }) => {
-  const { fontSize, dragLimits } = useGetSizesContext();
+  const { fontSize } = useGetSizesContext();
   const [id, setId] = useState(uuidv4());
   const newPos = useGetNewPos(dir);
 
@@ -76,7 +76,7 @@ export const ArrowLabelDraggable: FC<DraggableGroupProps> = ({
       dir = PosTypes.BOTTOM;
     } else if (y < ArrowParams.midY - 1.2 * fontSize) {
       dir = PosTypes.TOP;
-    } else if (x < dragLimits.x + ArrowParams.midX) {
+    } else if (x < ArrowParams.midX) {
       dir = PosTypes.LEFT;
     } else {
       dir = PosTypes.RIGHT;

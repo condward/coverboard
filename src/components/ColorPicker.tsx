@@ -26,6 +26,7 @@ const commonSelectSx = {
 interface ColorPickerProps {
   value: Colors;
   name: string;
+  autoFocus?: boolean;
   onChange: (colors: SelectChangeEvent<Colors>, child: ReactNode) => void;
 }
 
@@ -33,11 +34,13 @@ export const ColorPicker: FC<ColorPickerProps> = ({
   value,
   name,
   onChange,
+  autoFocus = false,
 }) => {
   return (
     <FormControl>
       <InputLabel id={name}>Color</InputLabel>
       <Select
+        autoFocus={autoFocus}
         labelId={name}
         aria-labelledby={name}
         label="Color"

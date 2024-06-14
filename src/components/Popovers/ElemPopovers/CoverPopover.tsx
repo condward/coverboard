@@ -134,7 +134,8 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   const buttons = getButtons(media, cover);
   const searchValue = useSearchValue(cover.id);
   const isLandscape = useIsLandscape();
-  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
+    useGetSizesContext();
 
   const {
     control,
@@ -382,8 +383,8 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                     onChange={field.onChange}
                     max={
                       isLandscape
-                        ? dragLimits.width - dragLimits.x
-                        : dragLimits.width - dragLimits.x - coverSizeWidth
+                        ? canvasLimits.width
+                        : canvasLimits.width - coverSizeWidth
                     }
                   />
                 )}
@@ -399,8 +400,8 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                     onChange={field.onChange}
                     max={
                       isLandscape
-                        ? dragLimits.height - coverSizeHeight
-                        : dragLimits.height - 2 * coverSizeHeight
+                        ? canvasLimits.height - coverSizeHeight
+                        : canvasLimits.height - 2 * coverSizeHeight
                     }
                   />
                 )}

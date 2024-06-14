@@ -1,20 +1,25 @@
-import { useAtomValue } from 'jotai';
-import { FC, createContext, useMemo } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { FC, createContext, useEffect, useMemo } from 'react';
 
-import { useMainStore, sizeAtom } from 'store';
-import { DragLimits, SPACING_GAP } from 'types';
-import { useIsLandscape } from 'utils';
+import { useMainStore, sizeAtom, hideToolbarAtom } from 'store';
+import { MAX_BOUNDARY } from 'types';
+import { throttle, useIsLandscape } from 'utils';
 
 interface SizesProviderProps {
-  toolbarIconSize: number;
   starRadius: number;
   circleRadius: number;
   fontSize: number;
-  dragLimits: DragLimits;
-  appLimits: DragLimits;
   coverSizeWidth: number;
   coverSizeHeight: number;
   padding: number;
+  canvasLimits: {
+    width: number;
+    height: number;
+  };
+  screenLimits: {
+    width: number;
+    height: number;
+  };
 }
 
 export const SizesContext = createContext<SizesProviderProps | null>(null);
@@ -23,53 +28,75 @@ export const SizesProvider: FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const scale = useMainStore((state) => state.configs.layout.scale);
+  const fitToScreen = useMainStore((state) => state.configs.layout.fitToScreen);
   const heightRatio = useMainStore((state) => state.getHeightRatio());
-  const screenSize = useAtomValue(sizeAtom);
+  const [screenSize, updateSize] = useAtom(sizeAtom);
   const isLandscape = useIsLandscape();
+  const hideToolbar = useAtomValue(hideToolbarAtom);
 
-  const baseScales = useMemo(
-    () => ({
-      toolbarIconSize: scale / 2.5,
-    }),
-    [scale],
-  );
+  const width = screenSize.width;
+  const height = screenSize.height;
+  const padding = scale / 4;
+  const compensation = !hideToolbar ? scale / 2 + 3 * padding + 12 : 6;
 
-  const padding = baseScales.toolbarIconSize / 2;
-  const width = screenSize.width - padding;
-  const height = screenSize.height - padding;
+  useEffect(() => {
+    const throttleResize = throttle(() => {
+      if (fitToScreen) {
+        updateSize({
+          width: Math.max(500, Math.min(MAX_BOUNDARY, window.innerWidth)),
+          height: Math.max(500, Math.min(MAX_BOUNDARY, window.innerHeight)),
+        });
+      }
+    }, 500);
+
+    window.addEventListener('resize', throttleResize);
+    return () => {
+      window.removeEventListener('resize', throttleResize);
+    };
+  }, [fitToScreen, updateSize]);
 
   return (
     <SizesContext.Provider
       value={useMemo(
         () => ({
-          toolbarIconSize: baseScales.toolbarIconSize,
           circleRadius: scale / 10,
           fontSize: scale / 7,
           starRadius: (scale / 10) * 0.8,
           padding,
-          appLimits: {
-            x: 0,
-            y: 0,
-            width,
-            height,
-          },
-          dragLimits: {
-            x: 0,
-            y: 0,
-            width: isLandscape ? width - scale - SPACING_GAP * 8 : width,
-            height: isLandscape ? height : height - scale - SPACING_GAP * 8,
-          },
           coverSizeWidth: scale,
           coverSizeHeight: scale * heightRatio,
+          canvasLimits: fitToScreen
+            ? {
+                width: isLandscape
+                  ? width - compensation - 2 * padding
+                  : width - 2 * padding,
+                height: isLandscape
+                  ? height - 2 * padding
+                  : height - compensation - 2 * padding,
+              }
+            : {
+                width,
+                height,
+              },
+          screenLimits: fitToScreen
+            ? {
+                width: width - 2 * padding,
+                height: height - 2 * padding,
+              }
+            : {
+                width: isLandscape ? width + compensation : width,
+                height: isLandscape ? height : height + compensation,
+              },
         }),
         [
-          baseScales.toolbarIconSize,
           scale,
           padding,
+          fitToScreen,
+          isLandscape,
           width,
           height,
-          isLandscape,
           heightRatio,
+          compensation,
         ],
       )}>
       {children}

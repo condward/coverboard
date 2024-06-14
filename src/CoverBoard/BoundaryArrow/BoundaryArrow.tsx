@@ -31,35 +31,35 @@ const useGetPoints = ({
   scaleX,
   scaleY,
 }: UseGetPoints): [number, number, number, number] => {
-  const { coverSizeWidth, coverSizeHeight, fontSize, dragLimits } =
+  const { coverSizeWidth, coverSizeHeight, fontSize, canvasLimits } =
     useGetSizesContext();
 
   if (
-    x > dragLimits.width - coverSizeWidth * scaleX &&
-    y > dragLimits.height - coverSizeHeight * scaleY
+    x > canvasLimits.width - coverSizeWidth * scaleX &&
+    y > canvasLimits.height - coverSizeHeight * scaleY
   ) {
     return [
-      dragLimits.width - 1.8 * fontSize,
-      dragLimits.height - 1.8 * fontSize,
-      dragLimits.width - fontSize,
-      dragLimits.height - fontSize,
+      canvasLimits.width - 1.8 * fontSize,
+      canvasLimits.height - 1.8 * fontSize,
+      canvasLimits.width - fontSize,
+      canvasLimits.height - fontSize,
     ];
   } else if (
-    x > dragLimits.width - coverSizeWidth * scaleX &&
-    y < dragLimits.height - coverSizeHeight * scaleY
+    x > canvasLimits.width - coverSizeWidth * scaleX &&
+    y < canvasLimits.height - coverSizeHeight * scaleY
   ) {
     return [
-      dragLimits.width - 2 * fontSize,
+      canvasLimits.width - 2 * fontSize,
       y + (coverSizeHeight * scaleY) / 2,
-      dragLimits.width - fontSize,
+      canvasLimits.width - fontSize,
       y + (coverSizeHeight * scaleY) / 2,
     ];
   }
   return [
     x + (coverSizeWidth * scaleX) / 2,
-    dragLimits.height - 2 * fontSize,
+    canvasLimits.height - 2 * fontSize,
     x + (coverSizeWidth * scaleX) / 2,
-    dragLimits.height - fontSize,
+    canvasLimits.height - fontSize,
   ];
 };
 
@@ -72,7 +72,7 @@ const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
   updatePosition,
   color,
 }) => {
-  const { coverSizeWidth, coverSizeHeight, fontSize, dragLimits } =
+  const { coverSizeWidth, coverSizeHeight, fontSize, canvasLimits } =
     useGetSizesContext();
 
   const [tooltip, setTooltip] = useState(false);
@@ -80,11 +80,11 @@ const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
 
   const handleBringIntoView = () => {
     const newPos: Vector2d = { x, y };
-    if (newPos.x > dragLimits.width) {
-      newPos.x = dragLimits.width - coverSizeWidth * scaleX;
+    if (newPos.x > canvasLimits.width) {
+      newPos.x = canvasLimits.width - coverSizeWidth * scaleX;
     }
-    if (newPos.y > dragLimits.height) {
-      newPos.y = dragLimits.height - coverSizeHeight * scaleY;
+    if (newPos.y > canvasLimits.height) {
+      newPos.y = canvasLimits.height - coverSizeHeight * scaleY;
     }
 
     updatePosition(newPos);

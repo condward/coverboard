@@ -6,7 +6,7 @@ import { temporal } from 'zundo';
 import throttle from 'just-throttle';
 import { DeepPartial } from 'react-hook-form';
 
-import { store } from 'store';
+import { sizeAtom, store } from 'store';
 
 import { CoverSchema, AppSchema, GroupSchema, appSchema } from 'types';
 import { DEFAULT_KEY, NAME_SPACE } from 'utils';
@@ -417,6 +417,19 @@ export const useMainStore = create<MainStoreUnion>()(
         try {
           const { configs, arrows, covers, groups } = state;
           appSchema.parse({ configs, arrows, covers, groups });
+
+          store.set(
+            sizeAtom,
+            configs.layout.fitToScreen
+              ? {
+                  width: window.innerWidth,
+                  height: window.innerHeight,
+                }
+              : {
+                  width: configs.layout.width,
+                  height: configs.layout.height,
+                },
+          );
         } catch (error) {
           console.error(error);
           state.resetStoreValues();

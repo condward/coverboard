@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Stack, Button, Tooltip } from '@mui/material';
 import { useAtom } from 'jotai';
+import { flushSync } from 'react-dom';
 import {
   HideSourceOutlined,
   InfoOutlined,
@@ -71,17 +72,19 @@ export const ToolbarConfigPopover: FC<{
       updateAllArrows({
         title: { dir: config.covers.title.dir },
       });
-      updateConfigs({
-        ...config,
-        title: {
-          ...config.title,
-          text: config.title.text.trim(),
-        },
-        layout: {
-          ...config.layout,
-          scale: config.layout.scale * 100,
-        },
-      });
+      flushSync(() =>
+        updateConfigs({
+          ...config,
+          title: {
+            ...config.title,
+            text: config.title.text.trim(),
+          },
+          layout: {
+            ...config.layout,
+            scale: config.layout.scale * 100,
+          },
+        }),
+      );
       onClose();
     },
     (error) => {

@@ -6,14 +6,14 @@ import { useGetSizesContext } from 'providers';
 import { BoundaryArrow } from './BoundaryArrow';
 
 export const BoundaryGroupArrows: FC = () => {
-  const { dragLimits } = useGetSizesContext();
+  const { canvasLimits } = useGetSizesContext();
   const groups = useMainStore((state) => state.groups);
   const scale = useMainStore((state) => state.configs.layout.scale);
 
   const offLimitGroups = groups.flatMap((group) => {
     if (
-      (group.pos.x > dragLimits.width && dragLimits.width > scale) ||
-      (group.pos.y > dragLimits.height && dragLimits.height > scale)
+      (group.pos.x > canvasLimits.width && canvasLimits.width > scale) ||
+      (group.pos.y > canvasLimits.height && canvasLimits.height > scale)
     ) {
       return group;
     }

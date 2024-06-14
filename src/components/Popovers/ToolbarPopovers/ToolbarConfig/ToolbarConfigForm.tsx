@@ -22,7 +22,7 @@ export const ToolbarConfigForm: FC<{
     control,
     name: 'layout.fitToScreen',
   });
-  const { dragLimits } = useGetSizesContext();
+  const { canvasLimits } = useGetSizesContext();
   const media = useMainStore((state) => state.configs.media);
 
   return (
@@ -33,16 +33,71 @@ export const ToolbarConfigForm: FC<{
           value: 'layout',
           component: (
             <Stack direction="column" gap={SPACING_GAP}>
-              <Stack direction="column" gap={SPACING_GAP}>
+              <Controller
+                name="layout.color"
+                control={control}
+                render={({ field }) => (
+                  <ColorPicker
+                    autoFocus
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+
+              <Controller
+                name="layout.backColor"
+                control={control}
+                render={({ field }) => (
+                  <BackColorPicker
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+
+              <FieldSet label="Title" direction="column" gap={SPACING_GAP}>
                 <Controller
-                  name="layout.helpers"
+                  name="title.text"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      fullWidth
+                      label="Title"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="title.show"
                   control={control}
                   render={({ field }) => (
                     <ShowSwitch
                       name={field.name}
                       value={field.value}
                       onChange={field.onChange}
-                      label="Show empty texts helpers"
+                    />
+                  )}
+                />
+              </FieldSet>
+
+              <Stack direction="column" gap={SPACING_GAP}>
+                <Controller
+                  name="layout.scale"
+                  control={control}
+                  render={({ field }) => (
+                    <SliderInput
+                      label="Elements scale"
+                      name={field.name}
+                      value={field.value}
+                      onChange={field.onChange}
+                      min={0.5}
+                      max={1.5}
+                      step={0.1}
                     />
                   )}
                 />
@@ -69,7 +124,9 @@ export const ToolbarConfigForm: FC<{
                         type="number"
                         label="Width"
                         disabled={showScreenSizes}
-                        value={showScreenSizes ? dragLimits.width : field.value}
+                        value={
+                          showScreenSizes ? canvasLimits.width : field.value
+                        }
                         onChange={field.onChange}
                         InputProps={{
                           inputProps: {
@@ -91,7 +148,7 @@ export const ToolbarConfigForm: FC<{
                         label="height"
                         disabled={showScreenSizes}
                         value={
-                          showScreenSizes ? dragLimits.height : field.value
+                          showScreenSizes ? canvasLimits.height : field.value
                         }
                         onChange={field.onChange}
                         InputProps={{
@@ -107,73 +164,18 @@ export const ToolbarConfigForm: FC<{
                 </Stack>
 
                 <Controller
-                  name="layout.scale"
-                  control={control}
-                  render={({ field }) => (
-                    <SliderInput
-                      label="Elements scale"
-                      name={field.name}
-                      value={field.value}
-                      onChange={field.onChange}
-                      min={0.5}
-                      max={1.5}
-                      step={0.1}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="layout.color"
-                  control={control}
-                  render={({ field }) => (
-                    <ColorPicker
-                      name={field.name}
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="layout.backColor"
-                  control={control}
-                  render={({ field }) => (
-                    <BackColorPicker
-                      name={field.name}
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-              </Stack>
-
-              <FieldSet label="Title" direction="column" gap={SPACING_GAP}>
-                <Controller
-                  name="title.text"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      autoFocus
-                      fullWidth
-                      label="Title"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="title.show"
+                  name="layout.helpers"
                   control={control}
                   render={({ field }) => (
                     <ShowSwitch
                       name={field.name}
                       value={field.value}
                       onChange={field.onChange}
+                      label="Show empty texts helpers"
                     />
                   )}
                 />
-              </FieldSet>
+              </Stack>
             </Stack>
           ),
         },

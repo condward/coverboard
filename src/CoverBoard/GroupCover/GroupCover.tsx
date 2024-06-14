@@ -42,6 +42,7 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const setSelected = useSetAtom(selectedAtom);
   const updateGroup = useMainStore((state) => state.updateGroup);
+  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
 
   const removeGroupAndRelatedArrows = useMainStore(
     (state) => state.removeGroupAndRelatedArrows,
@@ -59,9 +60,12 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
     refreshGroups(id);
   };
 
+  const hasTitle =
+    (showTitle && !!titleText) || (showTitle && !titleText && showHelpers);
+
   const { getOffset, getXPosition, getMaxBoundaries } =
     useGetElementSizes<LabelTypes>([
-      ...(titleText && showTitle ? [{ dir, type: LabelTypes.TITLE }] : []),
+      ...(hasTitle ? [{ dir, type: LabelTypes.TITLE }] : []),
       ...(subtitleText && showSubtitle
         ? [{ dir: subDir, type: LabelTypes.SUBTITLE }]
         : []),
@@ -82,7 +86,7 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
             <GroupSquare id={id} scaleX={scaleX} scaleY={scaleY} />
           </Group>
 
-          {titleText && showTitle && (
+          {hasTitle && (
             <CommonLabelDraggable
               updateDir={(dir) => updateGroup(id, { title: { dir } })}
               x={x}

@@ -13,7 +13,6 @@ import {
   BulkUpdateCoverSchema,
   BulkUpdateCoverSchemaOutput,
   CoversSchema,
-  DragLimits,
   SPACING_GAP,
   bulkUpdateCoverSchema,
   mediaMap,
@@ -33,7 +32,12 @@ import { useGetSizesContext } from 'providers';
 interface BulkUpdateCoversPopoverProps {
   onClose: () => void;
   covers: CoversSchema;
-  maxBounds: DragLimits;
+  maxBounds: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
 }
 
 export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
@@ -49,11 +53,12 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   const updateCover = useMainStore((state) => state.updateCover);
   const scale = useMainStore((state) => state.configs.layout.scale);
   const heightRatio = useMainStore((state) => state.getHeightRatio());
-  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
+    useGetSizesContext();
   const offLimitCovers = covers.flatMap((covers) => {
     if (
-      (covers.pos.x > dragLimits.width && dragLimits.width > scale) ||
-      (covers.pos.y > dragLimits.height && dragLimits.height > scale)
+      (covers.pos.x > canvasLimits.width && canvasLimits.width > scale) ||
+      (covers.pos.y > canvasLimits.height && canvasLimits.height > scale)
     ) {
       return covers;
     }
@@ -148,12 +153,12 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
       updateCover(cover.id, {
         pos: {
           x:
-            cover.pos.x > dragLimits.width
-              ? dragLimits.width - coverSizeWidth
+            cover.pos.x > canvasLimits.width
+              ? canvasLimits.width - coverSizeWidth
               : cover.pos.x,
           y:
-            cover.pos.y > dragLimits.height
-              ? dragLimits.height - coverSizeHeight
+            cover.pos.y > canvasLimits.height
+              ? canvasLimits.height - coverSizeHeight
               : cover.pos.y,
         },
       });

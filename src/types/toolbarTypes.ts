@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 export enum ToolConfigIDs {
   SEARCH = 'search',
   CONFIG = 'config',
@@ -12,10 +14,10 @@ export interface ToolConfig {
   id: ToolConfigIDs;
   tooltip: string;
   color: string;
-  emoji: string;
+  icon: ReactNode;
   value: boolean;
   valueModifier: (arg: boolean) => void;
-  badge: number | null;
+  badge: number | string | null;
   enabled: boolean;
   shortcut: string;
 }

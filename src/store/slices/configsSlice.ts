@@ -42,7 +42,7 @@ export const initialConfigValues = (): ConfigSchema => ({
     },
     rating: {
       show: true,
-      dir: PosTypes.BOTTOM,
+      dir: PosTypes.TOP,
     },
   },
   groups: {
@@ -50,7 +50,7 @@ export const initialConfigValues = (): ConfigSchema => ({
     backColor: BackColors.DARK,
     title: {
       show: true,
-      dir: PosTypes.BOTTOM,
+      dir: PosTypes.TOP,
     },
     subtitle: {
       show: true,
@@ -147,33 +147,33 @@ export const createConfigsSlice: StateCreator<
       },
     }));
 
-    if (layout !== undefined) {
-      if (
-        layout.width !== undefined ||
+    if (
+      layout !== undefined &&
+      (layout.width !== undefined ||
         layout.height !== undefined ||
-        layout.fitToScreen !== undefined
-      ) {
-        if (layout.fitToScreen) {
-          store.set(sizeAtom, {
-            width: window.innerWidth,
-            height: window.innerHeight,
-          });
-        } else {
-          store.set(sizeAtom, {
-            width: layout.width ?? get().configs.layout.width,
-            height: layout.height ?? get().configs.layout.height,
-          });
-        }
-      }
+        layout.fitToScreen !== undefined)
+    ) {
+      store.set(
+        sizeAtom,
+        layout.fitToScreen
+          ? {
+              width: window.innerWidth,
+              height: window.innerHeight,
+            }
+          : {
+              width: layout.width ?? get().configs.layout.width,
+              height: layout.height ?? get().configs.layout.height,
+            },
+      );
     }
   },
   getTitleLabel: () => mediaMap[get().configs.media].title,
   getSubTitleLabel: () => mediaMap[get().configs.media].subtitle,
   getHeightRatio: () => mediaMap[get().configs.media].heightRatio,
   getColor: () => colorMap[get().configs.layout.color],
+  getBackColor: () => backColorMap[get().configs.layout.backColor],
   getArrowColor: () => colorMap[get().configs.arrows.color],
   getCoverColor: () => colorMap[get().configs.covers.color],
   getGroupColor: () => colorMap[get().configs.groups.color],
-  getBackColor: () => backColorMap[get().configs.groups.backColor],
-  getGroupBackColor: () => backColorMap[get().configs.layout.backColor],
+  getGroupBackColor: () => backColorMap[get().configs.groups.backColor],
 });

@@ -15,7 +15,7 @@ import { CommonTextLabel } from '.';
 interface CommonLabelProps {
   id: CoverSchema['id'] | GroupSchema['id'];
   coverLabel: LabelTypes;
-  text: string | null;
+  text: string;
   fontStyle?: 'bold';
   scaleX?: GroupSchema['scale']['x'];
   scaleY?: GroupSchema['scale']['y'];
@@ -36,6 +36,17 @@ export const CommonLabel: FC<CommonLabelProps> = (props) => {
   return <CommonLabelChild {...props} />;
 };
 
+const useGetTitleText = (text: string, coverLabel: LabelTypes) => {
+  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
+
+  if (text) {
+    return text;
+  } else if (text === '' && showHelpers && coverLabel === LabelTypes.TITLE) {
+    return '<add title>';
+  }
+  return '';
+};
+
 const CommonLabelChild: FC<CommonLabelProps> = ({
   id,
   coverLabel,
@@ -53,19 +64,10 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
     id,
     text: coverLabel,
   });
-  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
+  const label = useGetTitleText(text, coverLabel);
 
   const handleSetOpen = (open: boolean) => {
     open ? setEditingText({ id, text: coverLabel }) : setEditingText(null);
-  };
-
-  const getTitleText = () => {
-    if (text) {
-      return text;
-    } else if (text === '' && showHelpers && coverLabel === LabelTypes.TITLE) {
-      return '<add title>';
-    }
-    return '';
   };
 
   return (
@@ -77,7 +79,7 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
       open={isCurrentTextSelected}
       setOpen={handleSetOpen}
       editable={true}
-      label={getTitleText()}
+      label={label}
       onReset={() => void 0}
       setLabel={(label) => updateLabel(label)}
       x={x}

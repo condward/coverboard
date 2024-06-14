@@ -63,7 +63,8 @@ export const GroupPopover: FC<GroupPopover> = ({
     onClose();
   };
 
-  const { dragLimits, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
+    useGetSizesContext();
 
   const {
     control,
@@ -184,7 +185,7 @@ export const GroupPopover: FC<GroupPopover> = ({
                     name={field.name}
                     value={field.value}
                     onChange={field.onChange}
-                    max={dragLimits.width - coverSizeWidth * watch('scale.x')}
+                    max={canvasLimits.width - coverSizeWidth * watch('scale.x')}
                   />
                 )}
               />
@@ -197,7 +198,9 @@ export const GroupPopover: FC<GroupPopover> = ({
                     name={field.name}
                     value={field.value}
                     onChange={field.onChange}
-                    max={dragLimits.height - coverSizeHeight * watch('scale.y')}
+                    max={
+                      canvasLimits.height - coverSizeHeight * watch('scale.y')
+                    }
                   />
                 )}
               />

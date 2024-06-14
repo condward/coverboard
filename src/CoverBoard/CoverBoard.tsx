@@ -3,14 +3,13 @@ import { Stage, Layer, Rect } from 'react-konva';
 import { flushSync } from 'react-dom';
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { Stack } from '@mui/material';
 
-import { pointsAtom, selectedAtom, useMainStore } from 'store';
+import { hideToolbarAtom, pointsAtom, selectedAtom, useMainStore } from 'store';
 import { formatDate, useIsLandscape, useSaveId } from 'utils';
 import { useGetSizesContext } from 'providers';
 import { Toolbar, Logo, useCreateGroup } from 'components';
-import { SPACING_GAP } from 'types';
 
 import {
   Covers,
@@ -28,9 +27,9 @@ export const CoverBoardWithoutMemo: FC = () => {
   const color = useMainStore((state) => state.getColor());
   const saveId = useSaveId();
   const isLandscape = useIsLandscape();
-
-  const { dragLimits } = useGetSizesContext();
-  // const backColor = useMainStore((state) => state.configs.layout.backColor);
+  const hideToolbar = useAtomValue(hideToolbarAtom);
+  const backColor = useMainStore((state) => state.getBackColor());
+  const { canvasLimits, padding } = useGetSizesContext();
 
   const stageRef: RefObject<Konva.Stage> = useRef(null);
   const [screenshotUrl, setScreenshotUrl] = useState('');
@@ -50,7 +49,7 @@ export const CoverBoardWithoutMemo: FC = () => {
     const stage = stageRef.current;
 
     if (stage) {
-      const uri = stage.toDataURL({ ...dragLimits, mimeType: 'image/png' });
+      const uri = stage.toDataURL({ ...canvasLimits, mimeType: 'image/png' });
 
       flushSync(() => {
         setScreenshotUrl(uri);
@@ -65,49 +64,56 @@ export const CoverBoardWithoutMemo: FC = () => {
         setScreenshotUrl('');
       });
     }
-  }, [dragLimits, saveId]);
+  }, [canvasLimits, saveId]);
   useKeysListener({ createGroup, takeScreenshot });
 
   return (
     <Stack
       direction={isLandscape ? 'row' : 'column'}
-      gap={SPACING_GAP}
-      maxHeight={dragLimits.height}
-      overflow="hidden">
-      <Stack
-        maxHeight={dragLimits.height}
-        justifyContent="space-between"
-        alignItems="center"
-        direction={isLandscape ? 'column' : 'row'}>
-        <Toolbar takeScreenshot={takeScreenshot} createGroup={createGroup} />
-        <Logo />
+      gap={`${padding}px`}
+      sx={{
+        overflowY: isLandscape ? 'hidden' : undefined,
+        overflowX: !isLandscape ? 'hidden' : undefined,
+      }}>
+      {!hideToolbar && (
+        <Stack
+          maxHeight={isLandscape ? canvasLimits.height : undefined}
+          maxWidth={!isLandscape ? canvasLimits.width : undefined}
+          justifyContent="space-between"
+          alignItems="center"
+          direction={isLandscape ? 'column' : 'row'}>
+          <Toolbar takeScreenshot={takeScreenshot} createGroup={createGroup} />
+          <Logo />
+        </Stack>
+      )}
+      <Stack border={`3px solid ${color}`}>
+        <Stage
+          width={canvasLimits.width}
+          height={canvasLimits.height}
+          ref={stageRef}
+          onMouseDown={checkDeselect}
+          onTouchStart={checkDeselect}>
+          <Layer>
+            {screenshotUrl && (
+              <Rect
+                listening={false}
+                width={canvasLimits.width}
+                height={canvasLimits.height}
+                fill={backColor}
+                stroke={color}
+              />
+            )}
+            <GroupCovers />
+            <Arrows />
+            <Covers />
+            <TitleLabel />
+            <BoundaryCoverArrows />
+            <BoundaryGroupArrows />
+            <CoverCountLabel />
+            <GroupCountLabel />
+          </Layer>
+        </Stage>
       </Stack>
-
-      <Stage
-        width={dragLimits.width}
-        height={dragLimits.height}
-        ref={stageRef}
-        onMouseDown={checkDeselect}
-        onTouchStart={checkDeselect}>
-        <Layer>
-          <Rect
-            name="arenaBorder"
-            width={dragLimits.width}
-            height={dragLimits.height}
-            stroke={color}
-            strokeWidth={3}
-            listening={false}
-          />
-          <GroupCovers />
-          <Arrows />
-          <Covers />
-          <TitleLabel />
-          <BoundaryCoverArrows />
-          <BoundaryGroupArrows />
-          <CoverCountLabel />
-          <GroupCountLabel />
-        </Layer>
-      </Stage>
 
       {screenshotUrl && <img src={screenshotUrl} alt="Screenshot" />}
     </Stack>

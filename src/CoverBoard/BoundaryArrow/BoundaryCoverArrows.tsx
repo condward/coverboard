@@ -6,14 +6,14 @@ import { useGetSizesContext } from 'providers';
 import { BoundaryArrow } from './BoundaryArrow';
 
 export const BoundaryCoverArrowsWithoutMemo: FC = () => {
-  const { dragLimits } = useGetSizesContext();
+  const { canvasLimits } = useGetSizesContext();
   const covers = useMainStore((state) => state.covers);
   const scale = useMainStore((state) => state.configs.layout.scale);
 
   const offLimitCovers = covers.flatMap((covers) => {
     if (
-      (covers.pos.x > dragLimits.width && dragLimits.width > scale) ||
-      (covers.pos.y > dragLimits.height && dragLimits.height > scale)
+      (covers.pos.x > canvasLimits.width && canvasLimits.width > scale) ||
+      (covers.pos.y > canvasLimits.height && canvasLimits.height > scale)
     ) {
       return covers;
     }

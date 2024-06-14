@@ -32,7 +32,7 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
   const groups = useMainStore((state) => state.groups);
   const color = useMainStore((state) => state.getColor());
 
-  const { dragLimits } = useGetSizesContext();
+  const { canvasLimits } = useGetSizesContext();
   const [hintArrows, setHintArrows] = useState<
     [
       CoverSchema | GroupSchema | undefined,
@@ -123,7 +123,7 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
           points={[
             0,
             hintArrows[0].pos.y,
-            dragLimits.width,
+            canvasLimits.width,
             hintArrows[0].pos.y,
           ]}
           stroke={color}
@@ -136,7 +136,7 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
             hintArrows[1].pos.x,
             0,
             hintArrows[1].pos.x,
-            dragLimits.height,
+            canvasLimits.height,
           ]}
           stroke={color}
           strokeWidth={1}

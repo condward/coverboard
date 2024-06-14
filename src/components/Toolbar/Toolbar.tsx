@@ -2,14 +2,17 @@ import { FC, memo } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { useStore } from 'zustand';
 import { Stack } from '@mui/material';
-
 import {
-  colorMap,
-  Colors,
-  SPACING_GAP,
-  ToolConfig,
-  ToolConfigIDs,
-} from 'types';
+  DeleteOutline,
+  FolderOutlined,
+  SearchOutlined,
+  SettingsOutlined,
+  ShareOutlined,
+  UndoOutlined,
+  DownloadOutlined,
+} from '@mui/icons-material';
+
+import { colorMap, Colors, ToolConfig, ToolConfigIDs } from 'types';
 import { haxPrefix, useIsLandscape } from 'utils';
 
 import {
@@ -37,15 +40,29 @@ const ToolbarActionIcon: FC = () => {
     id: ToolConfigIDs.UNDO,
     tooltip: `Undo (moves: ${actionsLength}/10)`,
     color: colorMap[Colors.PINK],
-    emoji: '↩️',
+    icon: <UndoOutlined />,
     value: actionsLength < 1,
     valueModifier: () => undoAction(),
-    badge: actionsLength,
+    badge: actionsLength > 0 ? actionsLength : null,
     enabled: true,
     shortcut: 'U',
   };
 
   return <ToolbarIcon config={actionConfig} index={6} />;
+};
+
+const useGetElemName = () => {
+  const selected = useAtomValue(selectedAtom);
+  const isCover = useMainStore((state) => state.isCover);
+  const isGroup = useMainStore((state) => state.isGroup);
+  const isArrow = useMainStore((state) => state.isArrow);
+  if (!selected) return '';
+
+  if (isCover(selected.id)) return '(cover)';
+  if (isGroup(selected.id)) return '(group)';
+  if (isArrow(selected.id)) return '(arrow)';
+
+  return '';
 };
 
 const ToolbarWithoutMemo: FC<ToolbarProps> = ({
@@ -62,7 +79,7 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
   const coversLength = useMainStore((state) => state.covers.length);
   const groupsLength = useMainStore((state) => state.groups.length);
   const ArrowsLength = useMainStore((state) => state.arrows.length);
-  const { coverSizeWidth } = useGetSizesContext();
+  const { coverSizeWidth, padding } = useGetSizesContext();
 
   const removeCoverAndRelatedArrows = useMainStore(
     (state) => state.removeCoverAndRelatedArrows,
@@ -75,15 +92,7 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
   const isGroup = useMainStore((state) => state.isGroup);
   const isArrow = useMainStore((state) => state.isArrow);
 
-  const getElemName = () => {
-    if (!selected) return '';
-
-    if (isCover(selected.id)) return '(cover)';
-    if (isGroup(selected.id)) return '(group)';
-    if (isArrow(selected.id)) return '(arrow)';
-
-    return '';
-  };
+  const elemName = useGetElemName();
 
   const removeArrow = useMainStore((state) => state.removeArrow);
   const deleteElem = () => {
@@ -109,10 +118,10 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
       id: ToolConfigIDs.SEARCH,
       tooltip: `Search and add (covers: ${coversLength})`,
       color: colorMap[Colors.GREEN],
-      emoji: '🔍',
+      icon: <SearchOutlined />,
       value: openSearch,
       valueModifier: setOpenSearch,
-      badge: coversLength,
+      badge: coversLength > 0 ? coversLength : null,
       enabled: true,
       shortcut: 'A',
     },
@@ -120,7 +129,7 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
       id: ToolConfigIDs.CONFIG,
       tooltip: `Options (scale: ${configSize})`,
       color: colorMap[Colors.PURPLE],
-      emoji: '⚙️',
+      icon: <SettingsOutlined />,
       value: openConfig,
       valueModifier: setOpenConfig,
       badge: configSize === 1 ? 0 : configSize,
@@ -131,10 +140,10 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
       id: ToolConfigIDs.SHARE,
       tooltip: `Share and save (saves: ${savesNumber})`,
       color: colorMap[Colors.BLUE],
-      emoji: '🔗',
+      icon: <ShareOutlined />,
       value: openShare,
       valueModifier: setOpenShare,
-      badge: savesNumber === 1 ? 0 : savesNumber,
+      badge: savesNumber === 1 ? null : savesNumber,
       enabled: true,
       shortcut: 'S',
     },
@@ -142,21 +151,21 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
       id: ToolConfigIDs.GROUP,
       tooltip: `Create group (groups: ${groupsLength})`,
       color: colorMap[Colors.YELLOW],
-      emoji: '📁',
+      icon: <FolderOutlined />,
       value: false,
       valueModifier: createGroup,
-      badge: groupsLength,
+      badge: groupsLength > 0 ? groupsLength : null,
       enabled: true,
       shortcut: 'G',
     },
     {
       id: ToolConfigIDs.DELETE,
-      tooltip: `Delete selected ${getElemName()}`,
+      tooltip: `Delete selected ${elemName}`,
       color: colorMap[Colors.RED],
-      emoji: '🗑️',
+      icon: <DeleteOutline />,
       value: !selected,
       valueModifier: deleteElem,
-      badge: groupsLength + coversLength + ArrowsLength,
+      badge: elemName !== '' ? elemName[1] : null,
       enabled: !!selected,
       shortcut: 'D',
     },
@@ -166,10 +175,13 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
         groupsLength + coversLength + ArrowsLength
       })`,
       color: colorMap[Colors.ORANGE],
-      emoji: '📷',
+      icon: <DownloadOutlined />,
       value: !!editArrows || !!selected,
       valueModifier: takeScreenshot,
-      badge: groupsLength + coversLength + ArrowsLength,
+      badge:
+        groupsLength + coversLength + ArrowsLength > 0
+          ? groupsLength + coversLength + ArrowsLength
+          : null,
       enabled: !editArrows && !selected,
       shortcut: 'C',
     },
@@ -178,9 +190,9 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
   return (
     <Stack
       direction={isLandscape ? 'column' : 'row'}
-      gap={SPACING_GAP}
-      border={`2px solid ${color}`}
-      padding={2}>
+      gap={`${padding}px`}
+      border={`3px solid ${color}`}
+      padding={`${padding}px`}>
       {configTools.map((config, index) => (
         <ToolbarIcon config={config} key={config.id} index={index} />
       ))}
