@@ -2,15 +2,15 @@ import { atom, useAtomValue } from 'jotai';
 
 import { LabelTypes, ArrowPointSchema, TextTypes } from 'types';
 
-type SelectedText = {
+interface SelectedText {
   id: string;
   text: TextTypes | LabelTypes;
-};
+}
 
-type SelectedElement = {
+interface SelectedElement {
   id: string;
   open: boolean;
-};
+}
 
 export const pointsAtom = atom<ArrowPointSchema | null>(null);
 

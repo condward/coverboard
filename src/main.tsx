@@ -7,13 +7,17 @@ import { DEFAULT_KEY, NAME_SPACE } from 'utils';
 import { AppWrapper } from './AppWrapper.tsx';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter basename={`/${NAME_SPACE}`}>
-      <Routes>
-        <Route path="/:saveId" Component={AppWrapper} />
-        <Route path="/" element={<Navigate to={DEFAULT_KEY} />} />
-      </Routes>
-    </BrowserRouter>
-  </StrictMode>,
-);
+const root = document.getElementById('root');
+
+if (root) {
+  ReactDOM.createRoot(root).render(
+    <StrictMode>
+      <BrowserRouter basename={`/${NAME_SPACE}`}>
+        <Routes>
+          <Route path="/:saveId" Component={AppWrapper} />
+          <Route path="/" element={<Navigate to={DEFAULT_KEY} />} />
+        </Routes>
+      </BrowserRouter>
+    </StrictMode>,
+  );
+}

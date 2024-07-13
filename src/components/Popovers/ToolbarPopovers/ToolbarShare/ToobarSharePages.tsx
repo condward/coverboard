@@ -17,7 +17,7 @@ const getMediaFromStorage = (storageString: string) => {
   try {
     const item = window.localStorage.getItem(storageString);
     if (item) {
-      const curentData: { state: AppSchema } = JSON.parse(item);
+      const curentData = JSON.parse(item) as { state: AppSchema };
 
       if (Object.values(Media).includes(curentData.state.configs.media)) {
         return curentData.state.configs.media;

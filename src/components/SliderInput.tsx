@@ -11,7 +11,7 @@ interface SliderInputProp {
     event: Event,
     value: number | number[],
     activeThumb: number,
-  ) => void | ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
+  ) => void;
   min?: number;
   step?: number;
   max: number;

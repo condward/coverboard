@@ -13,7 +13,6 @@ import { useNavigate } from 'react-router-dom';
 import { InfoOutlined } from '@mui/icons-material';
 
 import {
-  AppSchema,
   ToolConfigIDs,
   appSchema,
   POPOVER_BACK_COLOR,
@@ -62,8 +61,7 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
     }
 
     try {
-      const parsedData: AppSchema = JSON.parse(jsonData);
-      const parsedSchema = appSchema.parse(parsedData);
+      const parsedSchema = appSchema.parse(JSON.parse(jsonData));
 
       updateStoreValues(parsedSchema);
 
@@ -71,7 +69,10 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
       showSuccessMessage('JSON was applied with success');
     } catch (error) {
       if (error instanceof ZodError) {
-        showErrorMessage(JSON.parse(error.message)[0].message);
+        const messages = JSON.parse(error.message) as Array<{
+          message: string;
+        }>;
+        showErrorMessage(messages[0].message);
         return;
       }
       showErrorMessage('JSON data is not valid');

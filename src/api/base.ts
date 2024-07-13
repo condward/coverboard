@@ -1,11 +1,17 @@
 import axios from 'axios';
+import { z } from 'zod';
 
 import { apiKeysAtom, store } from 'store';
-
 import { CoverLabelValues, Media, mediaMap } from 'types';
 import { isFulfilled } from 'utils';
 
 export const BASE_URL = 'https://albumcoverboard.vercel.app';
+
+const resultSchema = z.object({
+  value: z.object({
+    data: z.unknown(),
+  }),
+});
 
 export const apiFetch = async (
   media: Media,
@@ -28,13 +34,12 @@ export const apiFetch = async (
     }),
   );
 
-  return albums.flatMap((result, index) => {
-    if (isFulfilled(result)) {
-      return {
-        index,
-        data: result.value.data,
-      };
-    }
-    return [];
-  });
+  return albums.flatMap((result, index) =>
+    isFulfilled(result)
+      ? {
+          index,
+          data: resultSchema.parse(result).value.data,
+        }
+      : [],
+  );
 };

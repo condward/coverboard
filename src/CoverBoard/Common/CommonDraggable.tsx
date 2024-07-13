@@ -81,10 +81,10 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
     const targetX = Math.round(e.target.x());
 
     const foundY =
-      covers.find((cover) => cover.id !== id && cover.pos.y === targetY) ||
+      covers.find((cover) => cover.id !== id && cover.pos.y === targetY) ??
       groups.find((group) => group.id !== id && group.pos.y === targetY);
     const foundX =
-      covers.find((cover) => cover.id !== id && cover.pos.x === targetX) ||
+      covers.find((cover) => cover.id !== id && cover.pos.x === targetX) ??
       groups.find((group) => group.id !== id && group.pos.x === targetX);
 
     if (

@@ -101,8 +101,8 @@ export const coversSchema = z
   .max(25, 'Only 25 covers are allowed');
 export type CoversSchema = z.input<typeof coversSchema>;
 
-export type CoverLabelValue = {
+export interface CoverLabelValue {
   title: string;
   subtitle: string;
-};
+}
 export type CoverLabelValues = Array<CoverLabelValue>;

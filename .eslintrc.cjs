@@ -3,7 +3,8 @@ module.exports = {
   env: { browser: true, es2024: true },
   extends: [
     'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/strict-type-checked',
+    'plugin:@typescript-eslint/stylistic-type-checked',
     'plugin:react-hooks/recommended',
     'plugin:prettier/recommended',
     'plugin:import/recommended',
@@ -49,18 +50,30 @@ module.exports = {
       },
     ],
     'jsx-a11y/no-autofocus': 0,
+    '@typescript-eslint/no-confusing-void-expression': 'OFF',
+    '@typescript-eslint/array-type': 'OFF',
+    '@typescript-eslint/restrict-template-expressions': 'OFF',
+    '@typescript-eslint/no-duplicate-type-constituents': 'OFF',
+    '@typescript-eslint/no-misused-promises': 'OFF',
+    '@typescript-eslint/unbound-method': 'OFF',
+    '@typescript-eslint/no-unsafe-call': 'OFF',
+    '@typescript-eslint/prefer-literal-enum-member': 'OFF',
+    '@typescript-eslint/no-unsafe-member-access': 'OFF',
+    '@typescript-eslint/prefer-nullish-coalescing': [
+      'error',
+      {
+        ignoreConditionalTests: true,
+        ignorePrimitives: {
+          string: true,
+        },
+      },
+    ],
     'react-refresh/only-export-components': [
       'warn',
-      { allowConstantExport: true },
+      {
+        allowConstantExport: true,
+      },
     ],
-    '@typescript-eslint/no-floating-promises': 'error',
-    '@typescript-eslint/restrict-plus-operands': 'error',
-    '@typescript-eslint/no-unsafe-enum-comparison': 'error',
-    '@typescript-eslint/no-unnecessary-condition': 'error',
-    '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
-    '@typescript-eslint/no-unnecessary-type-arguments': 'error',
-    '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-    '@typescript-eslint/no-unnecessary-type-constraint': 'error',
     '@typescript-eslint/strict-boolean-expressions': [
       'error',
       {

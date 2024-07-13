@@ -68,7 +68,10 @@ export const ToolbarShareActions: FC<ToolbarShareActionsProps> = ({
       link.click();
     } catch (error) {
       if (error instanceof ZodError) {
-        showErrorMessage(JSON.parse(error.message)[0].message);
+        const messages = JSON.parse(error.message) as Array<{
+          message: string;
+        }>;
+        showErrorMessage(messages[0].message);
         return;
       }
       showErrorMessage('JSON data is not valid');
