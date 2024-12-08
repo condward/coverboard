@@ -70,7 +70,7 @@ const getButtons = (media: Media, currentCover: CoverSchema) => {
       },
     ];
   } else if (media === Media.BOOK) {
-    const isbm = currentCover.link.match(/isbn\/(\d+)-/i);
+    const isbm = /isbn\/(\d+)-/i.exec(currentCover.link);
 
     if (isbm && isbm.length > 0) {
       return [

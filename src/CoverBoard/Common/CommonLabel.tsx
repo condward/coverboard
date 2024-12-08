@@ -66,10 +66,6 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
   });
   const label = useGetTitleText(text, coverLabel);
 
-  const handleSetOpen = (open: boolean) => {
-    open ? setEditingText({ id, text: coverLabel }) : setEditingText(null);
-  };
-
   return (
     <CommonTextLabel
       title={coverLabel}
@@ -77,7 +73,9 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
       fontStyle={fontStyle}
       hasReset
       open={isCurrentTextSelected}
-      setOpen={handleSetOpen}
+      setOpen={(open: boolean) =>
+        setEditingText(open ? { id, text: coverLabel } : null)
+      }
       editable={true}
       label={label}
       onReset={() => void 0}

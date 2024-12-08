@@ -1,4 +1,4 @@
-import { FC, RefObject, useCallback, useRef, useState } from 'react';
+import { FC, useCallback, useRef, useState } from 'react';
 import { Stage, Layer, Rect } from 'react-konva';
 import { flushSync } from 'react-dom';
 import Konva from 'konva';
@@ -31,7 +31,7 @@ export const CoverBoard: FC = () => {
   const backColor = useMainStore((state) => state.getBackColor());
   const { canvasLimits, padding } = useGetSizesContext();
 
-  const stageRef: RefObject<Konva.Stage> = useRef(null);
+  const stageRef = useRef<Konva.Stage>(null);
   const [screenshotUrl, setScreenshotUrl] = useState('');
 
   const setSelected = useSetAtom(selectedAtom);

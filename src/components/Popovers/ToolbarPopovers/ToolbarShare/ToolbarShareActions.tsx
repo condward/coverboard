@@ -16,7 +16,7 @@ const isValidJSONFn = (jsonData: string) => {
   try {
     JSON.parse(jsonData);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -50,9 +50,8 @@ export const ToolbarShareActions: FC<ToolbarShareActionsProps> = ({
   };
 
   const handleCopy = (success: boolean) => {
-    success
-      ? showSuccessMessage('Text copied with success')
-      : showErrorMessage('Error copying text');
+    if (success) showSuccessMessage('Text copied with success');
+    else showErrorMessage('Error copying text');
   };
 
   const exportData = () => {

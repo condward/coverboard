@@ -1,28 +1,11 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { FC, createContext, useEffect, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 
 import { useMainStore, sizeAtom, hideToolbarAtom } from 'store';
 import { MAX_BOUNDARY } from 'types';
 import { throttle, useIsLandscape } from 'utils';
 
-interface SizesProviderProps {
-  starRadius: number;
-  circleRadius: number;
-  fontSize: number;
-  coverSizeWidth: number;
-  coverSizeHeight: number;
-  padding: number;
-  canvasLimits: {
-    width: number;
-    height: number;
-  };
-  screenLimits: {
-    width: number;
-    height: number;
-  };
-}
-
-export const SizesContext = createContext<SizesProviderProps | null>(null);
+import { SizesContext } from './useGetSizesContext';
 
 export const SizesProvider: FC<{
   children: React.ReactNode;

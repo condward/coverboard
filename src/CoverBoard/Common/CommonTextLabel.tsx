@@ -1,6 +1,6 @@
 import { Rect, Text } from 'react-konva';
 import { Html } from 'react-konva-utils';
-import { RefObject, useEffect, useRef, useState, FC } from 'react';
+import { useEffect, useRef, useState, FC } from 'react';
 import Konva from 'konva';
 
 import { PosTypes } from 'types';
@@ -48,7 +48,7 @@ export const CommonTextLabel: FC<TitleTexProps> = ({
 }) => {
   const { fontSize } = useGetSizesContext();
   const backColor = useMainStore((state) => state.getBackColor());
-  const textRef: RefObject<Konva.Text> = useRef(null);
+  const textRef = useRef<Konva.Text>(null);
   const [textWidth, setTextWidth] = useState(0);
   const saveId = useSaveId();
   const align = getAlign(dir);

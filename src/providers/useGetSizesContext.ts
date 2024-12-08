@@ -1,6 +1,23 @@
-import { useContext } from 'react';
+import { createContext, useContext } from 'react';
 
-import { SizesContext } from './SizesProvider';
+interface SizesProviderProps {
+  starRadius: number;
+  circleRadius: number;
+  fontSize: number;
+  coverSizeWidth: number;
+  coverSizeHeight: number;
+  padding: number;
+  canvasLimits: {
+    width: number;
+    height: number;
+  };
+  screenLimits: {
+    width: number;
+    height: number;
+  };
+}
+
+export const SizesContext = createContext<SizesProviderProps | null>(null);
 
 export const useGetSizesContext = () => {
   const context = useContext(SizesContext);

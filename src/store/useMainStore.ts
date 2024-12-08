@@ -4,7 +4,7 @@ import { StateCreator, create } from 'zustand';
 import isDeepEqual from 'fast-deep-equal';
 import { temporal } from 'zundo';
 import throttle from 'just-throttle';
-import { DeepPartial } from 'react-hook-form';
+import type { DeepPartial } from 'react-hook-form';
 
 import { sizeAtom, store } from 'store';
 

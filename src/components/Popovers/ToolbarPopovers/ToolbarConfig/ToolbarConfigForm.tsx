@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { TextField, Stack } from '@mui/material';
-import { Control, Controller, useWatch } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
 
 import { ConfigSchema, mediaMap, SPACING_GAP } from 'types';
 import {

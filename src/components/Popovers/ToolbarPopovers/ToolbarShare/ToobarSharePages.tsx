@@ -79,8 +79,8 @@ export const ToolbarSharePages: FC<ToolbarShareProps> = ({
               key={currentSave}
               label={`${mediaMap[currentMedia].emoji} ${currentSave}`}
               color={saveId === currentSave ? 'primary' : 'default'}
-              onClick={() => {
-                navigate(`/${currentSave}#${ToolConfigIDs.SHARE}`);
+              onClick={async () => {
+                await navigate(`/${currentSave}#${ToolConfigIDs.SHARE}`);
                 const data = window.localStorage.getItem(
                   addPrefix(currentSave),
                 );
@@ -90,7 +90,7 @@ export const ToolbarSharePages: FC<ToolbarShareProps> = ({
               }}
               onDelete={
                 showDelete
-                  ? (evt) => {
+                  ? async (evt) => {
                       evt.preventDefault();
 
                       if (saveId === DEFAULT_KEY && currentSave === saveId) {
@@ -107,7 +107,9 @@ export const ToolbarSharePages: FC<ToolbarShareProps> = ({
                       );
 
                       if (saveId === currentSave) {
-                        navigate(`/${DEFAULT_KEY}#${ToolConfigIDs.SHARE}`);
+                        await navigate(
+                          `/${DEFAULT_KEY}#${ToolConfigIDs.SHARE}`,
+                        );
 
                         const defaultData =
                           window.localStorage.getItem(DEFAULT_STORAGE);

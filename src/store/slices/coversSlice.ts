@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand';
-import { DeepPartial } from 'react-hook-form';
+import type { DeepPartial } from 'react-hook-form';
 
 import { CoverSchema, CoversSchema, coversSchema } from 'types';
 

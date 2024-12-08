@@ -50,12 +50,12 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
   ];
   const [keyList, setKeyList] = useState(pages);
 
-  const handleImport = (evt: FormEvent) => {
+  const handleImport = async (evt: FormEvent) => {
     evt.preventDefault();
     const value = newSave.trim();
 
     if (value) {
-      navigate(`/${value}`);
+      await navigate(`/${value}`);
       onClose();
       return;
     }

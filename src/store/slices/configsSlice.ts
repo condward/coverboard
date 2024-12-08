@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand';
-import { DeepPartial } from 'react-hook-form';
+import type { DeepPartial } from 'react-hook-form';
 
 import { sizeAtom, store } from 'store';
 import {
