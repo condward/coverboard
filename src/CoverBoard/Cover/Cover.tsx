@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
 import { Group } from 'react-konva';
 import { useSetAtom } from 'jotai';
 
@@ -35,7 +35,7 @@ enum Offsets {
   STAR = 'star',
 }
 
-const CoverWithoutMemo: FC<CoverImageProps> = ({
+export const Cover: FC<CoverImageProps> = ({
   id,
   titleText,
   subtitleText,
@@ -155,5 +155,3 @@ const CoverWithoutMemo: FC<CoverImageProps> = ({
     </>
   );
 };
-
-export const Cover = memo(CoverWithoutMemo);

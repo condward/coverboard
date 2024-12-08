@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
 import { Group } from 'react-konva';
 
 import { ArrowParams, ArrowSchema, PosTypes } from 'types';
@@ -128,7 +128,7 @@ const useGetArrowParams = ({
   }
 };
 
-const ArrowWithoutMemo: FC<ArrowProps> = ({
+export const Arrow: FC<ArrowProps> = ({
   id,
   dir,
   originId,
@@ -155,5 +155,3 @@ const ArrowWithoutMemo: FC<ArrowProps> = ({
     </Group>
   );
 };
-
-export const Arrow = memo(ArrowWithoutMemo);

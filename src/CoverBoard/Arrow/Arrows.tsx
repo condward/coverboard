@@ -1,11 +1,11 @@
 import { Group } from 'react-konva';
-import { FC, memo } from 'react';
+import { FC } from 'react';
 
 import { useMainStore } from 'store';
 
 import { Arrow } from './Arrow';
 
-export const ArrowsWithoutMemo: FC = () => {
+export const Arrows: FC = () => {
   const arrows = useMainStore((state) => state.arrows);
 
   return (
@@ -27,5 +27,3 @@ export const ArrowsWithoutMemo: FC = () => {
     </>
   );
 };
-
-export const Arrows = memo(ArrowsWithoutMemo);

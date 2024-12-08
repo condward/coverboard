@@ -1,6 +1,6 @@
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
-import { FC, memo, useState } from 'react';
+import { FC, useState } from 'react';
 import { Arrow, Group } from 'react-konva';
 
 import { CoverSchema, GroupSchema } from 'types';
@@ -63,7 +63,7 @@ const useGetPoints = ({
   ];
 };
 
-const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
+export const BoundaryArrow: FC<BoundaryArrowProps> = ({
   title,
   x,
   y,
@@ -125,5 +125,3 @@ const BoundaryArrowWithoutMemo: FC<BoundaryArrowProps> = ({
     </Group>
   );
 };
-
-export const BoundaryArrow = memo(BoundaryArrowWithoutMemo);

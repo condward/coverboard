@@ -1,11 +1,11 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
 
 import { useMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 import { BoundaryArrow } from './BoundaryArrow';
 
-export const BoundaryCoverArrowsWithoutMemo: FC = () => {
+export const BoundaryCoverArrows: FC = () => {
   const { canvasLimits } = useGetSizesContext();
   const covers = useMainStore((state) => state.covers);
   const scale = useMainStore((state) => state.configs.layout.scale);
@@ -43,5 +43,3 @@ export const BoundaryCoverArrowsWithoutMemo: FC = () => {
     </>
   );
 };
-
-export const BoundaryCoverArrows = memo(BoundaryCoverArrowsWithoutMemo);

@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 
 import { PosTypes } from 'types';
@@ -7,7 +7,7 @@ import { CommonTextLabel } from 'CoverBoard/Common';
 import { useSaveId } from 'utils';
 import { useGetSizesContext } from 'providers';
 
-const TitleLabelWithoutMemo: FC = () => {
+export const TitleLabel: FC = () => {
   const updateConfigs = useMainStore((state) => state.updateConfigs);
   const title = useMainStore((state) => state.configs.title.text);
   const showMainTitle = useMainStore((state) => state.configs.title.show);
@@ -43,5 +43,3 @@ const TitleLabelWithoutMemo: FC = () => {
     />
   );
 };
-
-export const TitleLabel = memo(TitleLabelWithoutMemo);

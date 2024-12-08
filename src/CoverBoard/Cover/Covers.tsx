@@ -1,10 +1,10 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
 
 import { useMainStore } from 'store';
 
 import { Cover } from './Cover';
 
-export const CoversWithoutMemo: FC = () => {
+export const Covers: FC = () => {
   const covers = useMainStore((state) => state.covers);
 
   return (
@@ -28,5 +28,3 @@ export const CoversWithoutMemo: FC = () => {
     </>
   );
 };
-
-export const Covers = memo(CoversWithoutMemo);

@@ -1,4 +1,4 @@
-import { FC, RefObject, memo, useCallback, useRef, useState } from 'react';
+import { FC, RefObject, useCallback, useRef, useState } from 'react';
 import { Stage, Layer, Rect } from 'react-konva';
 import { flushSync } from 'react-dom';
 import Konva from 'konva';
@@ -23,7 +23,7 @@ import {
   useKeysListener,
 } from './';
 
-export const CoverBoardWithoutMemo: FC = () => {
+export const CoverBoard: FC = () => {
   const color = useMainStore((state) => state.getColor());
   const saveId = useSaveId();
   const isLandscape = useIsLandscape();
@@ -119,5 +119,3 @@ export const CoverBoardWithoutMemo: FC = () => {
     </Stack>
   );
 };
-
-export const CoverBoard = memo(CoverBoardWithoutMemo);

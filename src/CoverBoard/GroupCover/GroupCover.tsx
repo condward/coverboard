@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
 import { Group } from 'react-konva';
 import { useSetAtom } from 'jotai';
 
@@ -27,7 +27,7 @@ interface CoverImageProps {
   scaleY: GroupSchema['scale']['y'];
 }
 
-const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
+export const GroupCover: FC<CoverImageProps> = ({
   id,
   titleText,
   subtitleText,
@@ -146,5 +146,3 @@ const GroupCoverWithoutMemo: FC<CoverImageProps> = ({
     </>
   );
 };
-
-export const GroupCover = memo(GroupCoverWithoutMemo);

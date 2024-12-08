@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { useStore } from 'zustand';
 import { Stack } from '@mui/material';
@@ -32,7 +32,7 @@ interface ToolbarProps {
   createGroup: () => void;
 }
 
-const ToolbarActionIcon: FC = () => {
+export const ToolbarActionIcon: FC = () => {
   const { undo: undoAction, pastStates } = useStore(useMainStore.temporal);
   const actionsLength = pastStates.length;
 
@@ -65,10 +65,7 @@ const useGetElemName = () => {
   return '';
 };
 
-const ToolbarWithoutMemo: FC<ToolbarProps> = ({
-  takeScreenshot,
-  createGroup,
-}) => {
+export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot, createGroup }) => {
   const isLandscape = useIsLandscape();
   const color = useMainStore((state) => state.getColor());
   const editArrows = useAtomValue(pointsAtom);
@@ -200,5 +197,3 @@ const ToolbarWithoutMemo: FC<ToolbarProps> = ({
     </Stack>
   );
 };
-
-export const Toolbar = memo(ToolbarWithoutMemo);

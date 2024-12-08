@@ -1,10 +1,10 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
 
 import { useMainStore } from 'store';
 
 import { GroupCover } from './GroupCover';
 
-export const GroupCoversWithoutMemo: FC = () => {
+export const GroupCovers: FC = () => {
   const groups = useMainStore((state) => state.groups);
 
   return (
@@ -26,5 +26,3 @@ export const GroupCoversWithoutMemo: FC = () => {
     </>
   );
 };
-
-export const GroupCovers = memo(GroupCoversWithoutMemo);
