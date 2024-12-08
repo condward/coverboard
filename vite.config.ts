@@ -6,7 +6,11 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   plugins: [
     tsconfigPaths(),
-    react(),
+    react({
+      babel: {
+        plugins: [['babel-plugin-react-compiler']],
+      },
+    }),
   ],
   base: '/coverboard/',
   server: {

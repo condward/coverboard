@@ -27,7 +27,6 @@ export const ToolbarIcon: FC<ToolbarIconProps> = ({ config }) => {
       : config.valueModifier(true);
   };
 
-  console.log('width', coverSizeWidth);
   return (
     <>
       <Tooltip title={config.tooltip} key={config.id}>
