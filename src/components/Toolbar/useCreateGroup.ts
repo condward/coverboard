@@ -12,11 +12,11 @@ export const useCreateGroup = () => {
     (state) => state.configs.groups.subtitle.dir,
   );
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const id = uuidv4();
   const setSelected = useSetAtom(selectedAtom);
 
   return {
     createGroup: useCallback(() => {
+      const id = uuidv4();
       try {
         addGroups([
           {
@@ -51,7 +51,6 @@ export const useCreateGroup = () => {
       addGroups,
       groupSubTitleDir,
       groupTitleDir,
-      id,
       setSelected,
       showErrorMessage,
     ]),
