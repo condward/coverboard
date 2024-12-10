@@ -103,6 +103,7 @@ const CommonDrawArrowChild: FC<CommonDrawArrowProps> = ({
       if (!points) {
         setPoints({ id, dir });
       } else if (points.id !== id) {
+        setPoints(null);
         try {
           if (
             arrows.some(
@@ -160,8 +161,6 @@ const CommonDrawArrowChild: FC<CommonDrawArrowProps> = ({
             return;
           }
           throw error;
-        } finally {
-          setPoints(null);
         }
       } else if (points.id === id) {
         setPoints(null);

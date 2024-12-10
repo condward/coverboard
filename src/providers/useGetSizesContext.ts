@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, use } from 'react';
 
 interface SizesProviderProps {
   starRadius: number;
@@ -20,7 +20,7 @@ interface SizesProviderProps {
 export const SizesContext = createContext<SizesProviderProps | null>(null);
 
 export const useGetSizesContext = () => {
-  const context = useContext(SizesContext);
+  const context = use(SizesContext);
 
   if (context === null) throw new Error();
 

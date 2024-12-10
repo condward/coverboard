@@ -39,7 +39,7 @@ export const SizesProvider: FC<{
   }, [fitToScreen, updateSize]);
 
   return (
-    <SizesContext.Provider
+    <SizesContext
       value={useMemo(
         () => ({
           circleRadius: scale / 10,
@@ -83,6 +83,6 @@ export const SizesProvider: FC<{
         ],
       )}>
       {children}
-    </SizesContext.Provider>
+    </SizesContext>
   );
 };

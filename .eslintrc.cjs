@@ -84,7 +84,13 @@ module.exports = {
         allowAny: true,
       },
     ],
-    'react-compiler/react-compiler': 'error',
+    'react-compiler/react-compiler': [
+      'error',
+      {
+        reportableLevels: new Set(['InvalidReact']),
+        __unstable_donotuse_reportAllBailouts: true,
+      },
+    ],
   },
   settings: {
     'import/resolver': {
