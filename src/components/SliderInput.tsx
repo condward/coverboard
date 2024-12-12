@@ -59,8 +59,8 @@ export const SliderInput: FC<SliderInputProp> = ({
               HTMLTextAreaElement | HTMLInputElement
             >
           }
-          InputProps={{
-            inputProps: {
+          slotProps={{
+            htmlInput: {
               min,
               max,
               step,

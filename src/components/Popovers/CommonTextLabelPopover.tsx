@@ -81,13 +81,15 @@ export const CommonTextLabelPopover: FC<PopupProps> = ({
           sx={{
             backgroundColor: fillBack,
           }}
-          inputProps={{
-            style: {
-              textAlign: align,
-              color: fill,
-              fontSize: `${fontSize}px`,
-              height: `${fontSize}px`,
-              padding: `${fontSize / 8}px`,
+          slotProps={{
+            htmlInput: {
+              sx: {
+                textAlign: align,
+                color: fill,
+                fontSize: `${fontSize}px`,
+                height: `${fontSize}px`,
+                padding: `${fontSize / 8}px`,
+              },
             },
           }}
         />

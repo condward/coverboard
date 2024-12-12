@@ -35,6 +35,7 @@ const FileImporter: React.FC<FileImporterProps> = (props) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target) {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
           onFileRead?.(String(e.target.result));
         }
       };

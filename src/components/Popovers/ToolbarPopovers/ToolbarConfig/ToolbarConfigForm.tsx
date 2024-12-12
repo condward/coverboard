@@ -129,8 +129,8 @@ export const ToolbarConfigForm: FC<{
                           showScreenSizes ? canvasLimits.width : field.value
                         }
                         onChange={field.onChange}
-                        InputProps={{
-                          inputProps: {
+                        slotProps={{
+                          htmlInput: {
                             min: 500,
                             max: 4000,
                             step: 1,
@@ -152,8 +152,8 @@ export const ToolbarConfigForm: FC<{
                           showScreenSizes ? canvasLimits.height : field.value
                         }
                         onChange={field.onChange}
-                        InputProps={{
-                          inputProps: {
+                        slotProps={{
+                          htmlInput: {
                             min: 500,
                             max: 4000,
                             step: 1,
