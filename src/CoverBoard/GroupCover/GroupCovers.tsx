@@ -1,8 +1,10 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 
 import { useMainStore } from 'store';
 
 import { GroupCover } from './GroupCover';
+
+const MemoGroupCover = memo(GroupCover);
 
 export const GroupCovers: FC = () => {
   const groups = useMainStore((state) => state.groups);
@@ -10,7 +12,7 @@ export const GroupCovers: FC = () => {
   return (
     <>
       {groups.map((group) => (
-        <GroupCover
+        <MemoGroupCover
           key={group.id}
           id={group.id}
           titleText={group.title.text}

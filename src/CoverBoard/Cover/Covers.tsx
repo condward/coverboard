@@ -1,8 +1,10 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 
 import { useMainStore } from 'store';
 
 import { Cover } from './Cover';
+
+const MemoCover = memo(Cover);
 
 export const Covers: FC = () => {
   const covers = useMainStore((state) => state.covers);
@@ -10,7 +12,7 @@ export const Covers: FC = () => {
   return (
     <>
       {covers.map((cover, index) => (
-        <Cover
+        <MemoCover
           key={cover.id}
           id={cover.id}
           titleText={cover.title.text}

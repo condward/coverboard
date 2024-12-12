@@ -39,7 +39,6 @@ export const GroupCover: FC<CoverImageProps> = ({
   scaleY,
 }) => {
   const color = useMainStore((state) => state.getGroupColor());
-
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const setSelected = useSetAtom(selectedAtom);
   const updateGroup = useMainStore((state) => state.updateGroup);
