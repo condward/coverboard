@@ -1,9 +1,10 @@
 import { FC, useRef, useEffect } from 'react';
-import { Rect, Transformer } from 'react-konva';
+import { Group, Rect, Transformer } from 'react-konva';
 import Konva from 'konva';
+import { useSetAtom } from 'jotai';
 
 import { GroupSchema } from 'types';
-import { useMainStore, useIsSelected } from 'store';
+import { useMainStore, useIsSelected, selectedAtom } from 'store';
 import { useGetSizesContext } from 'providers';
 
 interface CoverImageProps {
@@ -28,6 +29,14 @@ export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
   const removeCoverAndRelatedArrows = useMainStore(
     (state) => state.removeGroupAndRelatedArrows,
   );
+
+  const setSelected = useSetAtom(selectedAtom);
+  const refreshGroups = useMainStore((state) => state.refreshGroups);
+
+  const handlesSelect = () => {
+    setSelected({ id, open: isSelected });
+    refreshGroups(id);
+  };
 
   const rectRef = useRef<Konva.Rect>(null);
   const trRef = useRef<Konva.Transformer>(null);
@@ -56,7 +65,7 @@ export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
   };
 
   return (
-    <>
+    <Group onClick={handlesSelect} onTap={handlesSelect}>
       <Rect
         width={coverSizeWidthScaled - 2}
         height={coverSizeHeightScaled - 2}
@@ -94,6 +103,6 @@ export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
           rotateEnabled={false}
         />
       )}
-    </>
+    </Group>
   );
 };

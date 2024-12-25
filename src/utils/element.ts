@@ -53,3 +53,20 @@ export const useGetElementSizes = <T>(totalDirArray: Array<OffsetCalc<T>>) => {
     },
   };
 };
+
+export const useGetMaxBoundaries = () => {
+  const { coverSizeWidth, coverSizeHeight, canvasLimits } =
+    useGetSizesContext();
+  const isLandscape = useIsLandscape();
+
+  return {
+    getMaxBoundaries: (scale = { x: 1, y: 1 }) => ({
+      x: isLandscape
+        ? canvasLimits.width - coverSizeWidth * scale.x
+        : canvasLimits.width - coverSizeWidth * scale.x,
+      y: isLandscape
+        ? canvasLimits.height - coverSizeHeight * scale.y
+        : canvasLimits.height - coverSizeHeight * scale.y,
+    }),
+  };
+};

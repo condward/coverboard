@@ -7,16 +7,6 @@ import { useGetSizesContext } from 'providers';
 
 import { ArrowLabel, ArrowPointer } from '.';
 
-interface ArrowProps {
-  id: ArrowSchema['id'];
-  text: ArrowSchema['title']['text'];
-  dir: ArrowSchema['title']['dir'];
-  originId: ArrowSchema['origin']['id'];
-  originDir: ArrowSchema['origin']['dir'];
-  targetId: ArrowSchema['target']['id'];
-  targetDir: ArrowSchema['target']['dir'];
-}
-
 const convertPosToXY = (
   coverSizeWidth: number,
   coverSizeHeight: number,
@@ -48,10 +38,10 @@ const convertPosToXY = (
 };
 
 interface UseGetArrowParams {
-  originId: ArrowProps['originId'];
-  originDir: ArrowProps['originDir'];
-  targetId: ArrowProps['targetId'];
-  targetDir: ArrowProps['targetDir'];
+  originId: ArrowSchema['origin']['id'];
+  originDir: ArrowSchema['origin']['dir'];
+  targetId: ArrowSchema['target']['id'];
+  targetDir: ArrowSchema['target']['dir'];
 }
 
 const useGetArrowParams = ({
@@ -128,15 +118,16 @@ const useGetArrowParams = ({
   }
 };
 
-export const Arrow: FC<ArrowProps> = ({
-  id,
-  dir,
-  originId,
-  originDir,
-  targetId,
-  targetDir,
-  text,
-}) => {
+export const Arrow: FC<{
+  arrow: ArrowSchema;
+}> = ({ arrow }) => {
+  const {
+    id,
+    title: { text, dir },
+    origin: { id: originId, dir: originDir },
+    target: { id: targetId, dir: targetDir },
+  } = arrow;
+
   const ArrowParams = useGetArrowParams({
     originId,
     originDir,
@@ -149,9 +140,7 @@ export const Arrow: FC<ArrowProps> = ({
   return (
     <Group>
       <ArrowPointer ArrowParams={ArrowParams} />
-      <Group x={ArrowParams.midX} y={ArrowParams.midY}>
-        <ArrowLabel id={id} dir={dir} ArrowParams={ArrowParams} text={text} />
-      </Group>
+      <ArrowLabel id={id} dir={dir} ArrowParams={ArrowParams} text={text} />
     </Group>
   );
 };

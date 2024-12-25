@@ -59,10 +59,7 @@ export const CoverBoard: FC = () => {
       downloadLink.href = uri;
       downloadLink.download = `${saveId} ${formatDate(new Date())}.png`;
       downloadLink.click();
-
-      flushSync(() => {
-        setScreenshotUrl('');
-      });
+      setScreenshotUrl('');
     }
   }, [canvasLimits, saveId]);
   useKeysListener({ createGroup, takeScreenshot });
@@ -94,15 +91,14 @@ export const CoverBoard: FC = () => {
           onMouseDown={checkDeselect}
           onTouchStart={checkDeselect}>
           <Layer>
-            {screenshotUrl && (
-              <Rect
-                listening={false}
-                width={canvasLimits.width}
-                height={canvasLimits.height}
-                fill={backColor}
-                stroke={color}
-              />
-            )}
+            <Rect
+              listening={false}
+              width={canvasLimits.width}
+              height={canvasLimits.height}
+              fill={backColor}
+              stroke={color}
+            />
+
             <GroupCovers />
             <Arrows />
             <Covers />

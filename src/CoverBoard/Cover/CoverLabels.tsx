@@ -1,0 +1,93 @@
+import { FC } from 'react';
+
+import { useMainStore } from 'store';
+import { CommonLabelDraggable, CommonLabel } from 'CoverBoard/Common';
+import { CoverSchema, LabelTypes } from 'types';
+import { useGetSizesContext } from 'providers';
+import { useGetElementSizes } from 'utils';
+
+enum Offsets {
+  TITLE = LabelTypes.TITLE,
+  SUBTITLE = LabelTypes.SUBTITLE,
+  STAR = 'star',
+}
+
+export const CoverLabels: FC<{
+  cover: CoverSchema;
+}> = ({ cover }) => {
+  const {
+    id,
+    title: { text: titleText, dir: titleDir },
+    subtitle: { text: subtitleText, dir: subTitleDir },
+    pos: { x, y },
+    star: { dir: starDir },
+  } = cover;
+
+  const color = useMainStore((state) => state.getCoverColor());
+  const showTitle = useMainStore((state) => state.configs.covers.title.show);
+  const showSubtitle = useMainStore(
+    (state) => state.configs.covers.subtitle.show,
+  );
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const showStars = useMainStore((state) => state.configs.covers.rating.show);
+  const updateCover = useMainStore((state) => state.updateCover);
+
+  const { getOffset } = useGetElementSizes<Offsets>([
+    ...(titleText && showTitle ? [{ dir: titleDir, type: Offsets.TITLE }] : []),
+    ...(subtitleText && showSubtitle
+      ? [{ dir: subTitleDir, type: Offsets.SUBTITLE }]
+      : []),
+    ...(showStars ? [{ dir: starDir, type: Offsets.STAR }] : []),
+  ]);
+
+  return (
+    <>
+      {showTitle && titleText && (
+        <CommonLabelDraggable
+          updateDir={(dir) => updateCover(id, { title: { dir } })}
+          x={x}
+          y={y}
+          dir={titleDir}>
+          <CommonLabel
+            updateLabel={(text) => updateCover(id, { title: { text } })}
+            dir={titleDir}
+            coverLabel={LabelTypes.TITLE}
+            text={titleText}
+            id={id}
+            fontStyle="bold"
+            color={color}
+            x={-coverSizeWidth}
+            y={
+              coverSizeHeight +
+              getOffset({ dir: titleDir, type: Offsets.TITLE })
+            }
+            width={coverSizeWidth * 3}
+          />
+        </CommonLabelDraggable>
+      )}
+
+      {showSubtitle && subtitleText && (
+        <CommonLabelDraggable
+          updateDir={(dir) => updateCover(id, { subtitle: { dir } })}
+          x={x}
+          y={y}
+          dir={subTitleDir}>
+          <CommonLabel
+            updateLabel={(text) => updateCover(id, { subtitle: { text } })}
+            dir={subTitleDir}
+            coverLabel={LabelTypes.SUBTITLE}
+            text={subtitleText}
+            id={id}
+            color={color}
+            x={-coverSizeWidth}
+            y={
+              coverSizeHeight +
+              getOffset({ dir: subTitleDir, type: Offsets.SUBTITLE })
+            }
+            width={coverSizeWidth * 3}
+          />
+        </CommonLabelDraggable>
+      )}
+    </>
+  );
+};

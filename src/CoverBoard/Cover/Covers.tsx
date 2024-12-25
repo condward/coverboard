@@ -12,20 +12,7 @@ export const Covers: FC = () => {
   return (
     <>
       {covers.map((cover, index) => (
-        <MemoCover
-          key={cover.id}
-          id={cover.id}
-          titleText={cover.title.text}
-          subtitleText={cover.subtitle.text}
-          x={cover.pos.x}
-          y={cover.pos.y}
-          titleDir={cover.title.dir}
-          subTitleDir={cover.subtitle.dir}
-          starDir={cover.star.dir}
-          starCount={cover.star.count}
-          link={cover.link}
-          renderTime={400 * index}
-        />
+        <MemoCover key={cover.id} cover={cover} renderTime={400 * index} />
       ))}
     </>
   );

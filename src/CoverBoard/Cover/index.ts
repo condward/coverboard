@@ -5,3 +5,6 @@ export * from './CoverImage';
 export * from './CoverLoadImage';
 export * from './CoverStar';
 export * from './CoverCountLabel';
+export * from './CoverStars';
+export * from './CoverLabels';
+export * from './CoverDraggable';

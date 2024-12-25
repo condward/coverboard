@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { useSetAtom } from 'jotai';
+import { Group } from 'react-konva';
 
 import { ArrowParams, ArrowSchema, TextTypes } from 'types';
 import {
@@ -50,7 +51,7 @@ export const ArrowLabel: FC<ArrowProps> = ({ id, dir, ArrowParams, text }) => {
   if (!showLabel) return null;
 
   return (
-    <>
+    <Group x={ArrowParams.midX} y={ArrowParams.midY}>
       <ArrowLabelDraggable
         dir={dir}
         ArrowParams={ArrowParams}
@@ -71,6 +72,6 @@ export const ArrowLabel: FC<ArrowProps> = ({ id, dir, ArrowParams, text }) => {
         />
       </ArrowLabelDraggable>
       <ArrowCircle id={id} />
-    </>
+    </Group>
   );
 };

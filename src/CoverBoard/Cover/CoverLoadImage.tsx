@@ -1,22 +1,37 @@
 import { FC, useEffect, useState } from 'react';
-import { Rect, Text } from 'react-konva';
+import { Group, Rect, Text } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
+import { useSetAtom } from 'jotai';
 
 import { CoverSchema } from 'types';
-import { useMainStore } from 'store';
+import { selectedAtom, useIsSelected, useMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 import { CoverImage } from '.';
 
 interface CoverImageProps {
+  id: CoverSchema['id'];
   link: CoverSchema['link'];
   renderTime: number;
 }
 
-export const CoverLoadImage: FC<CoverImageProps> = ({ link, renderTime }) => {
+export const CoverLoadImage: FC<CoverImageProps> = ({
+  id,
+  link,
+  renderTime,
+}) => {
   const color = useMainStore((state) => state.getColor());
   const backColor = useMainStore((state) => state.getBackColor());
   const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
+  const setSelected = useSetAtom(selectedAtom);
+  const isSelected = useIsSelected(id);
+
+  const refreshCovers = useMainStore((state) => state.refreshCovers);
+  const handleSelect = () => {
+    setSelected({ id, open: isSelected });
+    refreshCovers(id);
+  };
 
   const [shouldRender, setShouldRender] = useState(false);
   const [hasRetries, setHasRetries] = useState(false);
@@ -41,7 +56,7 @@ export const CoverLoadImage: FC<CoverImageProps> = ({ link, renderTime }) => {
   }, [hasRetries, renderTime, shouldRender]);
 
   return (
-    <>
+    <Group onClick={handleSelect} onTap={handleSelect}>
       <Rect
         width={coverSizeWidth - 2}
         height={coverSizeHeight - 2}
@@ -64,6 +79,6 @@ export const CoverLoadImage: FC<CoverImageProps> = ({ link, renderTime }) => {
           text="Loading..."
         />
       )}
-    </>
+    </Group>
   );
 };
