@@ -1,8 +1,9 @@
 import { FC } from 'react';
 import { useSetAtom } from 'jotai';
 import { Group } from 'react-konva';
+import { useShallow } from 'zustand/react/shallow';
 
-import { ArrowParams, ArrowSchema, TextTypes } from 'types';
+import { ArrowParams, TextTypes } from 'types';
 import {
   editingTextAtom,
   useIsCurrentTextSelected,
@@ -15,13 +16,25 @@ import { useGetSizesContext } from 'providers';
 import { ArrowCircle, ArrowLabelDraggable } from '.';
 
 interface ArrowProps {
-  id: ArrowSchema['id'];
-  dir: ArrowSchema['title']['dir'];
-  text: ArrowSchema['title']['text'];
+  index: number;
   ArrowParams: ArrowParams;
 }
 
-export const ArrowLabel: FC<ArrowProps> = ({ id, dir, ArrowParams, text }) => {
+export const ArrowLabel: FC<ArrowProps> = ({ index, ArrowParams }) => {
+  const { text, dir, id } = useMainStore(
+    useShallow((state) => {
+      const {
+        title: { text, dir },
+        id,
+      } = state.getArrowByIdx(index);
+
+      return {
+        text,
+        dir,
+        id,
+      };
+    }),
+  );
   const { fontSize, coverSizeWidth } = useGetSizesContext();
   const color = useMainStore((state) => state.getArrowColor());
   const updateArrow = useMainStore((state) => state.updateArrow);

@@ -1,8 +1,9 @@
 import { FC } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useMainStore } from 'store';
 import { CommonLabelDraggable, CommonLabel } from 'CoverBoard/Common';
-import { CoverSchema, LabelTypes } from 'types';
+import { LabelTypes } from 'types';
 import { useGetSizesContext } from 'providers';
 import { useGetElementSizes } from 'utils';
 
@@ -13,15 +14,31 @@ enum Offsets {
 }
 
 export const CoverLabels: FC<{
-  cover: CoverSchema;
-}> = ({ cover }) => {
-  const {
-    id,
-    title: { text: titleText, dir: titleDir },
-    subtitle: { text: subtitleText, dir: subTitleDir },
-    pos: { x, y },
-    star: { dir: starDir },
-  } = cover;
+  index: number;
+}> = ({ index }) => {
+  const { id, titleText, titleDir, subtitleText, subTitleDir, x, y, starDir } =
+    useMainStore(
+      useShallow((state) => {
+        const {
+          id,
+          title: { text: titleText, dir: titleDir },
+          subtitle: { text: subtitleText, dir: subTitleDir },
+          pos: { x, y },
+          star: { dir: starDir },
+        } = state.getCoverByIdx(index);
+
+        return {
+          id,
+          titleText,
+          titleDir,
+          subtitleText,
+          subTitleDir,
+          x,
+          y,
+          starDir,
+        };
+      }),
+    );
 
   const color = useMainStore((state) => state.getCoverColor());
   const showTitle = useMainStore((state) => state.configs.covers.title.show);

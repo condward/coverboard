@@ -1,19 +1,31 @@
 import { FC, ReactNode } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
-import { GroupSchema } from 'types';
 import { useMainStore } from 'store';
 import { CommonDraggable } from 'CoverBoard/Common';
 import { useGetMaxBoundaries } from 'utils';
 
 export const GroupDraggable: FC<{
-  group: GroupSchema;
+  index: number;
   children: ReactNode[];
-}> = ({ group, children }) => {
-  const {
-    id,
-    pos: { x, y },
-    scale: { x: scaleX, y: scaleY },
-  } = group;
+}> = ({ index, children }) => {
+  const { id, x, y, scaleX, scaleY } = useMainStore(
+    useShallow((state) => {
+      const {
+        id,
+        pos: { x, y },
+        scale: { x: scaleX, y: scaleY },
+      } = state.getGroupByIdx(index);
+
+      return {
+        id,
+        x,
+        y,
+        scaleX,
+        scaleY,
+      };
+    }),
+  );
 
   const updateGroup = useMainStore((state) => state.updateGroup);
 

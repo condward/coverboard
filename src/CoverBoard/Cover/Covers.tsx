@@ -1,18 +1,19 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useMainStore } from 'store';
 
 import { Cover } from './Cover';
 
-const MemoCover = memo(Cover);
-
 export const Covers: FC = () => {
-  const covers = useMainStore((state) => state.covers);
+  const coverIds = useMainStore(
+    useShallow((state) => state.covers.map((cover) => cover.id)),
+  );
 
   return (
     <>
-      {covers.map((cover, index) => (
-        <MemoCover key={cover.id} cover={cover} renderTime={400 * index} />
+      {coverIds.map((id, index) => (
+        <Cover key={id} index={index} />
       ))}
     </>
   );

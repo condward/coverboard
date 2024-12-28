@@ -2,24 +2,25 @@ import { FC, useEffect, useState } from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useSetAtom } from 'jotai';
+import { useShallow } from 'zustand/react/shallow';
 
-import { CoverSchema } from 'types';
 import { selectedAtom, useIsSelected, useMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 import { CoverImage } from '.';
 
-interface CoverImageProps {
-  id: CoverSchema['id'];
-  link: CoverSchema['link'];
-  renderTime: number;
-}
+export const CoverLoadImage: FC<{
+  index: number;
+}> = ({ index }) => {
+  const { link, id } = useMainStore(
+    useShallow((state) => {
+      const { link, id } = state.getCoverByIdx(index);
 
-export const CoverLoadImage: FC<CoverImageProps> = ({
-  id,
-  link,
-  renderTime,
-}) => {
+      return { link, id };
+    }),
+  );
+  const renderTime = 400 * index;
+
   const color = useMainStore((state) => state.getColor());
   const backColor = useMainStore((state) => state.getBackColor());
   const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();

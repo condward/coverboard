@@ -4,8 +4,9 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { useAtom, useAtomValue } from 'jotai';
 import { ZodError } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
+import { useShallow } from 'zustand/react/shallow';
 
-import { CoverSchema, PosTypes } from 'types';
+import { PosTypes } from 'types';
 import {
   useMainStore,
   pointsAtom,
@@ -16,12 +17,11 @@ import {
 import { useGetSizesContext } from 'providers';
 
 interface CommonDrawArrowProps {
-  id: CoverSchema['id'];
-  scaleX?: number;
-  scaleY?: number;
+  index: number;
+  type: 'cover' | 'group';
 }
 
-const useShowArrow = (id: CommonDrawArrowProps['id']) => {
+const useShowArrow = (id: string) => {
   const covers = useMainStore((state) => state.covers);
   const points = useAtomValue(pointsAtom);
   const groups = useMainStore((state) => state.groups);
@@ -52,11 +52,28 @@ const useShowArrow = (id: CommonDrawArrowProps['id']) => {
   return true;
 };
 
-export const CommonDrawArrow: FC<CommonDrawArrowProps> = ({
-  id,
-  scaleX = 1,
-  scaleY = 1,
-}) => {
+export const CommonDrawArrow: FC<CommonDrawArrowProps> = ({ index, type }) => {
+  const { id, scaleX, scaleY } = useMainStore(
+    useShallow((state) => {
+      if (type === 'group') {
+        const { scale, id } = state.getGroupByIdx(index);
+
+        return {
+          scaleX: scale.x,
+          scaleY: scale.y,
+          id,
+        };
+      } else {
+        const { id } = state.getCoverByIdx(index);
+
+        return {
+          scaleX: 1,
+          scaleY: 1,
+          id,
+        };
+      }
+    }),
+  );
   const points = useAtomValue(pointsAtom);
   const isSelected = useIsSelected(id);
   const showArrow = useShowArrow(id);
@@ -66,11 +83,11 @@ export const CommonDrawArrow: FC<CommonDrawArrowProps> = ({
   return <CommonDrawArrowChild id={id} scaleX={scaleX} scaleY={scaleY} />;
 };
 
-const CommonDrawArrowChild: FC<CommonDrawArrowProps> = ({
-  id,
-  scaleX = 1,
-  scaleY = 1,
-}) => {
+const CommonDrawArrowChild: FC<{
+  id: string;
+  scaleX: number;
+  scaleY: number;
+}> = ({ id, scaleX, scaleY }) => {
   const [points, setPoints] = useAtom(pointsAtom);
   const isSelected = useIsSelected(id);
   const selected = useAtomValue(selectedAtom);
@@ -177,37 +194,6 @@ const CommonDrawArrowChild: FC<CommonDrawArrowProps> = ({
     ],
   );
 
-  const posArray = [
-    {
-      dir: PosTypes.TOP,
-      x: (coverSizeWidth * scaleX) / 2,
-      y: -square / 1.5,
-      width: square,
-      height: square,
-    },
-    {
-      dir: PosTypes.RIGHT,
-      x: coverSizeWidth * scaleX,
-      y: (coverSizeHeight * scaleY) / 2 - square / 1.5,
-      width: square,
-      height: square,
-    },
-    {
-      dir: PosTypes.LEFT,
-      x: 0,
-      y: (coverSizeHeight * scaleY) / 2 - square / 1.5,
-      width: square,
-      height: square,
-    },
-    {
-      dir: PosTypes.BOTTOM,
-      x: (coverSizeWidth * scaleX) / 2,
-      y: coverSizeHeight * scaleY - square / 1.5,
-      width: square,
-      height: square,
-    },
-  ];
-
   useEffect(() => {
     if (!isSelected) return;
 
@@ -276,6 +262,37 @@ const CommonDrawArrowChild: FC<CommonDrawArrowProps> = ({
     updateCover,
     updateGroup,
   ]);
+
+  const posArray = [
+    {
+      dir: PosTypes.TOP,
+      x: (coverSizeWidth * scaleX) / 2,
+      y: -square / 1.5,
+      width: square,
+      height: square,
+    },
+    {
+      dir: PosTypes.RIGHT,
+      x: coverSizeWidth * scaleX,
+      y: (coverSizeHeight * scaleY) / 2 - square / 1.5,
+      width: square,
+      height: square,
+    },
+    {
+      dir: PosTypes.LEFT,
+      x: 0,
+      y: (coverSizeHeight * scaleY) / 2 - square / 1.5,
+      width: square,
+      height: square,
+    },
+    {
+      dir: PosTypes.BOTTOM,
+      x: (coverSizeWidth * scaleX) / 2,
+      y: coverSizeHeight * scaleY - square / 1.5,
+      width: square,
+      height: square,
+    },
+  ];
 
   return (
     <Group>

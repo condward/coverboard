@@ -1,19 +1,32 @@
 import { FC, useRef, useEffect } from 'react';
 import { Group, Rect, Transformer } from 'react-konva';
+import { useShallow } from 'zustand/react/shallow';
 import Konva from 'konva';
 import { useSetAtom } from 'jotai';
 
-import { GroupSchema } from 'types';
 import { useMainStore, useIsSelected, selectedAtom } from 'store';
 import { useGetSizesContext } from 'providers';
 
 interface CoverImageProps {
-  id: GroupSchema['id'];
-  scaleX: GroupSchema['scale']['x'];
-  scaleY: GroupSchema['scale']['y'];
+  index: number;
 }
 
-export const GroupSquare: FC<CoverImageProps> = ({ id, scaleX, scaleY }) => {
+export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
+  const { scaleX, scaleY, id } = useMainStore(
+    useShallow((state) => {
+      const {
+        scale: { x: scaleX, y: scaleY },
+        id,
+      } = state.getGroupByIdx(index);
+
+      return {
+        scaleX,
+        scaleY,
+        id,
+      };
+    }),
+  );
+
   const isSelected = useIsSelected(id);
   const color = useMainStore((state) => state.getGroupColor());
   const groupBackColor = useMainStore((state) => state.getGroupBackColor());

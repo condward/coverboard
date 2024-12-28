@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Group } from 'react-konva';
+import { useShallow } from 'zustand/react/shallow';
 
 import { ArrowParams, ArrowSchema, PosTypes } from 'types';
 import { useMainStore } from 'store';
@@ -119,14 +120,23 @@ const useGetArrowParams = ({
 };
 
 export const Arrow: FC<{
-  arrow: ArrowSchema;
-}> = ({ arrow }) => {
-  const {
-    id,
-    title: { text, dir },
-    origin: { id: originId, dir: originDir },
-    target: { id: targetId, dir: targetDir },
-  } = arrow;
+  index: number;
+}> = ({ index }) => {
+  const { originId, originDir, targetId, targetDir } = useMainStore(
+    useShallow((state) => {
+      const {
+        origin: { id: originId, dir: originDir },
+        target: { id: targetId, dir: targetDir },
+      } = state.getArrowByIdx(index);
+
+      return {
+        originId,
+        originDir,
+        targetId,
+        targetDir,
+      };
+    }),
+  );
 
   const ArrowParams = useGetArrowParams({
     originId,
@@ -140,7 +150,7 @@ export const Arrow: FC<{
   return (
     <Group>
       <ArrowPointer ArrowParams={ArrowParams} />
-      <ArrowLabel id={id} dir={dir} ArrowParams={ArrowParams} text={text} />
+      <ArrowLabel index={index} ArrowParams={ArrowParams} />
     </Group>
   );
 };

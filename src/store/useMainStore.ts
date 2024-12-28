@@ -8,7 +8,13 @@ import type { DeepPartial } from 'react-hook-form';
 
 import { sizeAtom, store } from 'store';
 
-import { CoverSchema, AppSchema, GroupSchema, appSchema } from 'types';
+import {
+  CoverSchema,
+  AppSchema,
+  GroupSchema,
+  ArrowSchema,
+  appSchema,
+} from 'types';
 import { DEFAULT_KEY, NAME_SPACE } from 'utils';
 
 import {
@@ -52,6 +58,9 @@ interface CoverContextData {
   getCoversInsideGroup: (coverId: string) => CoverSchema[];
   getGroupsOfCover: (coverId: string) => GroupSchema[];
   getGroupsOfGroup: (groupId: string) => GroupSchema[];
+  getGroupByIdx: (groupId: number) => GroupSchema;
+  getCoverByIdx: (coverId: number) => CoverSchema;
+  getArrowByIdx: (arrowId: number) => ArrowSchema;
 }
 
 type MainStoreUnion = UseCoverParams &
@@ -81,6 +90,15 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
   },
   resetStoreValues() {
     set(defaultValues());
+  },
+  getGroupByIdx(groupIdx) {
+    return get().groups[groupIdx];
+  },
+  getCoverByIdx(coverIdx) {
+    return get().covers[coverIdx];
+  },
+  getArrowByIdx(arrowIdx) {
+    return get().arrows[arrowIdx];
   },
   getGroupBounds(groupId) {
     const group = get().groups.find(

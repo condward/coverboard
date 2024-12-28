@@ -1,7 +1,8 @@
 import { FC } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useMainStore } from 'store';
-import { CoverSchema, LabelTypes } from 'types';
+import { LabelTypes } from 'types';
 import { useGetElementSizes } from 'utils';
 
 import { CoverStar, CoverStarDraggable } from '.';
@@ -13,15 +14,41 @@ enum Offsets {
 }
 
 export const CoverStars: FC<{
-  cover: CoverSchema;
-}> = ({ cover }) => {
+  index: number;
+}> = ({ index }) => {
   const {
     id,
-    title: { text: titleText, dir: titleDir },
-    subtitle: { text: subtitleText, dir: subTitleDir },
-    pos: { x, y },
-    star: { dir: starDir, count: starCount },
-  } = cover;
+    titleText,
+    titleDir,
+    subtitleText,
+    subTitleDir,
+    x,
+    y,
+    starDir,
+    starCount,
+  } = useMainStore(
+    useShallow((state) => {
+      const {
+        id,
+        title: { text: titleText, dir: titleDir },
+        subtitle: { text: subtitleText, dir: subTitleDir },
+        pos: { x, y },
+        star: { dir: starDir, count: starCount },
+      } = state.getCoverByIdx(index);
+
+      return {
+        id,
+        titleText,
+        titleDir,
+        subtitleText,
+        subTitleDir,
+        x,
+        y,
+        starDir,
+        starCount,
+      };
+    }),
+  );
 
   const showTitle = useMainStore((state) => state.configs.covers.title.show);
   const showSubtitle = useMainStore(

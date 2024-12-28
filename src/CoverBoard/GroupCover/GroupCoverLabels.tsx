@@ -1,21 +1,39 @@
 import { FC } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
-import { GroupSchema, LabelTypes } from 'types';
+import { LabelTypes } from 'types';
 import { useMainStore } from 'store';
 import { CommonLabelDraggable, CommonLabel } from 'CoverBoard/Common';
 import { useGetSizesContext } from 'providers';
 import { useGetElementSizes } from 'utils';
 
 export const GroupCoverLabels: FC<{
-  group: GroupSchema;
-}> = ({ group }) => {
-  const {
-    id,
-    title: { text: titleText, dir },
-    subtitle: { text: subtitleText, dir: subDir },
-    pos: { x, y },
-    scale: { x: scaleX, y: scaleY },
-  } = group;
+  index: number;
+}> = ({ index }) => {
+  const { id, titleText, dir, subtitleText, subDir, x, y, scaleX, scaleY } =
+    useMainStore(
+      useShallow((state) => {
+        const {
+          id,
+          title: { text: titleText, dir },
+          subtitle: { text: subtitleText, dir: subDir },
+          pos: { x, y },
+          scale: { x: scaleX, y: scaleY },
+        } = state.getGroupByIdx(index);
+
+        return {
+          id,
+          titleText,
+          dir,
+          subtitleText,
+          subDir,
+          x,
+          y,
+          scaleX,
+          scaleY,
+        };
+      }),
+    );
 
   const color = useMainStore((state) => state.getGroupColor());
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();

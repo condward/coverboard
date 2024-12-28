@@ -1,18 +1,19 @@
-import { FC, memo } from 'react';
+import { FC } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useMainStore } from 'store';
 
 import { Arrow } from './Arrow';
 
-const MemoArrow = memo(Arrow);
-
 export const Arrows: FC = () => {
-  const arrows = useMainStore((state) => state.arrows);
+  const arrowIds = useMainStore(
+    useShallow((state) => state.arrows.map((arrow) => arrow.id)),
+  );
 
   return (
     <>
-      {arrows.map((arrow) => (
-        <MemoArrow key={arrow.id} arrow={arrow} />
+      {arrowIds.map((id, index) => (
+        <Arrow key={id} index={index} />
       ))}
     </>
   );
