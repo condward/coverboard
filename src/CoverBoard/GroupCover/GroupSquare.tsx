@@ -1,53 +1,62 @@
 import { FC, useRef, useEffect } from 'react';
 import { Group, Rect, Transformer } from 'react-konva';
-import { useShallow } from 'zustand/react/shallow';
+
 import Konva from 'konva';
 import { useSetAtom } from 'jotai';
 
-import { useMainStore, useIsSelected, selectedAtom } from 'store';
+import { useShallowMainStore, useGetSelectedId, selectedAtom } from 'store';
 import { useGetSizesContext } from 'providers';
+import { KeyboardShortcuts } from 'types';
 
 interface CoverImageProps {
   index: number;
 }
 
 export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
-  const { scaleX, scaleY, id } = useMainStore(
-    useShallow((state) => {
-      const {
-        scale: { x: scaleX, y: scaleY },
-        id,
-      } = state.getGroupByIdx(index);
+  const {
+    scaleX,
+    scaleY,
+    id,
+    color,
+    groupBackColor,
+    updateGroupScale,
+    removeCoverAndRelatedArrows,
+    removeGroupAndRelatedArrows,
+    refreshGroups,
+    getCovers,
+    getGroups,
+  } = useShallowMainStore((state) => {
+    const {
+      scale: { x: scaleX, y: scaleY },
+      id,
+    } = state.getGroupByIdx(index);
 
-      return {
-        scaleX,
-        scaleY,
-        id,
-      };
-    }),
-  );
-
-  const isSelected = useIsSelected(id);
-  const color = useMainStore((state) => state.getGroupColor());
-  const groupBackColor = useMainStore((state) => state.getGroupBackColor());
+    return {
+      scaleX,
+      scaleY,
+      id,
+      color: state.getGroupColor(),
+      groupBackColor: state.getGroupBackColor(),
+      updateGroupScale: state.updateGroupScale,
+      removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
+      removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
+      refreshGroups: state.refreshGroups,
+      getCovers: state.getCovers,
+      getGroups: state.getGroups,
+    };
+  });
+  const selectedId = useGetSelectedId(id);
 
   const boxRef = useRef<null | { width: number; height: number }>(null);
-
-  const updateGroupScale = useMainStore((state) => state.updateGroupScale);
 
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const coverSizeWidthScaled = coverSizeWidth * scaleX;
   const coverSizeHeightScaled = coverSizeHeight * scaleY;
 
-  const removeCoverAndRelatedArrows = useMainStore(
-    (state) => state.removeGroupAndRelatedArrows,
-  );
-
   const setSelected = useSetAtom(selectedAtom);
-  const refreshGroups = useMainStore((state) => state.refreshGroups);
 
   const handlesSelect = () => {
-    setSelected({ id, open: isSelected });
+    setSelected({ id, open: !!selectedId });
     refreshGroups(id);
   };
 
@@ -55,10 +64,74 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
   const trRef = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
-    if (trRef.current && rectRef.current && isSelected) {
+    if (trRef.current && rectRef.current && selectedId) {
       trRef.current.nodes([rectRef.current]);
     }
-  }, [isSelected, removeCoverAndRelatedArrows]);
+  }, [selectedId, removeCoverAndRelatedArrows]);
+
+  useEffect(() => {
+    if (!selectedId) return;
+
+    const keyFn = (e: KeyboardEvent) => {
+      if (
+        e.key === 'Delete' ||
+        (e.key as KeyboardShortcuts) === KeyboardShortcuts.DELETE
+      ) {
+        removeGroupAndRelatedArrows(selectedId);
+        e.preventDefault();
+      } else if (e.key === 'Escape') {
+        setSelected(null);
+        e.preventDefault();
+      } else if (e.key === 'Enter') {
+        setSelected({ id: selectedId, open: true });
+        e.preventDefault();
+      } else if ((e.key as KeyboardShortcuts) === KeyboardShortcuts.NEXT) {
+        const groups = getGroups();
+        const covers = getCovers();
+        if (index > -1 && Boolean(groups[index - 1])) {
+          setSelected({
+            id: groups[index - 1].id,
+            open: false,
+          });
+          e.preventDefault();
+        } else if (covers.length > 0) {
+          setSelected({
+            id: covers[covers.length - 1].id,
+            open: false,
+          });
+          e.preventDefault();
+        } else {
+          setSelected({
+            id: groups[groups.length - 1].id,
+            open: false,
+          });
+          e.preventDefault();
+        }
+      } else if ((e.key as KeyboardShortcuts) === KeyboardShortcuts.PREV) {
+        const groups = getGroups();
+        if (index > -1 && Boolean(groups[index + 1])) {
+          setSelected({
+            id: groups[index + 1].id,
+            open: false,
+          });
+          e.preventDefault();
+        } else {
+          setSelected({ id: groups[0].id, open: false });
+          e.preventDefault();
+        }
+      }
+    };
+    window.addEventListener('keydown', keyFn);
+
+    return () => window.removeEventListener('keydown', keyFn);
+  }, [
+    getCovers,
+    getGroups,
+    index,
+    selectedId,
+    removeGroupAndRelatedArrows,
+    setSelected,
+  ]);
 
   const handleTransform = () => {
     if (rectRef.current && boxRef.current) {
@@ -90,7 +163,7 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
         ref={rectRef}
         onTransformEnd={handleTransform}
       />
-      {isSelected && (
+      {selectedId && (
         <Transformer
           ref={trRef}
           centeredScaling

@@ -6,7 +6,6 @@ import {
   AddOutlined,
   DeleteOutlined,
   HideSourceOutlined,
-  SaveOutlined,
 } from '@mui/icons-material';
 
 import {
@@ -23,8 +22,9 @@ import {
   SliderInput,
   DirectionRadio,
   FieldSet,
+  SubmitButton,
 } from 'components';
-import { useMainStore, useToastStore } from 'store';
+import { useShallowMainStore, useToastStore } from 'store';
 
 import { formatLabel } from 'utils';
 import { useGetSizesContext } from 'providers';
@@ -45,14 +45,22 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   covers,
   maxBounds,
 }) => {
-  const media = useMainStore((state) => state.configs.media);
-  const removeCoverAndRelatedArrows = useMainStore(
-    (state) => state.removeCoverAndRelatedArrows,
-  );
+  const {
+    media,
+    removeCoverAndRelatedArrows,
+    updateCover,
+    scale,
+    heightRatio,
+  } = useShallowMainStore((state) => ({
+    media: state.configs.media,
+    removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
+    updateCover: state.updateCover,
+    scale: state.configs.layout.scale,
+    heightRatio: state.getHeightRatio(),
+  }));
+
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const updateCover = useMainStore((state) => state.updateCover);
-  const scale = useMainStore((state) => state.configs.layout.scale);
-  const heightRatio = useMainStore((state) => state.getHeightRatio());
+
   const { canvasLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
   const offLimitCovers = covers.flatMap((covers) => {
@@ -364,14 +372,10 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             onClick={handleBringToScreen}>
             Bring to screen
           </Button>
-          <Button
+          <SubmitButton
+            control={control}
             disabled={watch('ids').length === 0}
-            variant="contained"
-            color="primary"
-            type="submit"
-            startIcon={<SaveOutlined />}>
-            Save
-          </Button>
+          />
         </Stack>
       }
       onSubmit={onSubmit}

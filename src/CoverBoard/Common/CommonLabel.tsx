@@ -6,7 +6,7 @@ import {
   editingTextAtom,
   pointsAtom,
   useIsCurrentTextSelected,
-  useIsSelected,
+  useGetSelectedId,
   useMainStore,
 } from 'store';
 
@@ -29,9 +29,9 @@ interface CommonLabelProps {
 
 export const CommonLabel: FC<CommonLabelProps> = (props) => {
   const editArrows = useAtomValue(pointsAtom);
-  const isSelected = useIsSelected(props.id);
+  const selectedId = useGetSelectedId(props.id);
 
-  if (editArrows || isSelected) return null;
+  if (editArrows || selectedId) return null;
 
   return <CommonLabelChild {...props} />;
 };

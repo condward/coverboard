@@ -9,7 +9,6 @@ import {
   HideSourceOutlined,
   InfoOutlined,
   LinkOutlined,
-  SaveOutlined,
 } from '@mui/icons-material';
 
 import {
@@ -18,9 +17,10 @@ import {
   ToolConfigIDs,
   configSchema,
   SPACING_GAP,
+  KeyboardShortcuts,
 } from 'types';
-import { CommonDialog } from 'components';
-import { hideToolbarAtom, useMainStore, useToastStore } from 'store';
+import { CommonDialog, SubmitButton } from 'components';
+import { hideToolbarAtom, useShallowMainStore, useToastStore } from 'store';
 import { CoverboardOverview } from 'components/Popovers/ElemPopovers/connections';
 
 import { ToolbarConfigForm } from './ToolbarConfigForm';
@@ -28,24 +28,30 @@ import { ToolbarConfigForm } from './ToolbarConfigForm';
 export const ToolbarConfigPopover: FC<{
   onClose: () => void;
 }> = ({ onClose }) => {
-  const configs = useMainStore((state) => state.configs);
-  const groupsLength = useMainStore((state) => state.groups.length);
-  const coversLength = useMainStore((state) => state.covers.length);
-  const totalLength = groupsLength + coversLength;
-
-  const updateConfigs = useMainStore((state) => state.updateConfigs);
-  const updateAllCovers = useMainStore((state) => state.updateAllCovers);
-  const updateAllGroups = useMainStore((state) => state.updateAllGroups);
-  const updateAllArrows = useMainStore((state) => state.updateAllArrows);
+  const {
+    configs,
+    totalLength,
+    updateConfigs,
+    updateAllCovers,
+    updateAllGroups,
+    updateAllArrows,
+  } = useShallowMainStore((state) => ({
+    configs: state.configs,
+    totalLength: state.groups.length + state.covers.length,
+    updateConfigs: state.updateConfigs,
+    updateAllCovers: state.updateAllCovers,
+    updateAllGroups: state.updateAllGroups,
+    updateAllArrows: state.updateAllArrows,
+  }));
 
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const [isToolbarHidden, setHideToolBar] = useAtom(hideToolbarAtom);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isDirty },
-  } = useForm<ConfigSchema, unknown, ConfigSchemaOutput>({
+  const { control, handleSubmit } = useForm<
+    ConfigSchema,
+    unknown,
+    ConfigSchemaOutput
+  >({
     resolver: zodResolver(
       configSchema.extend({
         layout: configSchema.shape.layout.extend({
@@ -117,18 +123,20 @@ export const ToolbarConfigPopover: FC<{
           title={
             <>
               <h3>Toolbar (no selections)</h3>
-              <p>A - open Search and add</p>
-              <p>O - open Options</p>
-              <p>S - open Share and save</p>
-              <p>G - create group</p>
-              <p>C - download image of board</p>
-              <p>U or CTRL+Z - undo</p>
-              <p>H - toggle show and hide toolbar</p>
+              <p>{KeyboardShortcuts.SEARCH} - open Search and add</p>
+              <p>{KeyboardShortcuts.CONFIG} - open Options</p>
+              <p>{KeyboardShortcuts.SHARE} - open Share and save</p>
+              <p>{KeyboardShortcuts.GROUP} - create group</p>
+              <p>{KeyboardShortcuts.SCREENSHOT} - download image of board</p>
+              <p>{KeyboardShortcuts.UNDO} or CTRL+Z - undo</p>
+              <p>
+                {KeyboardShortcuts.HIDE_TOOLBAR} - toggle show and hide toolbar
+              </p>
               <h3>Misc.</h3>
-              <p>E - edit title</p>
-              <p>F - toggle fit to screen</p>
-              <p>N - next cover and group</p>
-              <p>P - prev cover or group</p>
+              <p>{KeyboardShortcuts.TITLE} - edit title</p>
+              <p>{KeyboardShortcuts.FIT_SCREEN} - toggle fit to screen</p>
+              <p>{KeyboardShortcuts.NEXT} - next cover and group</p>
+              <p>{KeyboardShortcuts.PREV} - prev cover or group</p>
               <h3>When elem selected</h3>
               <p>Delete - delete elem</p>
               <p>Enter - open config popover</p>
@@ -165,14 +173,7 @@ export const ToolbarConfigPopover: FC<{
             }}>
             {isToolbarHidden ? 'Show Toolbar' : 'Hide Toolbar'}
           </Button>
-          <Button
-            disabled={!isDirty}
-            variant="contained"
-            color="primary"
-            startIcon={<SaveOutlined />}
-            type="submit">
-            Save
-          </Button>
+          <SubmitButton control={control} />
         </Stack>
       }
     />

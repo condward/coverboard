@@ -1,22 +1,50 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Circle, Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useSetAtom } from 'jotai';
 
-import { selectedAtom, useIsSelected, useMainStore } from 'store';
-import { ArrowSchema } from 'types';
+import { selectedAtom, useGetSelectedId, useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
+import { KeyboardShortcuts } from 'types';
 
-export const ArrowCircle: FC<{ id: ArrowSchema['id'] }> = ({ id }) => {
+export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
+  const { id, color, showArrow, removeArrow } = useShallowMainStore((state) => {
+    const { id } = state.getArrowByIdx(index);
+
+    return {
+      id,
+      color: state.getArrowColor(),
+      showArrow: state.configs.arrows.circle.show,
+      removeArrow: state.removeArrow,
+    };
+  });
   const { circleRadius } = useGetSizesContext();
-  const isSelected = useIsSelected(id);
+  const selectedId = useGetSelectedId(id);
   const setSelected = useSetAtom(selectedAtom);
-  const color = useMainStore((state) => state.getArrowColor());
-  const showArrow = useMainStore((state) => state.configs.arrows.circle.show);
 
   const handleSelect = () => {
-    setSelected({ id, open: isSelected });
+    setSelected({ id, open: !!selectedId });
   };
+
+  useEffect(() => {
+    if (!selectedId) return;
+
+    const keyFn = (e: KeyboardEvent) => {
+      if (
+        e.key === 'Delete' ||
+        (e.key as KeyboardShortcuts) === KeyboardShortcuts.DELETE
+      ) {
+        removeArrow(selectedId);
+        e.preventDefault();
+      } else if (e.key === 'Escape') {
+        setSelected(null);
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', keyFn);
+
+    return () => window.removeEventListener('keydown', keyFn);
+  }, [removeArrow, selectedId, setSelected]);
 
   if (!showArrow) return null;
 
@@ -27,10 +55,10 @@ export const ArrowCircle: FC<{ id: ArrowSchema['id'] }> = ({ id }) => {
       onClick={handleSelect}
       onTap={handleSelect}>
       <Circle
-        radius={isSelected ? circleRadius * 1.4 : circleRadius}
+        radius={selectedId ? circleRadius * 1.4 : circleRadius}
         fill={color}
         onMouseMove={(evt: KonvaEventObject<MouseEvent>) => {
-          if (!isSelected) {
+          if (!selectedId) {
             evt.currentTarget.scaleX(1.4);
             evt.currentTarget.scaleY(1.4);
           }
@@ -41,7 +69,7 @@ export const ArrowCircle: FC<{ id: ArrowSchema['id'] }> = ({ id }) => {
           }
         }}
         onMouseLeave={(evt: KonvaEventObject<MouseEvent>) => {
-          if (!isSelected) {
+          if (!selectedId) {
             evt.currentTarget.scaleX(1);
             evt.currentTarget.scaleY(1);
           }

@@ -2,7 +2,7 @@ import { Stack, Chip } from '@mui/material';
 import { LinkOutlined } from '@mui/icons-material';
 import { FC } from 'react';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { SPACING_GAP } from 'types';
 import { FieldSet } from 'components/FieldSet';
 import { formatLabel } from 'utils';
@@ -16,12 +16,13 @@ export const ParentGroupsOfCover: FC<ParentGroupsOfCoverProps> = ({
   coverId,
   onChange,
 }) => {
-  const groupsOfCover = useMainStore((state) =>
-    state.getGroupsOfCover(coverId),
+  const { getGroupsOfCover, removeGroupAndRelatedArrows } = useShallowMainStore(
+    (state) => ({
+      getGroupsOfCover: state.getGroupsOfCover,
+      removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
+    }),
   );
-  const removeGroupAndRelatedArrows = useMainStore(
-    (state) => state.removeGroupAndRelatedArrows,
-  );
+  const groupsOfCover = getGroupsOfCover(coverId);
 
   if (groupsOfCover.length === 0) return null;
 

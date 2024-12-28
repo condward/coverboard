@@ -1,14 +1,26 @@
 import { FC } from 'react';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 import { BoundaryArrow } from './BoundaryArrow';
 
 export const BoundaryGroupArrows: FC = () => {
   const { canvasLimits } = useGetSizesContext();
-  const groups = useMainStore((state) => state.groups);
-  const scale = useMainStore((state) => state.configs.layout.scale);
+
+  const {
+    groups,
+    scale,
+    updateGroup,
+    removeGroupAndRelatedArrows,
+    groupColor,
+  } = useShallowMainStore((state) => ({
+    groups: state.groups,
+    scale: state.configs.layout.scale,
+    updateGroup: state.updateGroup,
+    removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
+    groupColor: state.getGroupColor(),
+  }));
 
   const offLimitGroups = groups.flatMap((group) => {
     if (
@@ -20,11 +32,6 @@ export const BoundaryGroupArrows: FC = () => {
 
     return [];
   });
-  const updateGroup = useMainStore((state) => state.updateGroup);
-  const removeGroupAndRelatedArrows = useMainStore(
-    (state) => state.removeGroupAndRelatedArrows,
-  );
-  const groupColor = useMainStore((state) => state.getGroupColor());
 
   return (
     <>

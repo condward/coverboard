@@ -13,3 +13,4 @@ export * from './BackColorPicker';
 export * from './ShowSwitch';
 export * from './Toolbar';
 export * from './Logo';
+export * from './SubmitButton';

@@ -2,7 +2,7 @@ import { Stack } from '@mui/material';
 import { FC } from 'react';
 
 import { SPACING_GAP } from 'types';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 
 import { NavigationBar } from './NavigationBar';
 import { ArrowsOfCoverOrigin } from './ArrowsOfCoverOrigin';
@@ -22,10 +22,11 @@ export const GroupConnections: FC<GroupConnectionsProps> = ({
   groupId,
   onChange,
 }) => {
-  const groupIdx = useMainStore((state) =>
-    state.groups.findIndex((grp) => grp.id === groupId),
-  );
-  const groups = useMainStore((state) => state.groups);
+  const { groups, groupIdx } = useShallowMainStore((state) => ({
+    groups: state.groups,
+    groupIdx: state.groups.findIndex((grp) => grp.id === groupId),
+  }));
+
   const prevGroup = groupIdx > 0 ? groups[groupIdx - 1] : undefined;
   const nextGroup =
     groupIdx < groups.length - 1 ? groups[groupIdx + 1] : undefined;

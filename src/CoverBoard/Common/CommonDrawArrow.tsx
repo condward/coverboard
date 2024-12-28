@@ -4,13 +4,12 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { useAtom, useAtomValue } from 'jotai';
 import { ZodError } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import { useShallow } from 'zustand/react/shallow';
 
 import { PosTypes } from 'types';
 import {
-  useMainStore,
+  useShallowMainStore,
   pointsAtom,
-  useIsSelected,
+  useGetSelectedId,
   useToastStore,
   selectedAtom,
 } from 'store';
@@ -22,17 +21,23 @@ interface CommonDrawArrowProps {
 }
 
 const useShowArrow = (id: string) => {
-  const covers = useMainStore((state) => state.covers);
+  const {
+    covers,
+    groups,
+    getGroupsOfCover,
+    getGroupsOfGroup,
+    getGroupsInsideGroup,
+    getCoversInsideGroup,
+  } = useShallowMainStore((state) => ({
+    covers: state.covers,
+    groups: state.groups,
+    getGroupsOfCover: state.getGroupsOfCover,
+    getGroupsOfGroup: state.getGroupsOfGroup,
+    getGroupsInsideGroup: state.getGroupsInsideGroup,
+    getCoversInsideGroup: state.getCoversInsideGroup,
+  }));
+
   const points = useAtomValue(pointsAtom);
-  const groups = useMainStore((state) => state.groups);
-  const getGroupsOfCover = useMainStore((state) => state.getGroupsOfCover);
-  const getGroupsOfGroup = useMainStore((state) => state.getGroupsOfGroup);
-  const getGroupsInsideGroup = useMainStore(
-    (state) => state.getGroupsInsideGroup,
-  );
-  const getCoversInsideGroup = useMainStore(
-    (state) => state.getCoversInsideGroup,
-  );
 
   if (points) {
     const cover = covers.find((cover) => cover.id === points.id);
@@ -53,29 +58,27 @@ const useShowArrow = (id: string) => {
 };
 
 export const CommonDrawArrow: FC<CommonDrawArrowProps> = ({ index, type }) => {
-  const { id, scaleX, scaleY } = useMainStore(
-    useShallow((state) => {
-      if (type === 'group') {
-        const { scale, id } = state.getGroupByIdx(index);
+  const { id, scaleX, scaleY } = useShallowMainStore((state) => {
+    if (type === 'group') {
+      const { scale, id } = state.getGroupByIdx(index);
 
-        return {
-          scaleX: scale.x,
-          scaleY: scale.y,
-          id,
-        };
-      } else {
-        const { id } = state.getCoverByIdx(index);
+      return {
+        scaleX: scale.x,
+        scaleY: scale.y,
+        id,
+      };
+    } else {
+      const { id } = state.getCoverByIdx(index);
 
-        return {
-          scaleX: 1,
-          scaleY: 1,
-          id,
-        };
-      }
-    }),
-  );
+      return {
+        scaleX: 1,
+        scaleY: 1,
+        id,
+      };
+    }
+  });
   const points = useAtomValue(pointsAtom);
-  const isSelected = useIsSelected(id);
+  const isSelected = useGetSelectedId(id);
   const showArrow = useShowArrow(id);
 
   if ((!points && !isSelected) || !showArrow) return null;
@@ -89,26 +92,35 @@ const CommonDrawArrowChild: FC<{
   scaleY: number;
 }> = ({ id, scaleX, scaleY }) => {
   const [points, setPoints] = useAtom(pointsAtom);
-  const isSelected = useIsSelected(id);
+  const selectedId = useGetSelectedId(id);
   const selected = useAtomValue(selectedAtom);
 
-  const arrows = useMainStore((state) => state.arrows);
-  const addArrow = useMainStore((state) => state.addArrow);
-  const updateArrow = useMainStore((state) => state.updateArrow);
-  const labelDir = useMainStore((state) => state.configs.arrows.title.dir);
+  const {
+    arrows,
+    addArrow,
+    updateArrow,
+    labelDir,
+    updateCover,
+    updateGroup,
+    group,
+    cover,
+  } = useShallowMainStore((state) => {
+    return {
+      arrows: state.arrows,
+      addArrow: state.addArrow,
+      updateArrow: state.updateArrow,
+      labelDir: state.configs.arrows.title.dir,
+      updateCover: state.updateCover,
+      updateGroup: state.updateGroup,
+      group: selected?.id
+        ? state.groups.find((group) => selected.id === group.id)
+        : undefined,
+      cover: selected?.id
+        ? state.covers.find((cover) => selected.id === cover.id)
+        : undefined,
+    };
+  });
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const cover = useMainStore((state) =>
-    selected?.id
-      ? state.covers.find((cover) => selected.id === cover.id)
-      : undefined,
-  );
-  const group = useMainStore((state) =>
-    selected?.id
-      ? state.groups.find((group) => selected.id === group.id)
-      : undefined,
-  );
-  const updateCover = useMainStore((state) => state.updateCover);
-  const updateGroup = useMainStore((state) => state.updateGroup);
 
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const selection: PosTypes | null = points?.id === id ? points.dir : null;
@@ -195,7 +207,7 @@ const CommonDrawArrowChild: FC<{
   );
 
   useEffect(() => {
-    if (!isSelected) return;
+    if (!selectedId) return;
 
     const keyFn = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
@@ -256,7 +268,7 @@ const CommonDrawArrowChild: FC<{
     group,
     handleDrawArrow,
     id,
-    isSelected,
+    selectedId,
     selection,
     setPoints,
     updateCover,

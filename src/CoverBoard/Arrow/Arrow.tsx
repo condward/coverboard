@@ -1,9 +1,8 @@
 import { FC } from 'react';
 import { Group } from 'react-konva';
-import { useShallow } from 'zustand/react/shallow';
 
 import { ArrowParams, ArrowSchema, PosTypes } from 'types';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 import { ArrowLabel, ArrowPointer } from '.';
@@ -53,19 +52,17 @@ const useGetArrowParams = ({
 }: UseGetArrowParams): ArrowParams | undefined => {
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
-  const originSquareCover = useMainStore((state) =>
-    state.covers.find((cov) => cov.id === originId),
-  );
-  const targetSquareCover = useMainStore((state) =>
-    state.covers.find((cov) => cov.id === targetId),
-  );
-
-  const originSquareGroup = useMainStore((state) =>
-    state.groups.find((cov) => cov.id === originId),
-  );
-  const targetSquareGroup = useMainStore((state) =>
-    state.groups.find((cov) => cov.id === targetId),
-  );
+  const {
+    originSquareCover,
+    targetSquareCover,
+    originSquareGroup,
+    targetSquareGroup,
+  } = useShallowMainStore((state) => ({
+    originSquareCover: state.covers.find((cov) => cov.id === originId),
+    targetSquareCover: state.covers.find((cov) => cov.id === targetId),
+    originSquareGroup: state.groups.find((cov) => cov.id === originId),
+    targetSquareGroup: state.groups.find((cov) => cov.id === targetId),
+  }));
 
   const origin = originSquareCover ? 'cover' : 'group';
   const target = targetSquareCover ? 'cover' : 'group';
@@ -122,8 +119,8 @@ const useGetArrowParams = ({
 export const Arrow: FC<{
   index: number;
 }> = ({ index }) => {
-  const { originId, originDir, targetId, targetDir } = useMainStore(
-    useShallow((state) => {
+  const { originId, originDir, targetId, targetDir } = useShallowMainStore(
+    (state) => {
       const {
         origin: { id: originId, dir: originDir },
         target: { id: targetId, dir: targetDir },
@@ -135,7 +132,7 @@ export const Arrow: FC<{
         targetId,
         targetDir,
       };
-    }),
+    },
   );
 
   const ArrowParams = useGetArrowParams({

@@ -8,3 +8,4 @@ export * from './throttle';
 export * from './promise';
 export * from './orientation';
 export * from './element';
+export * from './keyboard';

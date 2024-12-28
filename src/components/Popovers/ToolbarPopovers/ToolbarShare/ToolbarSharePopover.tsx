@@ -24,7 +24,7 @@ import {
 import { CommonDialog, FieldSet } from 'components';
 import { DEFAULT_KEY, addPrefix, haxPrefix, useSaveId } from 'utils';
 
-import { useMainStore, useToastStore } from 'store';
+import { useShallowMainStore, useToastStore } from 'store';
 
 import { ToolbarSharePages } from './ToobarSharePages';
 import { ToolbarShareActions } from './ToolbarShareActions';
@@ -33,12 +33,16 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
   onClose,
 }) => {
   const navigate = useNavigate();
-  const updateStoreValues = useMainStore((state) => state.updateStoreValues);
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const defaultJsonData = useMainStore((state) =>
-    JSON.stringify(state.getStoreValues(), null, 4),
+
+  const { defaultJsonData, updateStoreValues } = useShallowMainStore(
+    (state) => ({
+      updateStoreValues: state.updateStoreValues,
+      defaultJsonData: JSON.stringify(state.getStoreValues(), null, 4),
+    }),
   );
+
   const saveId = useSaveId();
   const [jsonData, setJsonData] = useState(defaultJsonData);
   const [newSave, setNewSave] = useState('');

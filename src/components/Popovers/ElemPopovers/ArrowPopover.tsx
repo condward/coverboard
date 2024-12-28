@@ -7,13 +7,17 @@ import {
   ArrowCircleLeftOutlined,
   ArrowCircleRightOutlined,
   DeleteOutlined,
-  SaveOutlined,
   SwapHorizOutlined,
 } from '@mui/icons-material';
 
 import { ArrowSchema, ArrowSchemaOutput, SPACING_GAP } from 'types';
-import { CommonDialog, DirectionRadio, FieldSet } from 'components';
-import { configAtom, useMainStore, useToastStore } from 'store';
+import {
+  CommonDialog,
+  DirectionRadio,
+  FieldSet,
+  SubmitButton,
+} from 'components';
+import { configAtom, useShallowMainStore, useToastStore } from 'store';
 
 import { formatLabel } from 'utils';
 
@@ -30,11 +34,17 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
   onChange,
   onReturn,
 }) => {
-  const updateArrow = useMainStore((state) => state.updateArrow);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const covers = useMainStore((state) => state.covers);
-  const groups = useMainStore((state) => state.groups);
   const configToolbarOpen = useAtomValue(configAtom);
+
+  const { updateArrow, covers, groups, removeArrow } = useShallowMainStore(
+    (state) => ({
+      updateArrow: state.updateArrow,
+      covers: state.covers,
+      groups: state.groups,
+      removeArrow: state.removeArrow,
+    }),
+  );
 
   const originCoverTitle = covers.find((cov) => cov.id === arrow.origin.id)
     ?.title.text;
@@ -48,11 +58,11 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
   const originTitle = originCoverTitle || originGroupTitle || '';
   const targetTitle = targetCoverTitle || targetGroupTitle || '';
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isDirty },
-  } = useForm<ArrowSchema, unknown, ArrowSchemaOutput>({
+  const { control, handleSubmit } = useForm<
+    ArrowSchema,
+    unknown,
+    ArrowSchemaOutput
+  >({
     resolver: zodResolver(ArrowSchema),
     defaultValues: arrow,
   });
@@ -78,7 +88,6 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
     },
   );
 
-  const removeArrow = useMainStore((state) => state.removeArrow);
   const handleDelete = () => {
     removeArrow(arrow.id);
     onClose();
@@ -200,14 +209,7 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
             onClick={handleSwapDirection}>
             Swap Direction
           </Button>
-          <Button
-            disabled={!isDirty}
-            variant="contained"
-            color="primary"
-            startIcon={<SaveOutlined />}
-            type="submit">
-            Save
-          </Button>
+          <SubmitButton control={control} />
         </Stack>
       }
     />

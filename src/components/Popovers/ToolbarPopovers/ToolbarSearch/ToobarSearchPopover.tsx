@@ -1,12 +1,5 @@
 import { FC, useState } from 'react';
-import {
-  TextField,
-  Button,
-  CircularProgress,
-  Stack,
-  Alert,
-  Tooltip,
-} from '@mui/material';
+import { TextField, Button, Stack, Alert, Tooltip } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import Papa, { ParseResult } from 'papaparse';
@@ -27,8 +20,8 @@ import {
   searchSchema,
   SPACING_GAP,
 } from 'types';
-import { useMainStore, useResetApiKey } from 'store';
-import { CommonDialog } from 'components';
+import { useShallowMainStore, useResetApiKey } from 'store';
+import { CommonDialog, SubmitButton } from 'components';
 import FileImporter from 'components/FileImporter';
 
 import { useSearchValues } from './useSearchValues';
@@ -47,14 +40,18 @@ export const ToolbarSearchPopover: FC<{
   onClose: () => void;
 }> = ({ onClose }) => {
   const initialState = getInitialState();
-  const titleLabel = useMainStore((state) => state.getTitleLabel());
-  const subTitleLabel = useMainStore((state) => state.getSubTitleLabel());
   const { resetApiKey } = useResetApiKey();
-  const media = useMainStore((state) => state.configs.media);
   const [failedCovers, setFailedCovers] = useState<SearchSchema['search']>([]);
   const addEmptyCover = useAddEmptyCover();
   const { mutateAsync: handleSearch, isPending } = useSearchValues();
-  const coversLength = useMainStore((state) => state.covers.length);
+
+  const { media, coversLength, titleLabel, subTitleLabel } =
+    useShallowMainStore((state) => ({
+      media: state.configs.media,
+      coversLength: state.covers.length,
+      titleLabel: state.getTitleLabel(),
+      subTitleLabel: state.getSubTitleLabel(),
+    }));
 
   const {
     control,
@@ -233,19 +230,13 @@ export const ToolbarSearchPopover: FC<{
               Add without image
             </Button>
           )}
-          <Button
-            variant="contained"
-            color="primary"
+          <SubmitButton
+            control={control}
             id="searchSubmit"
-            disabled={!isDirty || !isValid || isPending}
+            disabled={!isValid}
+            isPending={isPending}
             startIcon={<SearchOutlined />}
-            type="submit">
-            {isPending ? (
-              <CircularProgress size="1.5rem" aria-labelledby="searchSubmit" />
-            ) : (
-              'Search'
-            )}
-          </Button>
+          />
         </Stack>
       }
     />

@@ -3,7 +3,7 @@ import { useSetAtom } from 'jotai';
 import { AddOutlined, LinkOutlined } from '@mui/icons-material';
 import { FC, useState } from 'react';
 
-import { selectedAtom, useMainStore } from 'store';
+import { selectedAtom, useShallowMainStore } from 'store';
 import { CoverSchema, GroupSchema, SPACING_GAP } from 'types';
 import { formatLabel } from 'utils';
 
@@ -26,19 +26,28 @@ export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
   onClose,
 }) => {
   const setSelected = useSetAtom(selectedAtom);
-  const covers = useMainStore((state) => state.covers);
-  const groups = useMainStore((state) => state.groups);
-  const arrows = useMainStore((state) => state.arrows);
-  const groupsInsideGroup = useMainStore((state) => state.getGroupsInsideGroup);
-  const coversInsideGroup = useMainStore((state) => state.getCoversInsideGroup);
-  const removeGroupAndRelatedArrows = useMainStore(
-    (state) => state.removeGroupAndRelatedArrows,
-  );
+
+  const {
+    groups,
+    covers,
+    arrows,
+    groupsInsideGroup,
+    coversInsideGroup,
+    removeGroupAndRelatedArrows,
+    removeCoverAndRelatedArrows,
+    removeArrow,
+  } = useShallowMainStore((state) => ({
+    groups: state.groups,
+    covers: state.covers,
+    arrows: state.arrows,
+    groupsInsideGroup: state.getGroupsInsideGroup,
+    coversInsideGroup: state.getCoversInsideGroup,
+    removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
+    removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
+    removeArrow: state.removeArrow,
+  }));
+
   const totalElements = covers.length + groups.length;
-  const removeCoverAndRelatedArrows = useMainStore(
-    (state) => state.removeCoverAndRelatedArrows,
-  );
-  const removeArrow = useMainStore((state) => state.removeArrow);
 
   const groupConnections: RecursiveTypeGroup = {};
   groups.forEach((group) => {

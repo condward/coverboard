@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { TextField, Button, Stack } from '@mui/material';
+import { TextField, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,8 +16,9 @@ import {
   SliderInput,
   DirectionRadio,
   FieldSet,
+  SubmitButton,
 } from 'components';
-import { useMainStore, useToastStore } from 'store';
+import { useShallowMainStore, useToastStore } from 'store';
 
 import { useGetSizesContext } from 'providers';
 
@@ -25,22 +26,23 @@ interface AddGroupPopover {
   onClose: (id?: string) => void;
 }
 export const AddGroupPopover: FC<AddGroupPopover> = ({ onClose }) => {
-  const addGroups = useMainStore((state) => state.addGroups);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
-  const groupTitleDir = useMainStore((state) => state.configs.groups.title.dir);
-  const groupSubTitleDir = useMainStore(
-    (state) => state.configs.groups.subtitle.dir,
+  const { addGroups, groupTitleDir, groupSubTitleDir } = useShallowMainStore(
+    (state) => ({
+      addGroups: state.addGroups,
+      groupTitleDir: state.configs.groups.title.dir,
+      groupSubTitleDir: state.configs.groups.subtitle.dir,
+    }),
   );
   const { canvasLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    formState: { isDirty },
-  } = useForm<GroupSchema, unknown, GroupSchemaOutput>({
+  const { control, handleSubmit, watch } = useForm<
+    GroupSchema,
+    unknown,
+    GroupSchemaOutput
+  >({
     resolver: zodResolver(groupSchema),
     defaultValues: {
       id: uuidv4(),
@@ -202,14 +204,11 @@ export const AddGroupPopover: FC<AddGroupPopover> = ({ onClose }) => {
       }
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
-          <Button
-            disabled={!isDirty}
-            variant="contained"
-            color="primary"
+          <SubmitButton
+            control={control}
+            text="Create"
             startIcon={<AddOutlined />}
-            type="submit">
-            Create
-          </Button>
+          />
         </Stack>
       }
     />

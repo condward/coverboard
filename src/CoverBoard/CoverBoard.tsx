@@ -6,10 +6,15 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Stack } from '@mui/material';
 
-import { hideToolbarAtom, pointsAtom, selectedAtom, useMainStore } from 'store';
+import {
+  hideToolbarAtom,
+  pointsAtom,
+  selectedAtom,
+  useShallowMainStore,
+} from 'store';
 import { formatDate, useIsLandscape, useSaveId } from 'utils';
 import { useGetSizesContext } from 'providers';
-import { Toolbar, Logo, useCreateGroup } from 'components';
+import { Toolbar, Logo } from 'components';
 
 import {
   Covers,
@@ -24,27 +29,34 @@ import {
 } from './';
 
 export const CoverBoard: FC = () => {
-  const color = useMainStore((state) => state.getColor());
   const saveId = useSaveId();
   const isLandscape = useIsLandscape();
-  const hideToolbar = useAtomValue(hideToolbarAtom);
-  const backColor = useMainStore((state) => state.getBackColor());
+
   const { canvasLimits, padding } = useGetSizesContext();
+
+  const hideToolbar = useAtomValue(hideToolbarAtom);
+
+  const { color, backColor } = useShallowMainStore((state) => ({
+    color: state.getColor(),
+    backColor: state.getBackColor(),
+  }));
 
   const stageRef = useRef<Konva.Stage>(null);
   const [screenshotUrl, setScreenshotUrl] = useState('');
 
   const setSelected = useSetAtom(selectedAtom);
   const setPoints = useSetAtom(pointsAtom);
-  const checkDeselect = (e: KonvaEventObject<MouseEvent | Event>) => {
-    const clickedOnEmpty = e.target === e.target.getStage();
-    if (clickedOnEmpty) {
-      setSelected(null);
-      setPoints(null);
-    }
-  };
+  const checkDeselect = useCallback(
+    (e: KonvaEventObject<MouseEvent | Event>) => {
+      const clickedOnEmpty = e.target === e.target.getStage();
+      if (clickedOnEmpty) {
+        setSelected(null);
+        setPoints(null);
+      }
+    },
+    [setPoints, setSelected],
+  );
 
-  const { createGroup } = useCreateGroup();
   const takeScreenshot = useCallback(() => {
     const stage = stageRef.current;
 
@@ -62,7 +74,8 @@ export const CoverBoard: FC = () => {
       setScreenshotUrl('');
     }
   }, [canvasLimits, saveId]);
-  useKeysListener({ createGroup, takeScreenshot });
+
+  useKeysListener();
 
   return (
     <Stack
@@ -79,7 +92,7 @@ export const CoverBoard: FC = () => {
           justifyContent="space-between"
           alignItems="center"
           direction={isLandscape ? 'column' : 'row'}>
-          <Toolbar takeScreenshot={takeScreenshot} createGroup={createGroup} />
+          <Toolbar takeScreenshot={takeScreenshot} />
           <Logo />
         </Stack>
       )}

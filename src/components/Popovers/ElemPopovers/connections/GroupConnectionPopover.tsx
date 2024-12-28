@@ -5,7 +5,7 @@ import { AddOutlined } from '@mui/icons-material';
 import { GroupSchema, SPACING_GAP } from 'types';
 
 import { CommonDialog } from 'components';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 
 import { AddArrowPopover } from '../AddArrowPopover';
 import { GroupConnections } from './GroupConnections';
@@ -21,8 +21,11 @@ export const GroupConnectionPopover: FC<GroupPopoverProps> = ({
   onClose,
   onChange,
 }) => {
-  const covers = useMainStore((state) => state.covers);
-  const groups = useMainStore((state) => state.groups);
+  const { groups, covers } = useShallowMainStore((state) => ({
+    groups: state.groups,
+    covers: state.covers,
+  }));
+
   const [openConn, setOpenConn] = useState(false);
   return (
     <CommonDialog

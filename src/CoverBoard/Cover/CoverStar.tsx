@@ -3,7 +3,7 @@ import { Group, Rect, Star } from 'react-konva';
 import { FC } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { pointsAtom, useIsSelected, useMainStore } from 'store';
+import { pointsAtom, useGetSelectedId, useShallowMainStore } from 'store';
 import { CoverSchema } from 'types';
 import { useGetSizesContext } from 'providers';
 
@@ -15,9 +15,9 @@ interface CoverStarProps {
 
 export const CoverStar: FC<CoverStarProps> = (props) => {
   const editArrows = useAtomValue(pointsAtom);
-  const isSelected = useIsSelected(props.id);
+  const selectedId = useGetSelectedId(props.id);
 
-  if (editArrows || isSelected) return null;
+  if (editArrows || selectedId) return null;
 
   return <CoverStarChild {...props} />;
 };
@@ -28,9 +28,12 @@ export const CoverStarChild: FC<CoverStarProps> = ({
   starCount,
 }) => {
   const { starRadius, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
-  const color = useMainStore((state) => state.getCoverColor());
-  const backColor = useMainStore((state) => state.getBackColor());
-  const updateCover = useMainStore((state) => state.updateCover);
+
+  const { updateCover, color, backColor } = useShallowMainStore((state) => ({
+    updateCover: state.updateCover,
+    backColor: state.getBackColor(),
+    color: state.getColor(),
+  }));
 
   const handleClick = (
     evt: KonvaEventObject<MouseEvent | Event>,

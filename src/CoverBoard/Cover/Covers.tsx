@@ -1,13 +1,12 @@
 import { FC } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
 import { useMainStore } from 'store';
 
 import { Cover } from './Cover';
 
 export const Covers: FC = () => {
-  const coverIds = useMainStore(
-    useShallow((state) => state.covers.map((cover) => cover.id)),
+  const coverIds = useMainStore((state) =>
+    state.covers.map((cover) => cover.id),
   );
 
   return (

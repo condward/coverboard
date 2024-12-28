@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { FC, useEffect, useMemo } from 'react';
 
-import { useMainStore, sizeAtom, hideToolbarAtom } from 'store';
+import { useShallowMainStore, sizeAtom, hideToolbarAtom } from 'store';
 import { MAX_BOUNDARY } from 'types';
 import { throttle, useIsLandscape } from 'utils';
 
@@ -10,9 +10,12 @@ import { SizesContext } from './useGetSizesContext';
 export const SizesProvider: FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const scale = useMainStore((state) => state.configs.layout.scale);
-  const fitToScreen = useMainStore((state) => state.configs.layout.fitToScreen);
-  const heightRatio = useMainStore((state) => state.getHeightRatio());
+  const { fitToScreen, heightRatio, scale } = useShallowMainStore((state) => ({
+    fitToScreen: state.configs.layout.fitToScreen,
+    heightRatio: state.getHeightRatio(),
+    scale: state.configs.layout.scale,
+  }));
+
   const [screenSize, updateSize] = useAtom(sizeAtom);
   const isLandscape = useIsLandscape();
   const hideToolbar = useAtomValue(hideToolbarAtom);

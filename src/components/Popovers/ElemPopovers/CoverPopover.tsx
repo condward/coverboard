@@ -6,7 +6,6 @@ import { ZodError } from 'zod';
 import {
   DeleteOutlined,
   LinkOutlined,
-  SaveOutlined,
   SearchOutlined,
 } from '@mui/icons-material';
 import { useAtomValue } from 'jotai';
@@ -26,8 +25,9 @@ import {
   DirectionRadio,
   FieldSet,
   InputAction,
+  SubmitButton,
 } from 'components';
-import { configAtom, useMainStore, useToastStore } from 'store';
+import { configAtom, useShallowMainStore, useToastStore } from 'store';
 import { useGetSizesContext } from 'providers';
 import { useIsLandscape } from 'utils';
 
@@ -117,19 +117,25 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   onReturn,
 }) => {
   const [conn, setOpenConn] = useState(false);
-  const titleLabel = useMainStore((state) => state.getTitleLabel().label);
-  const subTitleLabel = useMainStore((state) => state.getSubTitleLabel().label);
-  const media = useMainStore((state) => state.configs.media);
-  const removeCoverAndRelatedArrows = useMainStore(
-    (state) => state.removeCoverAndRelatedArrows,
-  );
-  const totalElements = useMainStore(
-    (state) => state.covers.length + state.groups.length,
-  );
+
+  const {
+    titleLabel,
+    subTitleLabel,
+    media,
+    removeCoverAndRelatedArrows,
+    totalElements,
+    updateCover,
+  } = useShallowMainStore((state) => ({
+    titleLabel: state.getTitleLabel().label,
+    subTitleLabel: state.getSubTitleLabel().label,
+    media: state.configs.media,
+    removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
+    totalElements: state.covers.length + state.groups.length,
+    updateCover: state.updateCover,
+  }));
   const configToolbarOpen = useAtomValue(configAtom);
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const updateCover = useMainStore((state) => state.updateCover);
 
   const buttons = getButtons(media, cover);
   const searchValue = useSearchValue(cover.id);
@@ -137,12 +143,11 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   const { canvasLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
 
-  const {
-    control,
-    handleSubmit,
-    getValues,
-    formState: { isDirty },
-  } = useForm<CoverSchema, unknown, CoverSchemaOutput>({
+  const { control, handleSubmit, getValues } = useForm<
+    CoverSchema,
+    unknown,
+    CoverSchemaOutput
+  >({
     resolver: zodResolver(coverSchema),
     defaultValues: cover,
   });
@@ -478,14 +483,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
             onClick={handleSearchAgain}>
             Search
           </Button>
-          <Button
-            disabled={!isDirty}
-            variant="contained"
-            color="primary"
-            type="submit"
-            startIcon={<SaveOutlined />}>
-            Save
-          </Button>
+          <SubmitButton control={control} />
         </Stack>
       }
       onSubmit={onSubmit}

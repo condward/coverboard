@@ -2,10 +2,10 @@ import { FC, useState } from 'react';
 import { TextField, Button, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
+
 import {
   DeleteOutlined,
   LinkOutlined,
-  SaveOutlined,
   UpdateOutlined,
 } from '@mui/icons-material';
 import { useAtomValue } from 'jotai';
@@ -21,8 +21,9 @@ import {
   SliderInput,
   DirectionRadio,
   FieldSet,
+  SubmitButton,
 } from 'components';
-import { configAtom, useMainStore, useToastStore } from 'store';
+import { configAtom, useShallowMainStore, useToastStore } from 'store';
 
 import { useGetSizesContext } from 'providers';
 
@@ -42,22 +43,27 @@ export const GroupPopover: FC<GroupPopover> = ({
   onReturn,
 }) => {
   const [conn, setOpenConn] = useState(false);
-  const updateGroup = useMainStore((state) => state.updateGroup);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const [open, setOpen] = useState(false);
-  const totalElements = useMainStore(
-    (state) => state.covers.length + state.groups.length,
-  );
+
   const configToolbarOpen = useAtomValue(configAtom);
 
-  const coversInsideGroup = useMainStore((state) =>
-    state.getCoversInsideGroup(group.id),
-  );
-  const groupBound = useMainStore((state) => state.getGroupBounds(group.id));
+  const {
+    updateGroup,
+    totalElements,
+    getCoversInsideGroup,
+    getGroupBounds,
+    removeGroupAndRelatedArrows,
+  } = useShallowMainStore((state) => ({
+    updateGroup: state.updateGroup,
+    totalElements: state.covers.length + state.groups.length,
+    getCoversInsideGroup: state.getCoversInsideGroup,
+    getGroupBounds: state.getGroupBounds,
+    removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
+  }));
+  const groupBound = getGroupBounds(group.id);
+  const coversInsideGroup = getCoversInsideGroup(group.id);
 
-  const removeGroupAndRelatedArrows = useMainStore(
-    (state) => state.removeGroupAndRelatedArrows,
-  );
   const handleDelete = () => {
     removeGroupAndRelatedArrows(group.id);
     onClose();
@@ -66,12 +72,11 @@ export const GroupPopover: FC<GroupPopover> = ({
   const { canvasLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    formState: { isDirty },
-  } = useForm<GroupSchema, unknown, GroupSchemaOutput>({
+  const { control, handleSubmit, watch } = useForm<
+    GroupSchema,
+    unknown,
+    GroupSchemaOutput
+  >({
     resolver: zodResolver(groupSchema),
     defaultValues: group,
   });
@@ -285,14 +290,7 @@ export const GroupPopover: FC<GroupPopover> = ({
               }}
             />
           )}
-          <Button
-            disabled={!isDirty}
-            variant="contained"
-            color="primary"
-            startIcon={<SaveOutlined />}
-            type="submit">
-            Save
-          </Button>
+          <SubmitButton control={control} />
         </Stack>
       }
     />

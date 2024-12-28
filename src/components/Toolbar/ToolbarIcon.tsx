@@ -1,9 +1,9 @@
 import { Box, Button, Tooltip } from '@mui/material';
-import { FC } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { useSetAtom } from 'jotai';
 
-import { ToolConfig } from 'types';
-import { clearHash } from 'utils';
+import { KeyboardShortcuts, ToolConfig } from 'types';
+import { clearHash, usePreventKeys } from 'utils';
 import { pointsAtom } from 'store';
 import { useGetSizesContext } from 'providers';
 
@@ -17,15 +17,30 @@ interface ToolbarIconProps {
 export const ToolbarIcon: FC<ToolbarIconProps> = ({ config }) => {
   const setPoints = useSetAtom(pointsAtom);
   const { coverSizeWidth, fontSize } = useGetSizesContext();
+  const preventKeys = usePreventKeys();
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     setPoints(null);
     clearHash();
 
     return config.value
       ? config.valueModifier(false)
       : config.valueModifier(true);
-  };
+  }, [config, setPoints]);
+
+  useEffect(() => {
+    if (preventKeys) return;
+
+    const keyFn = (e: KeyboardEvent) => {
+      if ((e.key as KeyboardShortcuts) === config.shortcut) {
+        handleClick();
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', keyFn);
+
+    return () => window.removeEventListener('keydown', keyFn);
+  }, [config.shortcut, handleClick, preventKeys]);
 
   return (
     <>
@@ -53,7 +68,7 @@ export const ToolbarIcon: FC<ToolbarIconProps> = ({ config }) => {
               px: 0.1,
               fontSize: `${fontSize / 20}rem`,
             }}>
-            {config.shortcut}
+            {config.shortcut.toUpperCase()}
           </Box>
           <Box
             sx={{

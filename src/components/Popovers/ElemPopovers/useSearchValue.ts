@@ -8,12 +8,14 @@ import {
   getTvShowPosters,
 } from 'api';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { CoverSchema, Media, SearchSchema } from 'types';
 
 export const useSearchValue = (id: CoverSchema['id']) => {
-  const media = useMainStore((state) => state.configs.media);
-  const updateCover = useMainStore((state) => state.updateCover);
+  const { updateCover, media } = useShallowMainStore((state) => ({
+    updateCover: state.updateCover,
+    media: state.configs.media,
+  }));
 
   return useMutation({
     mutationFn: async (inputArray: SearchSchema['search']) => {

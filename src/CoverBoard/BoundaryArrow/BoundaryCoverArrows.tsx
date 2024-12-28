@@ -1,14 +1,26 @@
 import { FC } from 'react';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 import { BoundaryArrow } from './BoundaryArrow';
 
 export const BoundaryCoverArrows: FC = () => {
   const { canvasLimits } = useGetSizesContext();
-  const covers = useMainStore((state) => state.covers);
-  const scale = useMainStore((state) => state.configs.layout.scale);
+
+  const {
+    covers,
+    scale,
+    updateGroup,
+    removeCoverAndRelatedArrows,
+    coverColor,
+  } = useShallowMainStore((state) => ({
+    covers: state.covers,
+    scale: state.configs.layout.scale,
+    updateGroup: state.updateGroup,
+    removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
+    coverColor: state.getCoverColor(),
+  }));
 
   const offLimitCovers = covers.flatMap((covers) => {
     if (
@@ -20,12 +32,6 @@ export const BoundaryCoverArrows: FC = () => {
 
     return [];
   });
-
-  const updateGroup = useMainStore((state) => state.updateGroup);
-  const removeCoverAndRelatedArrows = useMainStore(
-    (state) => state.removeCoverAndRelatedArrows,
-  );
-  const coverColor = useMainStore((state) => state.getCoverColor());
 
   return (
     <>

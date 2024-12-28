@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 
-import { parentSelectedAtom, selectedAtom, useMainStore } from 'store';
+import { parentSelectedAtom, selectedAtom, useShallowMainStore } from 'store';
 
 import { CoverPopover } from './CoverPopover';
 import { GroupPopover } from './GroupPopover';
@@ -10,14 +10,12 @@ import { ArrowPopover } from './ArrowPopover';
 export const ElemPopovers: FC<{ id: string }> = ({ id }) => {
   const setSelected = useSetAtom(selectedAtom);
   const [parentSelected, setParentSelected] = useAtom(parentSelectedAtom);
-  const currentCover = useMainStore((state) =>
-    state.covers.find((cov) => cov.id === id),
-  );
-  const currentArrow = useMainStore((state) =>
-    state.arrows.find((arrow) => arrow.id === id),
-  );
-  const currentGroup = useMainStore((state) =>
-    state.groups.find((cov) => cov.id === id),
+  const { currentGroup, currentArrow, currentCover } = useShallowMainStore(
+    (state) => ({
+      currentGroup: state.groups.find((cov) => cov.id === id),
+      currentArrow: state.arrows.find((cov) => cov.id === id),
+      currentCover: state.covers.find((cov) => cov.id === id),
+    }),
   );
 
   const handleClose = (id?: string) => {

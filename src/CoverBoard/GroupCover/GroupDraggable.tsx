@@ -1,7 +1,6 @@
 import { FC, ReactNode } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { CommonDraggable } from 'CoverBoard/Common';
 import { useGetMaxBoundaries } from 'utils';
 
@@ -9,8 +8,8 @@ export const GroupDraggable: FC<{
   index: number;
   children: ReactNode[];
 }> = ({ index, children }) => {
-  const { id, x, y, scaleX, scaleY } = useMainStore(
-    useShallow((state) => {
+  const { id, x, y, scaleX, scaleY, updateGroup, removeGroupAndRelatedArrows } =
+    useShallowMainStore((state) => {
       const {
         id,
         pos: { x, y },
@@ -23,15 +22,10 @@ export const GroupDraggable: FC<{
         y,
         scaleX,
         scaleY,
+        updateGroup: state.updateGroup,
+        removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
       };
-    }),
-  );
-
-  const updateGroup = useMainStore((state) => state.updateGroup);
-
-  const removeGroupAndRelatedArrows = useMainStore(
-    (state) => state.removeGroupAndRelatedArrows,
-  );
+    });
 
   const { getMaxBoundaries } = useGetMaxBoundaries();
 

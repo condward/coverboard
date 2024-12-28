@@ -9,14 +9,18 @@ import {
 } from '@mui/material';
 
 import { Media, mediaMap } from 'types';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 
 export const ToolbarSearchMedia: FC<{ onReset?: () => void }> = ({
   onReset,
 }) => {
-  const media = useMainStore((state) => state.configs.media);
-  const updateConfigs = useMainStore((state) => state.updateConfigs);
-  const coversLength = useMainStore((state) => state.covers.length);
+  const { media, updateConfigs, coversLength } = useShallowMainStore(
+    (state) => ({
+      media: state.configs.media,
+      updateConfigs: state.updateConfigs,
+      coversLength: state.covers.length,
+    }),
+  );
 
   if (coversLength > 0) {
     return (

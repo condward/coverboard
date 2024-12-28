@@ -1,7 +1,6 @@
 import { FC } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { CommonLabelDraggable, CommonLabel } from 'CoverBoard/Common';
 import { LabelTypes } from 'types';
 import { useGetSizesContext } from 'providers';
@@ -16,38 +15,47 @@ enum Offsets {
 export const CoverLabels: FC<{
   index: number;
 }> = ({ index }) => {
-  const { id, titleText, titleDir, subtitleText, subTitleDir, x, y, starDir } =
-    useMainStore(
-      useShallow((state) => {
-        const {
-          id,
-          title: { text: titleText, dir: titleDir },
-          subtitle: { text: subtitleText, dir: subTitleDir },
-          pos: { x, y },
-          star: { dir: starDir },
-        } = state.getCoverByIdx(index);
+  const {
+    id,
+    titleText,
+    titleDir,
+    subtitleText,
+    subTitleDir,
+    x,
+    y,
+    starDir,
+    color,
+    showSubtitle,
+    showTitle,
+    showStars,
+    updateCover,
+  } = useShallowMainStore((state) => {
+    const {
+      id,
+      title: { text: titleText, dir: titleDir },
+      subtitle: { text: subtitleText, dir: subTitleDir },
+      pos: { x, y },
+      star: { dir: starDir },
+    } = state.getCoverByIdx(index);
 
-        return {
-          id,
-          titleText,
-          titleDir,
-          subtitleText,
-          subTitleDir,
-          x,
-          y,
-          starDir,
-        };
-      }),
-    );
+    return {
+      id,
+      titleText,
+      titleDir,
+      subtitleText,
+      subTitleDir,
+      x,
+      y,
+      starDir,
+      color: state.getColor(),
+      showTitle: state.configs.covers.title.show,
+      showSubtitle: state.configs.covers.subtitle.show,
+      showStars: state.configs.covers.rating.show,
+      updateCover: state.updateCover,
+    };
+  });
 
-  const color = useMainStore((state) => state.getCoverColor());
-  const showTitle = useMainStore((state) => state.configs.covers.title.show);
-  const showSubtitle = useMainStore(
-    (state) => state.configs.covers.subtitle.show,
-  );
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
-  const showStars = useMainStore((state) => state.configs.covers.rating.show);
-  const updateCover = useMainStore((state) => state.updateCover);
 
   const { getOffset } = useGetElementSizes<Offsets>([
     ...(titleText && showTitle ? [{ dir: titleDir, type: Offsets.TITLE }] : []),

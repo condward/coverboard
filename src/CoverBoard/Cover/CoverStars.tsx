@@ -1,7 +1,6 @@
 import { FC } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { LabelTypes } from 'types';
 import { useGetElementSizes } from 'utils';
 
@@ -26,35 +25,34 @@ export const CoverStars: FC<{
     y,
     starDir,
     starCount,
-  } = useMainStore(
-    useShallow((state) => {
-      const {
-        id,
-        title: { text: titleText, dir: titleDir },
-        subtitle: { text: subtitleText, dir: subTitleDir },
-        pos: { x, y },
-        star: { dir: starDir, count: starCount },
-      } = state.getCoverByIdx(index);
+    showTitle,
+    showSubtitle,
+    showStars,
+  } = useShallowMainStore((state) => {
+    const {
+      id,
+      title: { text: titleText, dir: titleDir },
+      subtitle: { text: subtitleText, dir: subTitleDir },
+      pos: { x, y },
+      star: { dir: starDir, count: starCount },
+    } = state.getCoverByIdx(index);
 
-      return {
-        id,
-        titleText,
-        titleDir,
-        subtitleText,
-        subTitleDir,
-        x,
-        y,
-        starDir,
-        starCount,
-      };
-    }),
-  );
+    return {
+      id,
+      titleText,
+      titleDir,
+      subtitleText,
+      subTitleDir,
+      x,
+      y,
+      starDir,
+      starCount,
+      showTitle: state.configs.covers.title.show,
+      showSubtitle: state.configs.covers.subtitle.show,
+      showStars: state.configs.covers.rating.show,
+    };
+  });
 
-  const showTitle = useMainStore((state) => state.configs.covers.title.show);
-  const showSubtitle = useMainStore(
-    (state) => state.configs.covers.subtitle.show,
-  );
-  const showStars = useMainStore((state) => state.configs.covers.rating.show);
   const { getOffset } = useGetElementSizes<Offsets>([
     ...(titleText && showTitle ? [{ dir: titleDir, type: Offsets.TITLE }] : []),
     ...(subtitleText && showSubtitle

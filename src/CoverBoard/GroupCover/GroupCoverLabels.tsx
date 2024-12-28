@@ -1,8 +1,7 @@
 import { FC } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
 import { LabelTypes } from 'types';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { CommonLabelDraggable, CommonLabel } from 'CoverBoard/Common';
 import { useGetSizesContext } from 'providers';
 import { useGetElementSizes } from 'utils';
@@ -10,40 +9,49 @@ import { useGetElementSizes } from 'utils';
 export const GroupCoverLabels: FC<{
   index: number;
 }> = ({ index }) => {
-  const { id, titleText, dir, subtitleText, subDir, x, y, scaleX, scaleY } =
-    useMainStore(
-      useShallow((state) => {
-        const {
-          id,
-          title: { text: titleText, dir },
-          subtitle: { text: subtitleText, dir: subDir },
-          pos: { x, y },
-          scale: { x: scaleX, y: scaleY },
-        } = state.getGroupByIdx(index);
+  const {
+    id,
+    titleText,
+    dir,
+    subtitleText,
+    subDir,
+    x,
+    y,
+    scaleX,
+    scaleY,
+    color,
+    updateGroup,
+    showHelpers,
+    showTitle,
+    showSubtitle,
+  } = useShallowMainStore((state) => {
+    const {
+      id,
+      title: { text: titleText, dir },
+      subtitle: { text: subtitleText, dir: subDir },
+      pos: { x, y },
+      scale: { x: scaleX, y: scaleY },
+    } = state.getGroupByIdx(index);
 
-        return {
-          id,
-          titleText,
-          dir,
-          subtitleText,
-          subDir,
-          x,
-          y,
-          scaleX,
-          scaleY,
-        };
-      }),
-    );
+    return {
+      id,
+      titleText,
+      dir,
+      subtitleText,
+      subDir,
+      x,
+      y,
+      scaleX,
+      scaleY,
+      color: state.getGroupColor(),
+      updateGroup: state.updateGroup,
+      showHelpers: state.configs.layout.helpers,
+      showTitle: state.configs.groups.title.show,
+      showSubtitle: state.configs.groups.subtitle.show,
+    };
+  });
 
-  const color = useMainStore((state) => state.getGroupColor());
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
-  const updateGroup = useMainStore((state) => state.updateGroup);
-  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
-
-  const showTitle = useMainStore((state) => state.configs.groups.title.show);
-  const showSubtitle = useMainStore(
-    (state) => state.configs.groups.subtitle.show,
-  );
 
   const hasTitle =
     (showTitle && !!titleText) || (showTitle && !titleText && showHelpers);

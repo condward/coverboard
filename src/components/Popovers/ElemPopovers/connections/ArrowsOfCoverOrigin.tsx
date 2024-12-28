@@ -3,7 +3,7 @@ import { LinkOutlined } from '@mui/icons-material';
 import { FC } from 'react';
 
 import { CoverSchema, GroupSchema, SPACING_GAP } from 'types';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { FieldSet } from 'components';
 import { formatLabel } from 'utils';
 
@@ -16,11 +16,14 @@ export const ArrowsOfCoverOrigin: FC<ArrowsOfCoverOriginProps> = ({
   id,
   onChange,
 }) => {
-  const relatedArrows = useMainStore((state) =>
-    state.getTargetRelatedArrows(id),
+  const { getTargetRelatedArrows, covers, removeArrow } = useShallowMainStore(
+    (state) => ({
+      getTargetRelatedArrows: state.getTargetRelatedArrows,
+      covers: state.covers,
+      removeArrow: state.removeArrow,
+    }),
   );
-  const covers = useMainStore((state) => state.covers);
-  const removeArrow = useMainStore((state) => state.removeArrow);
+  const relatedArrows = getTargetRelatedArrows(id);
 
   const defaultCoverConnections = relatedArrows.flatMap((arrow) => {
     const cover = covers.find((cov) => cov.id === arrow.origin.id);

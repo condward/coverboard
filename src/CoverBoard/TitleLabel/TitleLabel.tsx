@@ -1,28 +1,47 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 
-import { PosTypes } from 'types';
-import { editTitleAtom, hideToolbarAtom, useMainStore } from 'store';
+import { KeyboardShortcuts, PosTypes } from 'types';
+import { editTitleAtom, hideToolbarAtom, useShallowMainStore } from 'store';
 import { CommonTextLabel } from 'CoverBoard/Common';
-import { useSaveId } from 'utils';
+import { usePreventKeys, useSaveId } from 'utils';
 import { useGetSizesContext } from 'providers';
 
+const fillValue = 0.9;
+
 export const TitleLabel: FC = () => {
-  const updateConfigs = useMainStore((state) => state.updateConfigs);
-  const title = useMainStore((state) => state.configs.title.text);
-  const showMainTitle = useMainStore((state) => state.configs.title.show);
   const saveId = useSaveId();
-  const color = useMainStore((state) => state.getColor());
-  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
+  const preventKeys = usePreventKeys();
   const { canvasLimits, fontSize } = useGetSizesContext();
 
   const [open, setOpen] = useAtom(editTitleAtom);
-  const setHideToolBar = useSetAtom(hideToolbarAtom);
-  const titleMode = showMainTitle
-    ? title || (showHelpers ? `<edit ${saveId} title>` : '')
-    : '';
 
-  const fillValue = 0.9;
+  const setHideToolBar = useSetAtom(hideToolbarAtom);
+  const setEditTitle = useSetAtom(editTitleAtom);
+
+  const { titleMode, color, updateConfigs } = useShallowMainStore((state) => ({
+    titleMode: state.configs.title.show
+      ? state.configs.title.text ||
+        (state.configs.layout.helpers ? `<edit ${saveId} title>` : '')
+      : '',
+    updateConfigs: state.updateConfigs,
+    color: state.getColor(),
+  }));
+
+  useEffect(() => {
+    if (preventKeys) return;
+
+    const keyFn = (e: KeyboardEvent) => {
+      if (e.key === KeyboardShortcuts.TITLE.toLowerCase()) {
+        setEditTitle(true);
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', keyFn);
+
+    return () => window.removeEventListener('keydown', keyFn);
+  }, [preventKeys, setEditTitle]);
+
   return (
     <CommonTextLabel
       color={color}

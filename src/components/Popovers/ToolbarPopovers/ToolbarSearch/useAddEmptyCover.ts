@@ -1,15 +1,17 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { CoverLabelValues } from 'types';
 
 export const useAddEmptyCover = () => {
-  const starsDir = useMainStore((state) => state.configs.covers.rating.dir);
-  const labelDir = useMainStore((state) => state.configs.covers.title.dir);
-  const labelSubDir = useMainStore(
-    (state) => state.configs.covers.subtitle.dir,
+  const { starsDir, labelDir, labelSubDir, addCovers } = useShallowMainStore(
+    (state) => ({
+      starsDir: state.configs.covers.rating.dir,
+      labelDir: state.configs.covers.title.dir,
+      labelSubDir: state.configs.covers.subtitle.dir,
+      addCovers: state.addCovers,
+    }),
   );
-  const addCovers = useMainStore((state) => state.addCovers);
 
   return (failedCovers: CoverLabelValues) => {
     addCovers(

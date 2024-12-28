@@ -1,13 +1,18 @@
 import { FC } from 'react';
-import { Stack, TextField, Chip, Button, Alert } from '@mui/material';
+import { Stack, TextField, Chip, Alert } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { AddOutlined } from '@mui/icons-material';
 
 import { ArrowSchemaOutput, ArrowSchema, SPACING_GAP, PosTypes } from 'types';
-import { CommonDialog, DirectionRadio, FieldSet } from 'components';
-import { useMainStore, useToastStore } from 'store';
+import {
+  CommonDialog,
+  DirectionRadio,
+  FieldSet,
+  SubmitButton,
+} from 'components';
+import { useShallowMainStore, useToastStore } from 'store';
 
 import { formatLabel } from 'utils';
 
@@ -20,13 +25,15 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
   onClose,
   originId,
 }) => {
-  const addArrow = useMainStore((state) => state.addArrow);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const checkIfArrowAlreadyExists = useMainStore(
-    (state) => state.checkIfArrowAlreadyExists,
-  );
-  const covers = useMainStore((state) => state.covers);
-  const groups = useMainStore((state) => state.groups);
+
+  const { covers, groups, checkIfArrowAlreadyExists, addArrow } =
+    useShallowMainStore((state) => ({
+      covers: state.covers,
+      groups: state.groups,
+      checkIfArrowAlreadyExists: state.checkIfArrowAlreadyExists,
+      addArrow: state.addArrow,
+    }));
 
   const originCover = covers.find((cov) => cov.id === originId);
   const originGroup = groups.find((grp) => grp.id === originId);
@@ -39,12 +46,11 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
     : undefined;
   const title = originCoverTitle || originGroupTitle || '';
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    formState: { isDirty },
-  } = useForm<ArrowSchema, unknown, ArrowSchemaOutput>({
+  const { control, handleSubmit, watch } = useForm<
+    ArrowSchema,
+    unknown,
+    ArrowSchemaOutput
+  >({
     resolver: zodResolver(ArrowSchema),
     defaultValues: {
       id: uuidv4(),
@@ -62,25 +68,28 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
     },
   });
 
+  const currentTargetId = watch('target.id');
+  const currentOriginId = watch('origin.id');
+
   const filteredOriginCovers = covers.filter(
     (cov) =>
-      cov.id !== watch('target.id') &&
-      !checkIfArrowAlreadyExists(cov.id, watch('target.id')),
+      cov.id !== currentTargetId &&
+      !checkIfArrowAlreadyExists(cov.id, currentTargetId),
   );
   const filteredOriginGroups = groups.filter(
     (grp) =>
-      grp.id !== watch('target.id') &&
-      !checkIfArrowAlreadyExists(grp.id, watch('target.id')),
+      grp.id !== currentTargetId &&
+      !checkIfArrowAlreadyExists(grp.id, currentTargetId),
   );
   const filteredTargetCovers = covers.filter(
     (cov) =>
-      cov.id !== watch('origin.id') &&
-      !checkIfArrowAlreadyExists(cov.id, watch('origin.id')),
+      cov.id !== currentOriginId &&
+      !checkIfArrowAlreadyExists(cov.id, currentOriginId),
   );
   const filteredTargetGroups = groups.filter(
     (grp) =>
-      grp.id !== watch('origin.id') &&
-      !checkIfArrowAlreadyExists(grp.id, watch('origin.id')),
+      grp.id !== currentOriginId &&
+      !checkIfArrowAlreadyExists(grp.id, currentOriginId),
   );
 
   const onSubmit = handleSubmit(
@@ -357,14 +366,12 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
       }
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
-          <Button
-            disabled={!isDirty || isError}
-            variant="contained"
-            color="primary"
+          <SubmitButton
+            control={control}
+            disabled={isError}
+            text="Create"
             startIcon={<AddOutlined />}
-            type="submit">
-            Create
-          </Button>
+          />
         </Stack>
       }
     />

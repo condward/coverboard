@@ -4,7 +4,7 @@ import { Vector2d } from 'konva/lib/types';
 import { useState, ReactNode, FC } from 'react';
 
 import { CoverSchema, GroupSchema } from 'types';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 interface CommonDraggableProps {
@@ -28,9 +28,14 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
   children,
   updatePosition,
 }) => {
-  const covers = useMainStore((state) => state.covers);
-  const groups = useMainStore((state) => state.groups);
-  const color = useMainStore((state) => state.getColor());
+  const { covers, groups, color, refreshGroups, refreshCovers } =
+    useShallowMainStore((state) => ({
+      covers: state.covers,
+      groups: state.groups,
+      color: state.getColor(),
+      refreshGroups: state.refreshGroups,
+      refreshCovers: state.refreshCovers,
+    }));
 
   const { canvasLimits } = useGetSizesContext();
   const [hintArrows, setHintArrows] = useState<
@@ -54,9 +59,6 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
       y: newY,
     };
   };
-
-  const refreshGroups = useMainStore((state) => state.refreshGroups);
-  const refreshCovers = useMainStore((state) => state.refreshCovers);
 
   const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
     e.cancelBubble = true;

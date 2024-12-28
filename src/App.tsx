@@ -2,16 +2,19 @@ import { useEffect, FC } from 'react';
 
 import { Toast } from 'components';
 import { CoverBoard } from 'CoverBoard';
-import { useMainStore } from 'store';
+import { useShallowMainStore, useMainStore } from 'store';
 import { addPrefix, useSaveId } from 'utils';
 import { Popovers } from 'components/Popovers';
 import { useGetSizesContext } from 'providers';
 
 export const App: FC = () => {
   const saveId = useSaveId();
-  const resetStoreValues = useMainStore((state) => state.resetStoreValues);
-  const backColor = useMainStore((state) => state.getBackColor());
   const { padding, screenLimits } = useGetSizesContext();
+
+  const { backColor, resetStoreValues } = useShallowMainStore((state) => ({
+    resetStoreValues: state.resetStoreValues,
+    backColor: state.getBackColor(),
+  }));
 
   useEffect(() => {
     if (!window.localStorage.getItem(addPrefix(saveId))) {

@@ -2,7 +2,7 @@ import { Stack } from '@mui/material';
 import { FC } from 'react';
 
 import { SPACING_GAP } from 'types';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 
 import { NavigationBar } from './NavigationBar';
 import { ArrowsOfCoverOrigin } from './ArrowsOfCoverOrigin';
@@ -20,10 +20,11 @@ export const CoverConnections: FC<CoverConnectionsProps> = ({
   coverId,
   onChange,
 }) => {
-  const coverIdx = useMainStore((state) =>
-    state.covers.findIndex((cov) => cov.id === coverId),
-  );
-  const covers = useMainStore((state) => state.covers);
+  const { covers, coverIdx } = useShallowMainStore((state) => ({
+    covers: state.covers,
+    coverIdx: state.covers.findIndex((cover) => cover.id === coverId),
+  }));
+
   const prevCover = coverIdx > 0 ? covers[coverIdx - 1] : undefined;
   const nextCover =
     coverIdx < covers.length - 1 ? covers[coverIdx + 1] : undefined;

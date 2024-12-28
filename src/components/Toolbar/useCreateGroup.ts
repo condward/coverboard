@@ -3,16 +3,19 @@ import { ZodError } from 'zod';
 import { useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 
-import { selectedAtom, useMainStore, useToastStore } from 'store';
+import { selectedAtom, useShallowMainStore, useToastStore } from 'store';
 
 export const useCreateGroup = () => {
-  const addGroups = useMainStore((state) => state.addGroups);
-  const groupTitleDir = useMainStore((state) => state.configs.groups.title.dir);
-  const groupSubTitleDir = useMainStore(
-    (state) => state.configs.groups.subtitle.dir,
-  );
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const setSelected = useSetAtom(selectedAtom);
+
+  const { groupTitleDir, groupSubTitleDir, addGroups } = useShallowMainStore(
+    (state) => ({
+      groupTitleDir: state.configs.groups.title.dir,
+      groupSubTitleDir: state.configs.groups.subtitle.dir,
+      addGroups: state.addGroups,
+    }),
+  );
 
   return {
     createGroup: useCallback(() => {

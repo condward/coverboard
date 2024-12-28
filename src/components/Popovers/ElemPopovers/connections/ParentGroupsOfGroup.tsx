@@ -2,7 +2,7 @@ import { Stack, Chip } from '@mui/material';
 import { LinkOutlined } from '@mui/icons-material';
 import { FC } from 'react';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 import { SPACING_GAP } from 'types';
 import { FieldSet } from 'components/FieldSet';
 import { formatLabel } from 'utils';
@@ -16,12 +16,13 @@ export const ParentGroupsOfGroup: FC<ParentGroupsOfGroupProps> = ({
   groupId,
   onChange,
 }) => {
-  const groupsOutsideGroup = useMainStore((state) =>
-    state.getGroupsOfGroup(groupId),
+  const { getGroupsOfGroup, removeGroupAndRelatedArrows } = useShallowMainStore(
+    (state) => ({
+      getGroupsOfGroup: state.getGroupsOfGroup,
+      removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
+    }),
   );
-  const removeGroupAndRelatedArrows = useMainStore(
-    (state) => state.removeGroupAndRelatedArrows,
-  );
+  const groupsOutsideGroup = getGroupsOfGroup(groupId);
 
   if (groupsOutsideGroup.length === 0) return null;
 

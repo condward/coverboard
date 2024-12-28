@@ -17,10 +17,10 @@ export const pointsAtom = atom<ArrowPointSchema | null>(null);
 export const parentSelectedAtom = atom<Array<string>>([]);
 
 export const selectedAtom = atom<SelectedElement | null>(null);
-export const useIsSelected = (id: string) => {
+export const useGetSelectedId = (id: string) => {
   const selected = useAtomValue(selectedAtom);
 
-  return !!selected && selected.id === id;
+  return selected && selected.id === id ? id : null;
 };
 
 export const useIsSelectedModalOpen = (id: string) => {

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { useStore } from 'zustand';
 import { Stack } from '@mui/material';
@@ -12,11 +12,18 @@ import {
   DownloadOutlined,
 } from '@mui/icons-material';
 
-import { colorMap, Colors, ToolConfig, ToolConfigIDs } from 'types';
-import { haxPrefix, useIsLandscape } from 'utils';
+import {
+  colorMap,
+  Colors,
+  KeyboardShortcuts,
+  ToolConfig,
+  ToolConfigIDs,
+} from 'types';
+import { haxPrefix, useIsLandscape, usePreventKeys } from 'utils';
 
 import {
   useMainStore,
+  useShallowMainStore,
   configAtom,
   searchAtom,
   shareAtom,
@@ -25,16 +32,33 @@ import {
 } from 'store';
 import { useGetSizesContext } from 'providers';
 
-import { ToolbarIcon } from '.';
+import { ToolbarIcon, useCreateGroup } from '.';
 
 interface ToolbarProps {
   takeScreenshot: () => void;
-  createGroup: () => void;
 }
 
 export const ToolbarActionIcon: FC = () => {
   const { undo: undoAction, pastStates } = useStore(useMainStore.temporal);
   const actionsLength = pastStates.length;
+  const preventKeys = usePreventKeys();
+
+  useEffect(() => {
+    if (preventKeys) return;
+
+    const keyFn = (e: KeyboardEvent) => {
+      if (e.key === 'u') {
+        undoAction();
+        e.preventDefault();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        undoAction();
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', keyFn);
+
+    return () => window.removeEventListener('keydown', keyFn);
+  }, [preventKeys, undoAction]);
 
   const actionConfig: ToolConfig = {
     id: ToolConfigIDs.UNDO,
@@ -45,7 +69,7 @@ export const ToolbarActionIcon: FC = () => {
     valueModifier: () => undoAction(),
     badge: actionsLength > 0 ? actionsLength : null,
     enabled: true,
-    shortcut: 'U',
+    shortcut: KeyboardShortcuts.UNDO,
   };
 
   return <ToolbarIcon config={actionConfig} index={6} />;
@@ -53,9 +77,11 @@ export const ToolbarActionIcon: FC = () => {
 
 const useGetElemName = () => {
   const selected = useAtomValue(selectedAtom);
-  const isCover = useMainStore((state) => state.isCover);
-  const isGroup = useMainStore((state) => state.isGroup);
-  const isArrow = useMainStore((state) => state.isArrow);
+  const { isCover, isGroup, isArrow } = useShallowMainStore((state) => ({
+    isCover: state.isCover,
+    isGroup: state.isGroup,
+    isArrow: state.isArrow,
+  }));
   if (!selected) return '';
 
   if (isCover(selected.id)) return '(cover)';
@@ -65,33 +91,42 @@ const useGetElemName = () => {
   return '';
 };
 
-export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot, createGroup }) => {
+export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot }) => {
   const isLandscape = useIsLandscape();
-  const color = useMainStore((state) => state.getColor());
   const editArrows = useAtomValue(pointsAtom);
   const [openConfig, setOpenConfig] = useAtom(configAtom);
   const [openSearch, setOpenSearch] = useAtom(searchAtom);
   const [openShare, setOpenShare] = useAtom(shareAtom);
   const [selected, setSelected] = useAtom(selectedAtom);
-  const coversLength = useMainStore((state) => state.covers.length);
-  const groupsLength = useMainStore((state) => state.groups.length);
-  const ArrowsLength = useMainStore((state) => state.arrows.length);
+
+  const {
+    color,
+    coversLength,
+    groupsLength,
+    arrowsLength,
+    isArrow,
+    isCover,
+    isGroup,
+    removeArrow,
+    removeCoverAndRelatedArrows,
+    removeGroupAndRelatedArrows,
+  } = useShallowMainStore((state) => ({
+    color: state.getColor(),
+    coversLength: state.covers.length,
+    groupsLength: state.groups.length,
+    arrowsLength: state.arrows.length,
+    isCover: state.isCover,
+    isGroup: state.isGroup,
+    isArrow: state.isArrow,
+    removeArrow: state.removeArrow,
+    removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
+    removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
+  }));
+
   const { coverSizeWidth, padding } = useGetSizesContext();
-
-  const removeCoverAndRelatedArrows = useMainStore(
-    (state) => state.removeCoverAndRelatedArrows,
-  );
-  const removeGroupAndRelatedArrows = useMainStore(
-    (state) => state.removeGroupAndRelatedArrows,
-  );
-
-  const isCover = useMainStore((state) => state.isCover);
-  const isGroup = useMainStore((state) => state.isGroup);
-  const isArrow = useMainStore((state) => state.isArrow);
-
   const elemName = useGetElemName();
 
-  const removeArrow = useMainStore((state) => state.removeArrow);
+  const { createGroup } = useCreateGroup();
   const deleteElem = () => {
     if (!selected) return;
 
@@ -120,7 +155,7 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot, createGroup }) => {
       valueModifier: setOpenSearch,
       badge: coversLength > 0 ? coversLength : null,
       enabled: true,
-      shortcut: 'A',
+      shortcut: KeyboardShortcuts.SEARCH,
     },
     {
       id: ToolConfigIDs.CONFIG,
@@ -131,7 +166,7 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot, createGroup }) => {
       valueModifier: setOpenConfig,
       badge: configSize === 1 ? 0 : configSize,
       enabled: true,
-      shortcut: 'O',
+      shortcut: KeyboardShortcuts.CONFIG,
     },
     {
       id: ToolConfigIDs.SHARE,
@@ -142,7 +177,7 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot, createGroup }) => {
       valueModifier: setOpenShare,
       badge: savesNumber === 1 ? null : savesNumber,
       enabled: true,
-      shortcut: 'S',
+      shortcut: KeyboardShortcuts.SHARE,
     },
     {
       id: ToolConfigIDs.GROUP,
@@ -153,7 +188,7 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot, createGroup }) => {
       valueModifier: createGroup,
       badge: groupsLength > 0 ? groupsLength : null,
       enabled: true,
-      shortcut: 'G',
+      shortcut: KeyboardShortcuts.GROUP,
     },
     {
       id: ToolConfigIDs.DELETE,
@@ -164,23 +199,23 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot, createGroup }) => {
       valueModifier: deleteElem,
       badge: elemName !== '' ? elemName[1] : null,
       enabled: !!selected,
-      shortcut: 'D',
+      shortcut: KeyboardShortcuts.DELETE,
     },
     {
       id: ToolConfigIDs.SCREENSHOT,
       tooltip: `Download board (elems: ${
-        groupsLength + coversLength + ArrowsLength
+        groupsLength + coversLength + arrowsLength
       })`,
       color: colorMap[Colors.ORANGE],
       icon: <DownloadOutlined />,
       value: !!editArrows || !!selected,
       valueModifier: takeScreenshot,
       badge:
-        groupsLength + coversLength + ArrowsLength > 0
-          ? groupsLength + coversLength + ArrowsLength
+        groupsLength + coversLength + arrowsLength > 0
+          ? groupsLength + coversLength + arrowsLength
           : null,
       enabled: !editArrows && !selected,
-      shortcut: 'C',
+      shortcut: KeyboardShortcuts.SCREENSHOT,
     },
   ];
 

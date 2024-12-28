@@ -5,6 +5,7 @@ import isDeepEqual from 'fast-deep-equal';
 import { temporal } from 'zundo';
 import throttle from 'just-throttle';
 import type { DeepPartial } from 'react-hook-form';
+import { useShallow } from 'zustand/react/shallow';
 
 import { sizeAtom, store } from 'store';
 
@@ -61,6 +62,9 @@ interface CoverContextData {
   getGroupByIdx: (groupId: number) => GroupSchema;
   getCoverByIdx: (coverId: number) => CoverSchema;
   getArrowByIdx: (arrowId: number) => ArrowSchema;
+  getGroups: () => GroupSchema[];
+  getCovers: () => CoverSchema[];
+  getArrows: () => ArrowSchema[];
 }
 
 type MainStoreUnion = UseCoverParams &
@@ -90,6 +94,15 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
   },
   resetStoreValues() {
     set(defaultValues());
+  },
+  getGroups() {
+    return get().groups;
+  },
+  getCovers() {
+    return get().covers;
+  },
+  getArrows() {
+    return get().arrows;
   },
   getGroupByIdx(groupIdx) {
     return get().groups[groupIdx];
@@ -456,3 +469,6 @@ export const useMainStore = create<MainStoreUnion>()(
     },
   ),
 );
+
+export const useShallowMainStore = <T>(fn: (state: MainStoreUnion) => T) =>
+  useMainStore(useShallow((state) => fn(state)));
