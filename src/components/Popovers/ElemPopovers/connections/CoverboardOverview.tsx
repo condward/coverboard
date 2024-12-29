@@ -25,29 +25,31 @@ interface CoverboardOverviewprops {
 export const CoverboardOverview: FC<CoverboardOverviewprops> = ({
   onClose,
 }) => {
-  const setSelected = useSetAtom(selectedAtom);
-
   const {
-    groups,
-    covers,
-    arrows,
+    getGroups,
+    getCovers,
+    getArrows,
     groupsInsideGroup,
     coversInsideGroup,
     removeGroupAndRelatedArrows,
     removeCoverAndRelatedArrows,
     removeArrow,
   } = useShallowMainStore((state) => ({
-    groups: state.groups,
-    covers: state.covers,
-    arrows: state.arrows,
+    getGroups: state.getGroups,
+    getCovers: state.getCovers,
+    getArrows: state.getArrows,
     groupsInsideGroup: state.getGroupsInsideGroup,
     coversInsideGroup: state.getCoversInsideGroup,
     removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
     removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
     removeArrow: state.removeArrow,
   }));
-
+  const covers = getCovers();
+  const groups = getGroups();
+  const arrows = getArrows();
   const totalElements = covers.length + groups.length;
+
+  const setSelected = useSetAtom(selectedAtom);
 
   const groupConnections: RecursiveTypeGroup = {};
   groups.forEach((group) => {

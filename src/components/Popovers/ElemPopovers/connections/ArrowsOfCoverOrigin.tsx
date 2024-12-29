@@ -16,13 +16,14 @@ export const ArrowsOfCoverOrigin: FC<ArrowsOfCoverOriginProps> = ({
   id,
   onChange,
 }) => {
-  const { getTargetRelatedArrows, covers, removeArrow } = useShallowMainStore(
-    (state) => ({
+  const { getTargetRelatedArrows, getCovers, removeArrow } =
+    useShallowMainStore((state) => ({
       getTargetRelatedArrows: state.getTargetRelatedArrows,
-      covers: state.covers,
+      getCovers: state.getCovers,
       removeArrow: state.removeArrow,
-    }),
-  );
+    }));
+  const covers = getCovers();
+
   const relatedArrows = getTargetRelatedArrows(id);
 
   const defaultCoverConnections = relatedArrows.flatMap((arrow) => {

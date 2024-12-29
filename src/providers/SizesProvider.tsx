@@ -10,15 +10,19 @@ import { SizesContext } from './useGetSizesContext';
 export const SizesProvider: FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
+  const isLandscape = useIsLandscape();
+
   const { fitToScreen, heightRatio, scale } = useShallowMainStore((state) => ({
     fitToScreen: state.configs.layout.fitToScreen,
     heightRatio: state.getHeightRatio(),
     scale: state.configs.layout.scale,
   }));
 
-  const [screenSize, updateSize] = useAtom(sizeAtom);
-  const isLandscape = useIsLandscape();
-  const hideToolbar = useAtomValue(hideToolbarAtom);
+  const { screenSize, updateSize, hideToolbar } = {
+    screenSize: useAtomValue(sizeAtom),
+    updateSize: useAtom(sizeAtom)[1],
+    hideToolbar: useAtomValue(hideToolbarAtom),
+  };
 
   const width = screenSize.width;
   const height = screenSize.height;

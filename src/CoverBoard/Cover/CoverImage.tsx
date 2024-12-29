@@ -13,9 +13,9 @@ interface CoverImageProps {
 }
 
 export const CoverImage: FC<CoverImageProps> = ({ link, onRetry }) => {
-  const color = useMainStore((state) => state.getColor());
-
   const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
+  const color = useMainStore((state) => state.getColor());
 
   if (link === '') {
     return (
@@ -35,9 +35,10 @@ export const CoverImage: FC<CoverImageProps> = ({ link, onRetry }) => {
 };
 
 const CoverImageChild: FC<CoverImageProps> = ({ link, onRetry }) => {
+  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
   const color = useMainStore((state) => state.getColor());
 
-  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const [image, status] = useImage(link, 'anonymous');
 
   return (

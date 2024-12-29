@@ -1,6 +1,5 @@
 import { FC, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Stack, Button, Tooltip } from '@mui/material';
 import { useAtom } from 'jotai';
@@ -21,6 +20,7 @@ import {
 } from 'types';
 import { CommonDialog, SubmitButton } from 'components';
 import { hideToolbarAtom, useShallowMainStore, useToastStore } from 'store';
+import { useForm } from 'utils';
 import { CoverboardOverview } from 'components/Popovers/ElemPopovers/connections';
 
 import { ToolbarConfigForm } from './ToolbarConfigForm';
@@ -28,24 +28,27 @@ import { ToolbarConfigForm } from './ToolbarConfigForm';
 export const ToolbarConfigPopover: FC<{
   onClose: () => void;
 }> = ({ onClose }) => {
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const {
-    configs,
+    getConfigs,
     totalLength,
     updateConfigs,
     updateAllCovers,
     updateAllGroups,
     updateAllArrows,
   } = useShallowMainStore((state) => ({
-    configs: state.configs,
+    getConfigs: state.getConfigs,
     totalLength: state.groups.length + state.covers.length,
     updateConfigs: state.updateConfigs,
     updateAllCovers: state.updateAllCovers,
     updateAllGroups: state.updateAllGroups,
     updateAllArrows: state.updateAllArrows,
   }));
+  const configs = getConfigs();
 
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const [isToolbarHidden, setHideToolBar] = useAtom(hideToolbarAtom);
+
+  const [openOverview, setOverviewOpen] = useState(false);
 
   const { control, handleSubmit } = useForm<
     ConfigSchema,
@@ -55,7 +58,7 @@ export const ToolbarConfigPopover: FC<{
     resolver: zodResolver(
       configSchema.extend({
         layout: configSchema.shape.layout.extend({
-          scale: z.number().min(0.5).max(1.5),
+          scale: z.coerce.number().min(0.5).max(1.5),
         }),
       }),
     ),
@@ -101,8 +104,6 @@ export const ToolbarConfigPopover: FC<{
       }
     },
   );
-
-  const [openOverview, setOverviewOpen] = useState(false);
 
   return (
     <CommonDialog

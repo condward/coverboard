@@ -15,6 +15,7 @@ import {
   GroupSchema,
   ArrowSchema,
   appSchema,
+  ConfigSchema,
 } from 'types';
 import { DEFAULT_KEY, NAME_SPACE } from 'utils';
 
@@ -65,6 +66,7 @@ interface CoverContextData {
   getGroups: () => GroupSchema[];
   getCovers: () => CoverSchema[];
   getArrows: () => ArrowSchema[];
+  getConfigs: () => ConfigSchema;
 }
 
 type MainStoreUnion = UseCoverParams &
@@ -103,6 +105,9 @@ const mainStoreFn: StateCreator<MainStoreUnion> = (set, get, api) => ({
   },
   getArrows() {
     return get().arrows;
+  },
+  getConfigs() {
+    return get().configs;
   },
   getGroupByIdx(groupIdx) {
     return get().groups[groupIdx];
@@ -471,4 +476,4 @@ export const useMainStore = create<MainStoreUnion>()(
 );
 
 export const useShallowMainStore = <T>(fn: (state: MainStoreUnion) => T) =>
-  useMainStore(useShallow((state) => fn(state)));
+  useMainStore(useShallow(fn));

@@ -23,12 +23,6 @@ export const useGetSelectedId = (id: string) => {
   return selected && selected.id === id ? id : null;
 };
 
-export const useIsSelectedModalOpen = (id: string) => {
-  const selected = useAtomValue(selectedAtom);
-
-  return !!selected && selected.id === id && selected.open;
-};
-
 const editingTextAtomBase = atom<SelectedText | null>(null);
 export const editingTextAtom = atom(
   (get) => get(editingTextAtomBase),

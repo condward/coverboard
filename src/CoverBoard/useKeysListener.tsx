@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 
 import {
@@ -13,6 +13,8 @@ import { KeyboardShortcuts } from 'types';
 import { usePreventKeys } from 'utils';
 
 export const useKeysListener = () => {
+  const preventKeys = usePreventKeys();
+
   const { fitToScreen, updateConfigs, getCovers, getGroups } =
     useShallowMainStore((state) => ({
       fitToScreen: state.configs.layout.fitToScreen,
@@ -21,16 +23,22 @@ export const useKeysListener = () => {
       getGroups: state.getGroups,
     }));
 
-  const setHideToolBar = useSetAtom(hideToolbarAtom);
-
-  const points = useAtomValue(pointsAtom);
-
-  const [selected, setSelected] = useAtom(selectedAtom);
-  const editTitle = useAtomValue(editTitleAtom);
-
-  const isTextSelected = !!useAtomValue(editingTextAtom);
+  const {
+    setHideToolBar,
+    setSelected,
+    points,
+    editTitle,
+    isTextSelected,
+    selected,
+  } = {
+    setHideToolBar: useSetAtom(hideToolbarAtom),
+    setSelected: useSetAtom(selectedAtom),
+    points: useAtomValue(pointsAtom),
+    editTitle: useAtomValue(editTitleAtom),
+    isTextSelected: !!useAtomValue(editingTextAtom),
+    selected: useAtomValue(selectedAtom),
+  };
   const hasMode = !!points || !!selected || editTitle || !!isTextSelected;
-  const preventKeys = usePreventKeys();
 
   useEffect(() => {
     if (preventKeys) return;

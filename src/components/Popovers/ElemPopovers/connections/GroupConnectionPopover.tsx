@@ -21,10 +21,12 @@ export const GroupConnectionPopover: FC<GroupPopoverProps> = ({
   onClose,
   onChange,
 }) => {
-  const { groups, covers } = useShallowMainStore((state) => ({
-    groups: state.groups,
-    covers: state.covers,
+  const { getGroups, getCovers } = useShallowMainStore((state) => ({
+    getGroups: state.getGroups,
+    getCovers: state.getCovers,
   }));
+  const groups = getGroups();
+  const covers = getCovers();
 
   const [openConn, setOpenConn] = useState(false);
   return (

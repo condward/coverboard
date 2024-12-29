@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
-import { TextField, Button, Stack, Alert, Tooltip } from '@mui/material';
+import { Button, Stack, Alert, Tooltip } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import Papa, { ParseResult } from 'papaparse';
 import {
   AddOutlined,
@@ -21,8 +21,9 @@ import {
   SPACING_GAP,
 } from 'types';
 import { useShallowMainStore, useResetApiKey } from 'store';
-import { CommonDialog, SubmitButton } from 'components';
+import { CommonDialog, SubmitButton, TextInput } from 'components';
 import FileImporter from 'components/FileImporter';
+import { useForm } from 'utils';
 
 import { useSearchValues } from './useSearchValues';
 import { ToolbarSearchMedia } from './ToobarSeachMedia';
@@ -40,9 +41,9 @@ export const ToolbarSearchPopover: FC<{
   onClose: () => void;
 }> = ({ onClose }) => {
   const initialState = getInitialState();
-  const { resetApiKey } = useResetApiKey();
-  const [failedCovers, setFailedCovers] = useState<SearchSchema['search']>([]);
   const addEmptyCover = useAddEmptyCover();
+
+  const { resetApiKey } = useResetApiKey();
   const { mutateAsync: handleSearch, isPending } = useSearchValues();
 
   const { media, coversLength, titleLabel, subTitleLabel } =
@@ -52,6 +53,8 @@ export const ToolbarSearchPopover: FC<{
       titleLabel: state.getTitleLabel(),
       subTitleLabel: state.getSubTitleLabel(),
     }));
+
+  const [failedCovers, setFailedCovers] = useState<SearchSchema['search']>([]);
 
   const {
     control,
@@ -156,8 +159,9 @@ export const ToolbarSearchPopover: FC<{
                 <Controller
                   name={`search.${index}.title`}
                   control={control}
-                  render={({ field }) => (
-                    <TextField
+                  render={({ field, fieldState: { error } }) => (
+                    <TextInput
+                      formError={error}
                       fullWidth
                       autoFocus={index === 0}
                       label={`${titleLabel.label}${titleLabel.required ? '*' : ''}`}
@@ -169,9 +173,10 @@ export const ToolbarSearchPopover: FC<{
                 <Controller
                   name={`search.${index}.subtitle`}
                   control={control}
-                  render={({ field }) => (
-                    <TextField
+                  render={({ field, fieldState: { error } }) => (
+                    <TextInput
                       fullWidth
+                      formError={error}
                       disabled={subTitleLabel.hidden}
                       label={`${subTitleLabel.label}${
                         subTitleLabel.required ? '*' : ''

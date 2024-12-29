@@ -1,11 +1,11 @@
 import { FC } from 'react';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 
 import { Arrow } from './Arrow';
 
 export const Arrows: FC = () => {
-  const arrowIds = useMainStore((state) =>
+  const arrowIds = useShallowMainStore((state) =>
     state.arrows.map((arrow) => arrow.id),
   );
 

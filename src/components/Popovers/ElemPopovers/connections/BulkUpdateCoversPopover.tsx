@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Button, Stack, Chip, Box } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import {
   AddOutlined,
   DeleteOutlined,
@@ -26,7 +26,7 @@ import {
 } from 'components';
 import { useShallowMainStore, useToastStore } from 'store';
 
-import { formatLabel } from 'utils';
+import { formatLabel, useForm } from 'utils';
 import { useGetSizesContext } from 'providers';
 
 interface BulkUpdateCoversPopoverProps {
@@ -45,6 +45,10 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   covers,
   maxBounds,
 }) => {
+  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
+    useGetSizesContext();
+
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const {
     media,
     removeCoverAndRelatedArrows,
@@ -59,10 +63,6 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
     heightRatio: state.getHeightRatio(),
   }));
 
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-
-  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
-    useGetSizesContext();
   const offLimitCovers = covers.flatMap((covers) => {
     if (
       (covers.pos.x > canvasLimits.width && canvasLimits.width > scale) ||
@@ -256,8 +256,9 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             <Controller
               name="star.count"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <SliderInput
+                  formError={error}
                   label="Rating"
                   name={field.name}
                   value={field.value}
@@ -288,8 +289,9 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             <Controller
               name="pos.x"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <SliderInput
+                  formError={error}
                   label="Start"
                   name={field.name}
                   value={field.value}
@@ -302,8 +304,9 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             <Controller
               name="pace.x"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <SliderInput
+                  formError={error}
                   label="Step"
                   name={field.name}
                   value={field.value}
@@ -323,8 +326,9 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             <Controller
               name="pos.y"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <SliderInput
+                  formError={error}
                   label="Start"
                   name={field.name}
                   value={field.value}
@@ -337,8 +341,9 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
             <Controller
               name="pace.y"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <SliderInput
+                  formError={error}
                   label="Step"
                   name={field.name}
                   value={field.value}

@@ -19,6 +19,8 @@ interface ArrowProps {
 }
 
 export const ArrowDraggable: FC<ArrowProps> = ({ index, ArrowParams }) => {
+  const { fontSize, coverSizeWidth } = useGetSizesContext();
+
   const { text, dir, id, color, updateArrow, showHelpers, showLabel } =
     useShallowMainStore((state) => {
       const {
@@ -36,10 +38,9 @@ export const ArrowDraggable: FC<ArrowProps> = ({ index, ArrowParams }) => {
         showLabel: state.configs.arrows.title.show,
       };
     });
-  const { fontSize, coverSizeWidth } = useGetSizesContext();
 
-  const selectedId = useGetSelectedId(id);
   const setEditingText = useSetAtom(editingTextAtom);
+  const selectedId = useGetSelectedId(id);
   const isCurrentTextSelected = useIsCurrentTextSelected({
     id,
     text: TextTypes.ArrowLABEL,

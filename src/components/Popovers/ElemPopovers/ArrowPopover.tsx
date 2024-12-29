@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { TextField, Button, Stack } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { useAtomValue } from 'jotai';
 import {
   ArrowCircleLeftOutlined,
@@ -16,10 +16,11 @@ import {
   DirectionRadio,
   FieldSet,
   SubmitButton,
+  TextInput,
 } from 'components';
 import { configAtom, useShallowMainStore, useToastStore } from 'store';
 
-import { formatLabel } from 'utils';
+import { formatLabel, useForm } from 'utils';
 
 interface ArrowPopoverProps {
   onClose: (id?: string) => void;
@@ -35,16 +36,17 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
   onReturn,
 }) => {
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const configToolbarOpen = useAtomValue(configAtom);
-
-  const { updateArrow, covers, groups, removeArrow } = useShallowMainStore(
-    (state) => ({
+  const { updateArrow, getCovers, getgroups, removeArrow } =
+    useShallowMainStore((state) => ({
       updateArrow: state.updateArrow,
-      covers: state.covers,
-      groups: state.groups,
+      getCovers: state.getCovers,
+      getgroups: state.getGroups,
       removeArrow: state.removeArrow,
-    }),
-  );
+    }));
+  const covers = getCovers();
+  const groups = getgroups();
+
+  const configToolbarOpen = useAtomValue(configAtom);
 
   const originCoverTitle = covers.find((cov) => cov.id === arrow.origin.id)
     ?.title.text;
@@ -118,13 +120,14 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
               <Controller
                 name="title.text"
                 control={control}
-                render={({ field }) => (
-                  <TextField
+                render={({ field, fieldState: { error } }) => (
+                  <TextInput
                     autoFocus
                     label="text"
                     fullWidth
                     value={field.value}
                     onChange={field.onChange}
+                    formError={error}
                   />
                 )}
               />

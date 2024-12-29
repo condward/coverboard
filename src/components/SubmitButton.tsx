@@ -20,12 +20,14 @@ export const SubmitButton = <TFieldValues extends FieldValues = FieldValues>({
   isPending,
   id,
 }: FormButtonProps<TFieldValues>) => {
-  const { isDirty } = useFormState({ control });
+  const { isDirty, errors } = useFormState({ control });
 
   return (
     <Button
       id={id}
-      disabled={!isDirty || !!isPending || !!disabled}
+      disabled={
+        !isDirty || !!isPending || Object.keys(errors).length > 0 || !!disabled
+      }
       variant="contained"
       color="primary"
       startIcon={startIcon ?? <SaveOutlined />}

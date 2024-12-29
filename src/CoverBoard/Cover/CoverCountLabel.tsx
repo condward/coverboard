@@ -5,11 +5,12 @@ import { useMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 export const CoverCountLabel: FC = () => {
+  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
   const pos0 = useMainStore(
     (state) =>
       state.covers.filter((cov) => cov.pos.x === 0 && cov.pos.y === 0).length,
   );
-  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
   return (
     <Text

@@ -36,14 +36,14 @@ export const groupSchema = z.object({
       ),
   }),
   scale: z.object({
-    x: z
+    x: z.coerce
       .number({
         invalid_type_error: 'groups:scale:x position must be a number',
         required_error: 'groups:scale:x is required',
       })
       .min(0, 'groups:x position must be positive number')
       .max(10),
-    y: z
+    y: z.coerce
       .number({
         invalid_type_error: 'groups:scale:y position must be a number',
         required_error: 'groups:scale:y is required',

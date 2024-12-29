@@ -14,18 +14,18 @@ import { useShallowMainStore, useToastStore } from 'store';
 import { Media, SearchSchema } from 'types';
 
 export const useSearchValues = () => {
-  const { media, covers, starsDir, labelDir, labelSubDir, addCovers } =
+  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { media, getCovers, starsDir, labelDir, labelSubDir, addCovers } =
     useShallowMainStore((state) => ({
       starsDir: state.configs.covers.rating.dir,
       labelDir: state.configs.covers.title.dir,
       labelSubDir: state.configs.covers.subtitle.dir,
       addCovers: state.addCovers,
-      covers: state.covers,
+      getCovers: state.getCovers,
       media: state.configs.media,
     }));
-
-  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const covers = getCovers();
 
   return useMutation({
     mutationFn: async (inputArray: SearchSchema['search']) => {

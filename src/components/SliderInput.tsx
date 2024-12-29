@@ -1,8 +1,10 @@
-import { TextField, FormLabel, FormGroup } from '@mui/material';
+import { FormLabel, FormGroup } from '@mui/material';
 import { ChangeEventHandler, FC } from 'react';
+import type { FieldError } from 'react-hook-form';
 
 import { SliderField } from './SliderField';
 import { InputAction } from './InputAction';
+import { TextInput } from './TextInput';
 
 interface SliderInputProp {
   value: number;
@@ -16,6 +18,7 @@ interface SliderInputProp {
   step?: number;
   max: number;
   label: string;
+  formError?: FieldError;
 }
 
 export const SliderInput: FC<SliderInputProp> = ({
@@ -26,6 +29,7 @@ export const SliderInput: FC<SliderInputProp> = ({
   label,
   name,
   step = 1,
+  formError,
 }) => (
   <FormGroup>
     <InputAction
@@ -46,7 +50,7 @@ export const SliderInput: FC<SliderInputProp> = ({
         </>
       }
       action={
-        <TextField
+        <TextInput
           fullWidth
           id={`${name}-number-id`}
           type="number"
@@ -54,6 +58,7 @@ export const SliderInput: FC<SliderInputProp> = ({
           aria-label={name}
           value={value}
           disabled={value === -1}
+          formError={formError}
           onChange={
             onChange as unknown as ChangeEventHandler<
               HTMLTextAreaElement | HTMLInputElement

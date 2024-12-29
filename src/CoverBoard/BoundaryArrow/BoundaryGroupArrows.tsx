@@ -9,18 +9,19 @@ export const BoundaryGroupArrows: FC = () => {
   const { canvasLimits } = useGetSizesContext();
 
   const {
-    groups,
+    getGroups,
     scale,
     updateGroup,
     removeGroupAndRelatedArrows,
     groupColor,
   } = useShallowMainStore((state) => ({
-    groups: state.groups,
+    getGroups: state.getGroups,
     scale: state.configs.layout.scale,
     updateGroup: state.updateGroup,
     removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
     groupColor: state.getGroupColor(),
   }));
+  const groups = getGroups();
 
   const offLimitGroups = groups.flatMap((group) => {
     if (

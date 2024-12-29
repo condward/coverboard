@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { Stack, TextField, Chip, Alert } from '@mui/material';
+import { Stack, Chip, Alert } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { AddOutlined } from '@mui/icons-material';
 
@@ -11,10 +11,11 @@ import {
   DirectionRadio,
   FieldSet,
   SubmitButton,
+  TextInput,
 } from 'components';
 import { useShallowMainStore, useToastStore } from 'store';
 
-import { formatLabel } from 'utils';
+import { formatLabel, useForm } from 'utils';
 
 interface AddArrowPopoverProps {
   onClose: (id?: string) => void;
@@ -26,14 +27,15 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
   originId,
 }) => {
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-
-  const { covers, groups, checkIfArrowAlreadyExists, addArrow } =
+  const { getCovers, getGroups, checkIfArrowAlreadyExists, addArrow } =
     useShallowMainStore((state) => ({
-      covers: state.covers,
-      groups: state.groups,
+      getCovers: state.getCovers,
+      getGroups: state.getGroups,
       checkIfArrowAlreadyExists: state.checkIfArrowAlreadyExists,
       addArrow: state.addArrow,
     }));
+  const covers = getCovers();
+  const groups = getGroups();
 
   const originCover = covers.find((cov) => cov.id === originId);
   const originGroup = groups.find((grp) => grp.id === originId);
@@ -122,13 +124,14 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
             <Controller
               name="title.text"
               control={control}
-              render={({ field }) => (
-                <TextField
+              render={({ field, fieldState: { error } }) => (
+                <TextInput
                   autoFocus
                   label="text"
                   fullWidth
                   value={field.value}
                   onChange={field.onChange}
+                  formError={error}
                 />
               )}
             />

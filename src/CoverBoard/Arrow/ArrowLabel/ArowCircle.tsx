@@ -8,6 +8,8 @@ import { useGetSizesContext } from 'providers';
 import { KeyboardShortcuts } from 'types';
 
 export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
+  const { circleRadius } = useGetSizesContext();
+
   const { id, color, showArrow, removeArrow } = useShallowMainStore((state) => {
     const { id } = state.getArrowByIdx(index);
 
@@ -18,9 +20,9 @@ export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
       removeArrow: state.removeArrow,
     };
   });
-  const { circleRadius } = useGetSizesContext();
-  const selectedId = useGetSelectedId(id);
+
   const setSelected = useSetAtom(selectedAtom);
+  const selectedId = useGetSelectedId(id);
 
   const handleSelect = () => {
     setSelected({ id, open: !!selectedId });

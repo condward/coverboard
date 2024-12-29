@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
-import { TextField, Button, Link, Stack } from '@mui/material';
+import { Button, Link, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { ZodError } from 'zod';
 import {
   DeleteOutlined,
@@ -26,10 +26,11 @@ import {
   FieldSet,
   InputAction,
   SubmitButton,
+  TextInput,
 } from 'components';
 import { configAtom, useShallowMainStore, useToastStore } from 'store';
 import { useGetSizesContext } from 'providers';
-import { useIsLandscape } from 'utils';
+import { useIsLandscape, useForm } from 'utils';
 
 import { useSearchValue } from './useSearchValue';
 import { CoverConnectionPopover } from './connections';
@@ -116,8 +117,14 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   onChange,
   onReturn,
 }) => {
-  const [conn, setOpenConn] = useState(false);
+  const isLandscape = useIsLandscape();
+  const searchValue = useSearchValue(cover.id);
 
+  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
+    useGetSizesContext();
+
+  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const {
     titleLabel,
     subTitleLabel,
@@ -133,15 +140,12 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
     totalElements: state.covers.length + state.groups.length,
     updateCover: state.updateCover,
   }));
+
   const configToolbarOpen = useAtomValue(configAtom);
-  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
   const buttons = getButtons(media, cover);
-  const searchValue = useSearchValue(cover.id);
-  const isLandscape = useIsLandscape();
-  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
-    useGetSizesContext();
+
+  const [conn, setOpenConn] = useState(false);
 
   const { control, handleSubmit, getValues } = useForm<
     CoverSchema,
@@ -255,10 +259,11 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
               <Controller
                 name="title.text"
                 control={control}
-                render={({ field, fieldState }) => (
+                render={({ field, fieldState: { error, isDirty } }) => (
                   <InputAction
                     input={
-                      <TextField
+                      <TextInput
+                        formError={error}
                         label={`text`}
                         autoFocus
                         fullWidth
@@ -273,7 +278,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                         type="button"
                         fullWidth
                         sx={{ height: '100%' }}
-                        disabled={!fieldState.isDirty}
+                        disabled={!isDirty || !!error}
                         onClick={() =>
                           field.onChange(getValues('title.search'))
                         }>
@@ -305,15 +310,16 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
               <Controller
                 name="subtitle.text"
                 control={control}
-                render={({ field, fieldState }) => (
+                render={({ field, fieldState: { error, isDirty } }) => (
                   <InputAction
                     input={
-                      <TextField
+                      <TextInput
                         label="text"
                         autoFocus
                         fullWidth
                         value={field.value}
                         onChange={field.onChange}
+                        formError={error}
                       />
                     }
                     action={
@@ -323,7 +329,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                         type="button"
                         fullWidth
                         sx={{ height: '100%' }}
-                        disabled={!fieldState.isDirty}
+                        disabled={!isDirty}
                         onClick={() =>
                           field.onChange(getValues('subtitle.search'))
                         }>
@@ -349,8 +355,9 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
               <Controller
                 name="star.count"
                 control={control}
-                render={({ field }) => (
+                render={({ field, fieldState: { error } }) => (
                   <SliderInput
+                    formError={error}
                     label="Rating"
                     name={field.name}
                     value={field.value}
@@ -380,8 +387,9 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
               <Controller
                 name="pos.x"
                 control={control}
-                render={({ field }) => (
+                render={({ field, fieldState: { error } }) => (
                   <SliderInput
+                    formError={error}
                     label="X"
                     name={field.name}
                     value={field.value}
@@ -397,8 +405,9 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
               <Controller
                 name="pos.y"
                 control={control}
-                render={({ field }) => (
+                render={({ field, fieldState: { error } }) => (
                   <SliderInput
+                    formError={error}
                     label="Y"
                     name={field.name}
                     value={field.value}
@@ -421,10 +430,11 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                 <Controller
                   name="link"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field, fieldState: { error } }) => (
                     <InputAction
                       input={
-                        <TextField
+                        <TextInput
+                          formError={error}
                           fullWidth
                           disabled
                           label="Link"

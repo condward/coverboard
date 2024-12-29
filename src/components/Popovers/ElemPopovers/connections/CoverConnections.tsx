@@ -20,10 +20,11 @@ export const CoverConnections: FC<CoverConnectionsProps> = ({
   coverId,
   onChange,
 }) => {
-  const { covers, coverIdx } = useShallowMainStore((state) => ({
-    covers: state.covers,
+  const { getCovers, coverIdx } = useShallowMainStore((state) => ({
+    getCovers: state.getCovers,
     coverIdx: state.covers.findIndex((cover) => cover.id === coverId),
   }));
+  const covers = getCovers();
 
   const prevCover = coverIdx > 0 ? covers[coverIdx - 1] : undefined;
   const nextCover =

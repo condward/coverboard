@@ -22,10 +22,11 @@ export const GroupConnections: FC<GroupConnectionsProps> = ({
   groupId,
   onChange,
 }) => {
-  const { groups, groupIdx } = useShallowMainStore((state) => ({
-    groups: state.groups,
+  const { getGroups, groupIdx } = useShallowMainStore((state) => ({
+    getGroups: state.getGroups,
     groupIdx: state.groups.findIndex((grp) => grp.id === groupId),
   }));
+  const groups = getGroups();
 
   const prevGroup = groupIdx > 0 ? groups[groupIdx - 1] : undefined;
   const nextGroup =

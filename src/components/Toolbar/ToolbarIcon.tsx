@@ -15,9 +15,11 @@ interface ToolbarIconProps {
 }
 
 export const ToolbarIcon: FC<ToolbarIconProps> = ({ config }) => {
-  const setPoints = useSetAtom(pointsAtom);
-  const { coverSizeWidth, fontSize } = useGetSizesContext();
   const preventKeys = usePreventKeys();
+
+  const { coverSizeWidth, fontSize } = useGetSizesContext();
+
+  const setPoints = useSetAtom(pointsAtom);
 
   const handleClick = useCallback(() => {
     setPoints(null);

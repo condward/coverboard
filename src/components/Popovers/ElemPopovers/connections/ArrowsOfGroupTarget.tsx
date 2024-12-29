@@ -16,13 +16,13 @@ export const ArrowsOfGroupTarget: FC<ArrowsOfGroupTargetProps> = ({
   id,
   onChange,
 }) => {
-  const { getTargetRelatedArrows, groups, removeArrow } = useShallowMainStore(
-    (state) => ({
+  const { getTargetRelatedArrows, getGroups, removeArrow } =
+    useShallowMainStore((state) => ({
       getTargetRelatedArrows: state.getTargetRelatedArrows,
-      groups: state.groups,
+      getGroups: state.getGroups,
       removeArrow: state.removeArrow,
-    }),
-  );
+    }));
+  const groups = getGroups();
   const relatedArrows = getTargetRelatedArrows(id);
 
   const defaultGroupConnections = relatedArrows.flatMap((arrow) => {

@@ -9,6 +9,7 @@ export const ArrowPointer: FC<{
   ArrowParams: ArrowParams;
 }> = ({ ArrowParams }) => {
   const { fontSize } = useGetSizesContext();
+
   const color = useMainStore((state) => state.getArrowColor());
 
   return (

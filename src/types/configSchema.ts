@@ -48,7 +48,7 @@ export const backColorMap = {
 export const configSchema = z.object(
   {
     layout: z.object({
-      scale: z
+      scale: z.coerce
         .number({
           invalid_type_error: 'configs:layout.scale must be a number',
           required_error: 'configs:layout.scale is required',

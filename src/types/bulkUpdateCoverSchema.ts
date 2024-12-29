@@ -93,7 +93,7 @@ export const bulkUpdateCoverSchema = z.object({
         },
       })
       .or(z.literal('none')),
-    count: z
+    count: z.coerce
       .number({
         invalid_type_error: 'covers:star:count must be a number',
         required_error: 'covers:star:count is required',

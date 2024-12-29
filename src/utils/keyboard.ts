@@ -8,11 +8,12 @@ import {
 } from 'store';
 
 export const usePreventKeys = () => {
-  const editTitle = useAtomValue(editTitleAtom);
   const openPopup = useIsPopOpen();
-  const selected = useAtomValue(selectedAtom);
-  const isContextModalOpen = !!selected?.open;
-  const isTextSelected = !!useAtomValue(editingTextAtom);
+  const { editTitle, isContextModalOpen, isTextSelected } = {
+    editTitle: useAtomValue(editTitleAtom),
+    isContextModalOpen: !!useAtomValue(selectedAtom)?.open,
+    isTextSelected: !!useAtomValue(editingTextAtom),
+  };
 
   return openPopup || isContextModalOpen || isTextSelected || editTitle;
 };

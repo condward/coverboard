@@ -14,6 +14,8 @@ export const CoverLoadImage: FC<{
 }> = ({ index }) => {
   const renderTime = 400 * index;
 
+  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
   const {
     link,
     id,
@@ -37,10 +39,9 @@ export const CoverLoadImage: FC<{
       getCovers: state.getCovers,
     };
   });
-  const { fontSize, coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
-  const selectedId = useGetSelectedId(id);
   const setSelected = useSetAtom(selectedAtom);
+  const selectedId = useGetSelectedId(id);
 
   const [shouldRender, setShouldRender] = useState(false);
   const [hasRetries, setHasRetries] = useState(false);

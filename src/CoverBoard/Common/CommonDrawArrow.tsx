@@ -11,7 +11,6 @@ import {
   pointsAtom,
   useGetSelectedId,
   useToastStore,
-  selectedAtom,
 } from 'store';
 import { useGetSizesContext } from 'providers';
 
@@ -22,20 +21,22 @@ interface CommonDrawArrowProps {
 
 const useShowArrow = (id: string) => {
   const {
-    covers,
-    groups,
+    getCovers,
+    getGroups,
     getGroupsOfCover,
     getGroupsOfGroup,
     getGroupsInsideGroup,
     getCoversInsideGroup,
   } = useShallowMainStore((state) => ({
-    covers: state.covers,
-    groups: state.groups,
+    getCovers: state.getCovers,
+    getGroups: state.getGroups,
     getGroupsOfCover: state.getGroupsOfCover,
     getGroupsOfGroup: state.getGroupsOfGroup,
     getGroupsInsideGroup: state.getGroupsInsideGroup,
     getCoversInsideGroup: state.getCoversInsideGroup,
   }));
+  const covers = getCovers();
+  const groups = getGroups();
 
   const points = useAtomValue(pointsAtom);
 
@@ -91,10 +92,9 @@ const CommonDrawArrowChild: FC<{
   scaleX: number;
   scaleY: number;
 }> = ({ id, scaleX, scaleY }) => {
-  const [points, setPoints] = useAtom(pointsAtom);
-  const selectedId = useGetSelectedId(id);
-  const selected = useAtomValue(selectedAtom);
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
   const {
     arrows,
     addArrow,
@@ -102,29 +102,31 @@ const CommonDrawArrowChild: FC<{
     labelDir,
     updateCover,
     updateGroup,
-    group,
-    cover,
+    groups,
+    covers,
   } = useShallowMainStore((state) => {
     return {
       arrows: state.arrows,
+      groups: state.groups,
+      covers: state.covers,
       addArrow: state.addArrow,
       updateArrow: state.updateArrow,
       labelDir: state.configs.arrows.title.dir,
       updateCover: state.updateCover,
       updateGroup: state.updateGroup,
-      group: selected?.id
-        ? state.groups.find((group) => selected.id === group.id)
-        : undefined,
-      cover: selected?.id
-        ? state.covers.find((cover) => selected.id === cover.id)
-        : undefined,
     };
   });
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
 
-  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+  const [points, setPoints] = useAtom(pointsAtom);
+  const selectedId = useGetSelectedId(id);
+  const group = selectedId
+    ? groups.find((group) => selectedId === group.id)
+    : undefined;
+  const cover = selectedId
+    ? covers.find((cover) => selectedId === cover.id)
+    : undefined;
+
   const selection: PosTypes | null = points?.id === id ? points.dir : null;
-
   const square = 25 + (coverSizeWidth * scaleX) / 20;
 
   const handleDrawArrow = useCallback(

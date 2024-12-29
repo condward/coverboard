@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
-import { TextField, Button, Stack } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 
 import {
   DeleteOutlined,
@@ -22,9 +22,10 @@ import {
   DirectionRadio,
   FieldSet,
   SubmitButton,
+  TextInput,
 } from 'components';
 import { configAtom, useShallowMainStore, useToastStore } from 'store';
-
+import { useForm } from 'utils';
 import { useGetSizesContext } from 'providers';
 
 import { BulkUpdateCoversPopover } from './connections';
@@ -42,12 +43,10 @@ export const GroupPopover: FC<GroupPopover> = ({
   onChange,
   onReturn,
 }) => {
-  const [conn, setOpenConn] = useState(false);
+  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
+    useGetSizesContext();
+
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-  const [open, setOpen] = useState(false);
-
-  const configToolbarOpen = useAtomValue(configAtom);
-
   const {
     updateGroup,
     totalElements,
@@ -61,6 +60,12 @@ export const GroupPopover: FC<GroupPopover> = ({
     getGroupBounds: state.getGroupBounds,
     removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
   }));
+
+  const configToolbarOpen = useAtomValue(configAtom);
+
+  const [open, setOpen] = useState(false);
+  const [conn, setOpenConn] = useState(false);
+
   const groupBound = getGroupBounds(group.id);
   const coversInsideGroup = getCoversInsideGroup(group.id);
 
@@ -68,9 +73,6 @@ export const GroupPopover: FC<GroupPopover> = ({
     removeGroupAndRelatedArrows(group.id);
     onClose();
   };
-
-  const { canvasLimits, coverSizeWidth, coverSizeHeight } =
-    useGetSizesContext();
 
   const { control, handleSubmit, watch } = useForm<
     GroupSchema,
@@ -129,13 +131,14 @@ export const GroupPopover: FC<GroupPopover> = ({
               <Controller
                 name="title.text"
                 control={control}
-                render={({ field }) => (
-                  <TextField
+                render={({ field, fieldState: { error } }) => (
+                  <TextInput
                     label="text"
                     autoFocus
                     fullWidth
                     value={field.value}
                     onChange={field.onChange}
+                    formError={error}
                   />
                 )}
               />
@@ -155,12 +158,13 @@ export const GroupPopover: FC<GroupPopover> = ({
               <Controller
                 name="subtitle.text"
                 control={control}
-                render={({ field }) => (
-                  <TextField
+                render={({ field, fieldState: { error } }) => (
+                  <TextInput
                     label="text"
                     fullWidth
                     value={field.value}
                     onChange={field.onChange}
+                    formError={error}
                   />
                 )}
               />
@@ -184,8 +188,9 @@ export const GroupPopover: FC<GroupPopover> = ({
               <Controller
                 name="pos.x"
                 control={control}
-                render={({ field }) => (
+                render={({ field, fieldState: { error } }) => (
                   <SliderInput
+                    formError={error}
                     label="X"
                     name={field.name}
                     value={field.value}
@@ -197,9 +202,10 @@ export const GroupPopover: FC<GroupPopover> = ({
               <Controller
                 name="pos.y"
                 control={control}
-                render={({ field }) => (
+                render={({ field, fieldState: { error } }) => (
                   <SliderInput
                     label="Y"
+                    formError={error}
                     name={field.name}
                     value={field.value}
                     onChange={field.onChange}
@@ -214,9 +220,10 @@ export const GroupPopover: FC<GroupPopover> = ({
               <Controller
                 name="scale.x"
                 control={control}
-                render={({ field }) => (
+                render={({ field, fieldState: { error } }) => (
                   <SliderInput
                     label="Scale X"
+                    formError={error}
                     name={field.name}
                     value={field.value}
                     onChange={field.onChange}
@@ -228,9 +235,10 @@ export const GroupPopover: FC<GroupPopover> = ({
               <Controller
                 name="scale.y"
                 control={control}
-                render={({ field }) => (
+                render={({ field, fieldState: { error } }) => (
                   <SliderInput
                     label="Scale Y"
+                    formError={error}
                     name={field.name}
                     value={field.value}
                     onChange={field.onChange}

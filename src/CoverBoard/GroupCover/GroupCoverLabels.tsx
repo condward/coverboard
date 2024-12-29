@@ -9,6 +9,8 @@ import { useGetElementSizes } from 'utils';
 export const GroupCoverLabels: FC<{
   index: number;
 }> = ({ index }) => {
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
   const {
     id,
     titleText,
@@ -50,8 +52,6 @@ export const GroupCoverLabels: FC<{
       showSubtitle: state.configs.groups.subtitle.show,
     };
   });
-
-  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
   const hasTitle =
     (showTitle && !!titleText) || (showTitle && !titleText && showHelpers);

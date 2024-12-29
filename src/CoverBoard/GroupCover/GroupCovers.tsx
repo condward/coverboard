@@ -1,11 +1,11 @@
 import { FC } from 'react';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 
 import { GroupCover } from './GroupCover';
 
 export const GroupCovers: FC = () => {
-  const groupsIds = useMainStore((state) =>
+  const groupsIds = useShallowMainStore((state) =>
     state.groups.map((group) => group.id),
   );
 

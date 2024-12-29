@@ -9,6 +9,7 @@ import { useGetSizesContext } from 'providers';
 
 export const App: FC = () => {
   const saveId = useSaveId();
+
   const { padding, screenLimits } = useGetSizesContext();
 
   const { backColor, resetStoreValues } = useShallowMainStore((state) => ({

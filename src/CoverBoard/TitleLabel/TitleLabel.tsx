@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 import { KeyboardShortcuts, PosTypes } from 'types';
 import { editTitleAtom, hideToolbarAtom, useShallowMainStore } from 'store';
@@ -12,12 +12,8 @@ const fillValue = 0.9;
 export const TitleLabel: FC = () => {
   const saveId = useSaveId();
   const preventKeys = usePreventKeys();
+
   const { canvasLimits, fontSize } = useGetSizesContext();
-
-  const [open, setOpen] = useAtom(editTitleAtom);
-
-  const setHideToolBar = useSetAtom(hideToolbarAtom);
-  const setEditTitle = useSetAtom(editTitleAtom);
 
   const { titleMode, color, updateConfigs } = useShallowMainStore((state) => ({
     titleMode: state.configs.title.show
@@ -27,6 +23,13 @@ export const TitleLabel: FC = () => {
     updateConfigs: state.updateConfigs,
     color: state.getColor(),
   }));
+
+  const { open, setOpen, setHideToolBar, setEditTitle } = {
+    open: useAtomValue(editTitleAtom),
+    setOpen: useSetAtom(editTitleAtom),
+    setHideToolBar: useSetAtom(hideToolbarAtom),
+    setEditTitle: useSetAtom(editTitleAtom),
+  };
 
   useEffect(() => {
     if (preventKeys) return;

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { TextField, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { Controller, useWatch } from 'react-hook-form';
 import type { Control } from 'react-hook-form';
 
@@ -12,6 +12,7 @@ import {
   BackColorPicker,
   CommonTabs,
   ShowSwitch,
+  TextInput,
 } from 'components';
 import { useMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
@@ -23,7 +24,9 @@ export const ToolbarConfigForm: FC<{
     control,
     name: 'layout.fitToScreen',
   });
+
   const { canvasLimits } = useGetSizesContext();
+
   const media = useMainStore((state) => state.configs.media);
 
   return (
@@ -63,12 +66,13 @@ export const ToolbarConfigForm: FC<{
                 <Controller
                   name="title.text"
                   control={control}
-                  render={({ field }) => (
-                    <TextField
+                  render={({ field, fieldState: { error } }) => (
+                    <TextInput
                       fullWidth
                       label="Title"
                       value={field.value}
                       onChange={field.onChange}
+                      formError={error}
                     />
                   )}
                 />
@@ -90,7 +94,7 @@ export const ToolbarConfigForm: FC<{
                 <Controller
                   name="layout.scale"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field, fieldState: { error } }) => (
                     <SliderInput
                       label="Elements scale"
                       name={field.name}
@@ -99,6 +103,7 @@ export const ToolbarConfigForm: FC<{
                       min={0.5}
                       max={1.5}
                       step={0.1}
+                      formError={error}
                     />
                   )}
                 />
@@ -119,9 +124,10 @@ export const ToolbarConfigForm: FC<{
                   <Controller
                     name="layout.width"
                     control={control}
-                    render={({ field }) => (
-                      <TextField
+                    render={({ field, fieldState: { error } }) => (
+                      <TextInput
                         fullWidth
+                        formError={error}
                         type="number"
                         label="Width"
                         disabled={showScreenSizes}
@@ -142,9 +148,10 @@ export const ToolbarConfigForm: FC<{
                   <Controller
                     name="layout.height"
                     control={control}
-                    render={({ field }) => (
-                      <TextField
+                    render={({ field, fieldState: { error } }) => (
+                      <TextInput
                         fullWidth
+                        formError={error}
                         type="number"
                         label="height"
                         disabled={showScreenSizes}

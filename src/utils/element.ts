@@ -8,9 +8,10 @@ interface OffsetCalc<T> {
 }
 
 export const useGetElementSizes = <T>(totalDirArray: Array<OffsetCalc<T>>) => {
+  const isLandscape = useIsLandscape();
+
   const { fontSize, coverSizeWidth, coverSizeHeight, canvasLimits } =
     useGetSizesContext();
-  const isLandscape = useIsLandscape();
 
   return {
     getOffset(offset: OffsetCalc<T>) {
@@ -55,9 +56,10 @@ export const useGetElementSizes = <T>(totalDirArray: Array<OffsetCalc<T>>) => {
 };
 
 export const useGetMaxBoundaries = () => {
+  const isLandscape = useIsLandscape();
+
   const { coverSizeWidth, coverSizeHeight, canvasLimits } =
     useGetSizesContext();
-  const isLandscape = useIsLandscape();
 
   return {
     getMaxBoundaries: (scale = { x: 1, y: 1 }) => ({

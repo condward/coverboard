@@ -1,11 +1,11 @@
 import { FC } from 'react';
 
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 
 import { Cover } from './Cover';
 
 export const Covers: FC = () => {
-  const coverIds = useMainStore((state) =>
+  const coverIds = useShallowMainStore((state) =>
     state.covers.map((cover) => cover.id),
   );
 

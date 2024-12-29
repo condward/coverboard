@@ -1,6 +1,5 @@
-import { FC, useEffect } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
-import { useStore } from 'zustand';
+import { FC, useCallback } from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Stack } from '@mui/material';
 import {
   DeleteOutline,
@@ -8,9 +7,10 @@ import {
   SearchOutlined,
   SettingsOutlined,
   ShareOutlined,
-  UndoOutlined,
   DownloadOutlined,
 } from '@mui/icons-material';
+import { ZodError } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   colorMap,
@@ -19,69 +19,34 @@ import {
   ToolConfig,
   ToolConfigIDs,
 } from 'types';
-import { haxPrefix, useIsLandscape, usePreventKeys } from 'utils';
+import { haxPrefix, useIsLandscape } from 'utils';
 
 import {
-  useMainStore,
   useShallowMainStore,
   configAtom,
   searchAtom,
   shareAtom,
   pointsAtom,
   selectedAtom,
+  useToastStore,
 } from 'store';
 import { useGetSizesContext } from 'providers';
 
-import { ToolbarIcon, useCreateGroup } from '.';
+import { ToolbarActionIcon, ToolbarIcon } from '.';
 
 interface ToolbarProps {
   takeScreenshot: () => void;
 }
 
-export const ToolbarActionIcon: FC = () => {
-  const { undo: undoAction, pastStates } = useStore(useMainStore.temporal);
-  const actionsLength = pastStates.length;
-  const preventKeys = usePreventKeys();
-
-  useEffect(() => {
-    if (preventKeys) return;
-
-    const keyFn = (e: KeyboardEvent) => {
-      if (e.key === 'u') {
-        undoAction();
-        e.preventDefault();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        undoAction();
-        e.preventDefault();
-      }
-    };
-    window.addEventListener('keydown', keyFn);
-
-    return () => window.removeEventListener('keydown', keyFn);
-  }, [preventKeys, undoAction]);
-
-  const actionConfig: ToolConfig = {
-    id: ToolConfigIDs.UNDO,
-    tooltip: `Undo (moves: ${actionsLength}/10)`,
-    color: colorMap[Colors.PINK],
-    icon: <UndoOutlined />,
-    value: actionsLength < 1,
-    valueModifier: () => undoAction(),
-    badge: actionsLength > 0 ? actionsLength : null,
-    enabled: true,
-    shortcut: KeyboardShortcuts.UNDO,
-  };
-
-  return <ToolbarIcon config={actionConfig} index={6} />;
-};
-
 const useGetElemName = () => {
-  const selected = useAtomValue(selectedAtom);
   const { isCover, isGroup, isArrow } = useShallowMainStore((state) => ({
     isCover: state.isCover,
     isGroup: state.isGroup,
     isArrow: state.isArrow,
   }));
+
+  const selected = useAtomValue(selectedAtom);
+
   if (!selected) return '';
 
   if (isCover(selected.id)) return '(cover)';
@@ -91,13 +56,65 @@ const useGetElemName = () => {
   return '';
 };
 
+const useCreateGroup = () => {
+  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { groupTitleDir, groupSubTitleDir, addGroups } = useShallowMainStore(
+    (state) => ({
+      groupTitleDir: state.configs.groups.title.dir,
+      groupSubTitleDir: state.configs.groups.subtitle.dir,
+      addGroups: state.addGroups,
+    }),
+  );
+
+  const setSelected = useSetAtom(selectedAtom);
+
+  return {
+    createGroup: useCallback(() => {
+      const id = uuidv4();
+      try {
+        addGroups([
+          {
+            id,
+            pos: {
+              x: 0,
+              y: 0,
+            },
+            title: { text: '', dir: groupTitleDir },
+            subtitle: { text: '', dir: groupSubTitleDir },
+            scale: {
+              x: 3,
+              y: 3,
+            },
+          },
+        ]);
+        setSelected({ id, open: false });
+      } catch (error) {
+        if (error instanceof ZodError) {
+          const tooBig = error.issues.find((msg) => msg.code === 'too_big');
+
+          if (tooBig) {
+            showErrorMessage(tooBig.message);
+            return;
+          }
+          showErrorMessage('Bad formatted group');
+          return;
+        }
+        throw error;
+      }
+    }, [
+      addGroups,
+      groupSubTitleDir,
+      groupTitleDir,
+      setSelected,
+      showErrorMessage,
+    ]),
+  };
+};
+
 export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot }) => {
   const isLandscape = useIsLandscape();
-  const editArrows = useAtomValue(pointsAtom);
-  const [openConfig, setOpenConfig] = useAtom(configAtom);
-  const [openSearch, setOpenSearch] = useAtom(searchAtom);
-  const [openShare, setOpenShare] = useAtom(shareAtom);
-  const [selected, setSelected] = useAtom(selectedAtom);
+  const elemName = useGetElemName();
+  const { coverSizeWidth, padding } = useGetSizesContext();
 
   const {
     color,
@@ -123,10 +140,14 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot }) => {
     removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
   }));
 
-  const { coverSizeWidth, padding } = useGetSizesContext();
-  const elemName = useGetElemName();
+  const [openConfig, setOpenConfig] = useAtom(configAtom);
+  const [openSearch, setOpenSearch] = useAtom(searchAtom);
+  const [openShare, setOpenShare] = useAtom(shareAtom);
+  const [selected, setSelected] = useAtom(selectedAtom);
+  const editArrows = useAtomValue(pointsAtom);
 
   const { createGroup } = useCreateGroup();
+
   const deleteElem = () => {
     if (!selected) return;
 

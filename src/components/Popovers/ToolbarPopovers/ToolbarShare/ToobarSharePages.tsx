@@ -45,8 +45,9 @@ export const ToolbarSharePages: FC<ToolbarShareProps> = ({
   setKeyList,
 }) => {
   const navigate = useNavigate();
-  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const saveId = useSaveId();
+
+  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const resetStoreValues = useMainStore((state) => state.resetStoreValues);
 
   const hasDefault = !!window.localStorage.getItem(addPrefix(DEFAULT_KEY));

@@ -13,6 +13,8 @@ interface CoverImageProps {
 }
 
 export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
   const {
     scaleX,
     scaleY,
@@ -45,23 +47,21 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
       getGroups: state.getGroups,
     };
   });
+
+  const setSelected = useSetAtom(selectedAtom);
   const selectedId = useGetSelectedId(id);
 
   const boxRef = useRef<null | { width: number; height: number }>(null);
+  const rectRef = useRef<Konva.Rect>(null);
+  const trRef = useRef<Konva.Transformer>(null);
 
-  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
   const coverSizeWidthScaled = coverSizeWidth * scaleX;
   const coverSizeHeightScaled = coverSizeHeight * scaleY;
-
-  const setSelected = useSetAtom(selectedAtom);
 
   const handlesSelect = () => {
     setSelected({ id, open: !!selectedId });
     refreshGroups(id);
   };
-
-  const rectRef = useRef<Konva.Rect>(null);
-  const trRef = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
     if (trRef.current && rectRef.current && selectedId) {

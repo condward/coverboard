@@ -18,8 +18,9 @@ export const ToolbarApiKeyPopover: FC<ToolbarApiKeyPopoverProps> = ({
   apiName,
   onClose,
 }) => {
-  const [key, setKey] = useState('');
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+
+  const [key, setKey] = useState('');
 
   const { updateApiKey } = useUpdateApiKey(apiName);
   const { mutateAsync: checkApi, isPending } = useCheckApiKey(apiName);

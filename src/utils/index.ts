@@ -9,3 +9,4 @@ export * from './promise';
 export * from './orientation';
 export * from './element';
 export * from './keyboard';
+export * from './useForm';

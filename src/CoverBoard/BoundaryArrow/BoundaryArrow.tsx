@@ -4,7 +4,7 @@ import { FC, useState } from 'react';
 import { Arrow, Group } from 'react-konva';
 
 import { CoverSchema, GroupSchema } from 'types';
-import { Tooltip } from 'components';
+import { BoundaryArrowTooltip } from 'components';
 import { useGetSizesContext } from 'providers';
 
 interface BoundaryArrowProps {
@@ -72,11 +72,12 @@ export const BoundaryArrow: FC<BoundaryArrowProps> = ({
   updatePosition,
   color,
 }) => {
+  const points = useGetPoints({ x, y, scaleX, scaleY });
+
   const { coverSizeWidth, coverSizeHeight, fontSize, canvasLimits } =
     useGetSizesContext();
 
   const [tooltip, setTooltip] = useState(false);
-  const points = useGetPoints({ x, y, scaleX, scaleY });
 
   const handleBringIntoView = () => {
     const newPos: Vector2d = { x, y };
@@ -115,7 +116,7 @@ export const BoundaryArrow: FC<BoundaryArrowProps> = ({
         }}
       />
       {tooltip && (
-        <Tooltip
+        <BoundaryArrowTooltip
           text={title}
           x={points[0] - 2 * coverSizeWidth * scaleX - fontSize}
           y={points[1] - fontSize}

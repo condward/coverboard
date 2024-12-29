@@ -33,9 +33,10 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
   onClose,
 }) => {
   const navigate = useNavigate();
+  const saveId = useSaveId();
+
   const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
   const showErrorMessage = useToastStore((state) => state.showErrorMessage);
-
   const { defaultJsonData, updateStoreValues } = useShallowMainStore(
     (state) => ({
       updateStoreValues: state.updateStoreValues,
@@ -43,7 +44,6 @@ export const ToolbarSharePopover: FC<{ onClose: () => void }> = ({
     }),
   );
 
-  const saveId = useSaveId();
   const [jsonData, setJsonData] = useState(defaultJsonData);
   const [newSave, setNewSave] = useState('');
   const pages = [

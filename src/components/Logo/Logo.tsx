@@ -7,9 +7,11 @@ import { useGetSizesContext } from 'providers';
 import { useIsLandscape } from 'utils';
 
 export const Logo: FC = () => {
-  const media = useMainStore((state) => state.configs.media);
-  const { coverSizeWidth, canvasLimits } = useGetSizesContext();
   const isLandscape = useIsLandscape();
+
+  const { coverSizeWidth, canvasLimits } = useGetSizesContext();
+
+  const media = useMainStore((state) => state.configs.media);
 
   if (isLandscape && canvasLimits.height < 520) return null;
   if (!isLandscape && canvasLimits.width < 520) return null;

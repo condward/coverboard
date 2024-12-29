@@ -9,18 +9,19 @@ export const BoundaryCoverArrows: FC = () => {
   const { canvasLimits } = useGetSizesContext();
 
   const {
-    covers,
+    getCovers,
     scale,
     updateGroup,
     removeCoverAndRelatedArrows,
     coverColor,
   } = useShallowMainStore((state) => ({
-    covers: state.covers,
+    getCovers: state.getCovers,
     scale: state.configs.layout.scale,
     updateGroup: state.updateGroup,
     removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
     coverColor: state.getCoverColor(),
   }));
+  const covers = getCovers();
 
   const offLimitCovers = covers.flatMap((covers) => {
     if (

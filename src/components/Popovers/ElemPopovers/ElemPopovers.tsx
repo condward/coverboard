@@ -8,15 +8,18 @@ import { GroupPopover } from './GroupPopover';
 import { ArrowPopover } from './ArrowPopover';
 
 export const ElemPopovers: FC<{ id: string }> = ({ id }) => {
-  const setSelected = useSetAtom(selectedAtom);
+  const { getGroups, getArrows, getCovers } = useShallowMainStore((state) => ({
+    getGroups: state.getGroups,
+    getArrows: state.getArrows,
+    getCovers: state.getCovers,
+  }));
+
+  const currentGroup = getGroups().find((cov) => cov.id === id);
+  const currentArrow = getArrows().find((cov) => cov.id === id);
+  const currentCover = getCovers().find((cov) => cov.id === id);
+
   const [parentSelected, setParentSelected] = useAtom(parentSelectedAtom);
-  const { currentGroup, currentArrow, currentCover } = useShallowMainStore(
-    (state) => ({
-      currentGroup: state.groups.find((cov) => cov.id === id),
-      currentArrow: state.arrows.find((cov) => cov.id === id),
-      currentCover: state.covers.find((cov) => cov.id === id),
-    }),
-  );
+  const setSelected = useSetAtom(selectedAtom);
 
   const handleClose = (id?: string) => {
     setParentSelected([]);

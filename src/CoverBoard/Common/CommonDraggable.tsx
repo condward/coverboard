@@ -28,16 +28,19 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
   children,
   updatePosition,
 }) => {
-  const { covers, groups, color, refreshGroups, refreshCovers } =
+  const { canvasLimits } = useGetSizesContext();
+
+  const { getCovers, getGroups, color, refreshGroups, refreshCovers } =
     useShallowMainStore((state) => ({
-      covers: state.covers,
-      groups: state.groups,
+      getCovers: state.getCovers,
+      getGroups: state.getGroups,
       color: state.getColor(),
       refreshGroups: state.refreshGroups,
       refreshCovers: state.refreshCovers,
     }));
+  const covers = getCovers();
+  const groups = getGroups();
 
-  const { canvasLimits } = useGetSizesContext();
   const [hintArrows, setHintArrows] = useState<
     [
       CoverSchema | GroupSchema | undefined,

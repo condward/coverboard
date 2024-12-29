@@ -13,6 +13,4 @@ export const hideToolbarAtom = atom(false);
 export const isPopupOpenAtom = atom(
   (get) => get(searchAtom) || get(configAtom) || get(shareAtom),
 );
-export const useIsPopOpen = () => {
-  return useAtomValue(isPopupOpenAtom);
-};
+export const useIsPopOpen = () => useAtomValue(isPopupOpenAtom);

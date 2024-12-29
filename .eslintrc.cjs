@@ -29,8 +29,36 @@ module.exports = {
     'eslint-plugin-react-compiler',
     'prettier',
     'jsx-a11y',
+    'hooks',
   ],
   rules: {
+    'hooks/sort': [
+      2,
+      {
+        groups: [
+          'useNavigate',
+          'useIsLandscape',
+          'useSaveId',
+          'usePreventKeys',
+          'useContext',
+          'useGetSizesContext',
+          'useToastStore',
+          'useMainStore',
+          'useShallowMainStore',
+          'useAtom',
+          'useAtomValue',
+          'useSetAtom',
+          'useGetSelectedId',
+          'useIsCurrentTextSelected',
+          'useRef',
+          'useState',
+          'useForm',
+          'useMemo',
+          'useCallback',
+          'useEffect',
+        ],
+      },
+    ],
     'prettier/prettier': [
       'error',
       {

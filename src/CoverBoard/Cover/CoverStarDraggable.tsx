@@ -59,8 +59,10 @@ export const CoverStarDraggable = ({
   starDir,
   children,
 }: DraggableGroupProps) => {
-  const updateCover = useMainStore((state) => state.updateCover);
   const { coverSizeHeight } = useGetSizesContext();
+
+  const updateCover = useMainStore((state) => state.updateCover);
+
   const [randId, setId] = useState(uuidv4());
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent | TouchEvent>) => {

@@ -29,23 +29,26 @@ import {
 } from './';
 
 export const CoverBoard: FC = () => {
-  const saveId = useSaveId();
   const isLandscape = useIsLandscape();
+  const saveId = useSaveId();
 
   const { canvasLimits, padding } = useGetSizesContext();
-
-  const hideToolbar = useAtomValue(hideToolbarAtom);
 
   const { color, backColor } = useShallowMainStore((state) => ({
     color: state.getColor(),
     backColor: state.getBackColor(),
   }));
 
+  const { hideToolbar, setSelected, setPoints } = {
+    hideToolbar: useAtomValue(hideToolbarAtom),
+    setSelected: useSetAtom(selectedAtom),
+    setPoints: useSetAtom(pointsAtom),
+  };
+
   const stageRef = useRef<Konva.Stage>(null);
+
   const [screenshotUrl, setScreenshotUrl] = useState('');
 
-  const setSelected = useSetAtom(selectedAtom);
-  const setPoints = useSetAtom(pointsAtom);
   const checkDeselect = useCallback(
     (e: KonvaEventObject<MouseEvent | Event>) => {
       const clickedOnEmpty = e.target === e.target.getStage();

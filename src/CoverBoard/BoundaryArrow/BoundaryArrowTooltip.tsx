@@ -12,10 +12,18 @@ interface TooltipProps {
   y: number;
 }
 
-export const Tooltip: FC<TooltipProps> = ({ text, align = 'left', x, y }) => {
+export const BoundaryArrowTooltip: FC<TooltipProps> = ({
+  text,
+  align = 'left',
+  x,
+  y,
+}) => {
   const { fontSize, coverSizeWidth } = useGetSizesContext();
+
   const backColor = useMainStore((state) => state.getBackColor());
+
   const textRef = useRef<Konva.Text>(null);
+
   const [textWidth, setTextWidth] = useState(0);
 
   useEffect(() => {

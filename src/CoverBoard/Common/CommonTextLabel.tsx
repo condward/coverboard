@@ -46,12 +46,16 @@ export const CommonTextLabel: FC<TitleTexProps> = ({
   color,
   fontStyle,
 }) => {
-  const { fontSize } = useGetSizesContext();
-  const backColor = useMainStore((state) => state.getBackColor());
-  const textRef = useRef<Konva.Text>(null);
-  const [textWidth, setTextWidth] = useState(0);
   const saveId = useSaveId();
   const align = getAlign(dir);
+
+  const { fontSize } = useGetSizesContext();
+
+  const backColor = useMainStore((state) => state.getBackColor());
+
+  const textRef = useRef<Konva.Text>(null);
+
+  const [textWidth, setTextWidth] = useState(0);
 
   const handleSubmit = (text: string) => {
     setOpen(false);

@@ -15,6 +15,8 @@ enum Offsets {
 export const CoverLabels: FC<{
   index: number;
 }> = ({ index }) => {
+  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
+
   const {
     id,
     titleText,
@@ -54,8 +56,6 @@ export const CoverLabels: FC<{
       updateCover: state.updateCover,
     };
   });
-
-  const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
   const { getOffset } = useGetElementSizes<Offsets>([
     ...(titleText && showTitle ? [{ dir: titleDir, type: Offsets.TITLE }] : []),
