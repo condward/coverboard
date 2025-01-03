@@ -4,7 +4,7 @@ import { SaveOutlined } from '@mui/icons-material';
 
 import { ApiKeys, ToolConfigIDs, SPACING_GAP } from 'types';
 import { CommonDialog } from 'components';
-import { useToastStore, useUpdateApiKey } from 'store';
+import { useShowToast, useUpdateApiKey } from 'store';
 
 import { ToolbarSearchMedia } from './ToobarSeachMedia';
 import { useCheckApiKey } from './useCheckApiKey';
@@ -18,7 +18,7 @@ export const ToolbarApiKeyPopover: FC<ToolbarApiKeyPopoverProps> = ({
   apiName,
   onClose,
 }) => {
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showErrorMessage } = useShowToast();
 
   const [key, setKey] = useState('');
 

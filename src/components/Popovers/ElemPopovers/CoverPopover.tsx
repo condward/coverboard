@@ -28,7 +28,7 @@ import {
   SubmitButton,
   TextInput,
 } from 'components';
-import { configAtom, useShallowMainStore, useToastStore } from 'store';
+import { configAtom, useShallowMainStore, useShowToast } from 'store';
 import { useGetSizesContext } from 'providers';
 import { useIsLandscape, useForm } from 'utils';
 
@@ -123,8 +123,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   const { canvasLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
 
-  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showSuccessMessage, showErrorMessage } = useShowToast();
   const {
     titleLabel,
     subTitleLabel,

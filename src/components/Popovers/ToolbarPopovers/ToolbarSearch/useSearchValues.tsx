@@ -10,12 +10,11 @@ import {
   getTvShowPosters,
 } from 'api';
 
-import { useShallowMainStore, useToastStore } from 'store';
+import { useShallowMainStore, useShowToast } from 'store';
 import { Media, SearchSchema } from 'types';
 
 export const useSearchValues = () => {
-  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showSuccessMessage, showErrorMessage } = useShowToast();
   const { media, getCovers, starsDir, labelDir, labelSubDir, addCovers } =
     useShallowMainStore((state) => ({
       starsDir: state.configs.covers.rating.dir,

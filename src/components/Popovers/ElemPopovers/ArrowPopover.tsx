@@ -18,7 +18,7 @@ import {
   SubmitButton,
   TextInput,
 } from 'components';
-import { configAtom, useShallowMainStore, useToastStore } from 'store';
+import { configAtom, useShallowMainStore, useShowToast } from 'store';
 
 import { formatLabel, useForm } from 'utils';
 
@@ -35,7 +35,7 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
   onChange,
   onReturn,
 }) => {
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showErrorMessage } = useShowToast();
   const { updateArrow, getCovers, getgroups, removeArrow } =
     useShallowMainStore((state) => ({
       updateArrow: state.updateArrow,

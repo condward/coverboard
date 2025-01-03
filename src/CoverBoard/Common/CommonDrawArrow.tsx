@@ -10,7 +10,7 @@ import {
   useShallowMainStore,
   pointsAtom,
   useGetSelectedId,
-  useToastStore,
+  useShowToast,
 } from 'store';
 import { useGetSizesContext } from 'providers';
 
@@ -94,7 +94,7 @@ const CommonDrawArrowChild: FC<{
 }> = ({ id, scaleX, scaleY }) => {
   const { coverSizeWidth, coverSizeHeight } = useGetSizesContext();
 
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showErrorMessage } = useShowToast();
   const {
     arrows,
     addArrow,

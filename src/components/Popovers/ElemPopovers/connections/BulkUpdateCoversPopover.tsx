@@ -24,7 +24,7 @@ import {
   FieldSet,
   SubmitButton,
 } from 'components';
-import { useShallowMainStore, useToastStore } from 'store';
+import { useShallowMainStore, useShowToast } from 'store';
 
 import { formatLabel, useForm } from 'utils';
 import { useGetSizesContext } from 'providers';
@@ -48,7 +48,7 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
   const { canvasLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
 
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showErrorMessage } = useShowToast();
   const {
     media,
     removeCoverAndRelatedArrows,

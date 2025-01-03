@@ -28,7 +28,7 @@ import {
   shareAtom,
   pointsAtom,
   selectedAtom,
-  useToastStore,
+  useShowToast,
 } from 'store';
 import { useGetSizesContext } from 'providers';
 
@@ -57,7 +57,7 @@ const useGetElemName = () => {
 };
 
 const useCreateGroup = () => {
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showErrorMessage } = useShowToast();
   const { groupTitleDir, groupSubTitleDir, addGroups } = useShallowMainStore(
     (state) => ({
       groupTitleDir: state.configs.groups.title.dir,

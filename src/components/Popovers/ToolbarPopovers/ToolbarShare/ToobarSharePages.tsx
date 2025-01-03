@@ -11,7 +11,7 @@ import {
   removePrefix,
   useSaveId,
 } from 'utils';
-import { useMainStore, useToastStore } from 'store';
+import { useMainStore, useShowToast } from 'store';
 
 const getMediaFromStorage = (storageString: string) => {
   try {
@@ -47,7 +47,7 @@ export const ToolbarSharePages: FC<ToolbarShareProps> = ({
   const navigate = useNavigate();
   const saveId = useSaveId();
 
-  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
+  const { showSuccessMessage } = useShowToast();
   const resetStoreValues = useMainStore((state) => state.resetStoreValues);
 
   const hasDefault = !!window.localStorage.getItem(addPrefix(DEFAULT_KEY));

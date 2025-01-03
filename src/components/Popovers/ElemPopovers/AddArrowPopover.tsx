@@ -13,7 +13,7 @@ import {
   SubmitButton,
   TextInput,
 } from 'components';
-import { useShallowMainStore, useToastStore } from 'store';
+import { useShallowMainStore, useShowToast } from 'store';
 
 import { formatLabel, useForm } from 'utils';
 
@@ -26,7 +26,8 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
   onClose,
   originId,
 }) => {
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { showErrorMessage } = useShowToast();
   const { getCovers, getGroups, checkIfArrowAlreadyExists, addArrow } =
     useShallowMainStore((state) => ({
       getCovers: state.getCovers,

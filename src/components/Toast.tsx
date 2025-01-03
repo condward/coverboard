@@ -1,13 +1,11 @@
 import { Snackbar, Alert } from '@mui/material';
+import { useAtom } from 'jotai';
 import { FC } from 'react';
 
-import { useToastStore } from 'store';
+import { toastAtom } from 'store/atoms/toastAtoms';
 
 export const Toast: FC = () => {
-  const toastMessage = useToastStore((state) => state.toastMessage);
-  const handleToastMessageClose = useToastStore(
-    (state) => state.handleToastMessageClose,
-  );
+  const [toastMessage, setToastMessage] = useAtom(toastAtom);
 
   if (!toastMessage) return null;
 
@@ -15,8 +13,8 @@ export const Toast: FC = () => {
     <Snackbar
       open={Boolean(toastMessage)}
       autoHideDuration={3000}
-      onClose={handleToastMessageClose}>
-      <Alert severity={toastMessage.type} onClose={handleToastMessageClose}>
+      onClose={() => setToastMessage(null)}>
+      <Alert severity={toastMessage.type} onClose={() => setToastMessage(null)}>
         {toastMessage.text}
       </Alert>
     </Snackbar>

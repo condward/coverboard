@@ -19,7 +19,7 @@ import {
   SubmitButton,
   TextInput,
 } from 'components';
-import { useShallowMainStore, useToastStore } from 'store';
+import { useShallowMainStore, useShowToast } from 'store';
 
 import { useGetSizesContext } from 'providers';
 import { useForm } from 'utils';
@@ -31,7 +31,7 @@ export const AddGroupPopover: FC<AddGroupPopover> = ({ onClose }) => {
   const { canvasLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
 
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showErrorMessage } = useShowToast();
   const { addGroups, groupTitleDir, groupSubTitleDir } = useShallowMainStore(
     (state) => ({
       addGroups: state.addGroups,

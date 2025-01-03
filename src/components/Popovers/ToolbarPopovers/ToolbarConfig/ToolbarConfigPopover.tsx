@@ -19,7 +19,7 @@ import {
   KeyboardShortcuts,
 } from 'types';
 import { CommonDialog, SubmitButton } from 'components';
-import { hideToolbarAtom, useShallowMainStore, useToastStore } from 'store';
+import { hideToolbarAtom, useShallowMainStore, useShowToast } from 'store';
 import { useForm } from 'utils';
 import { CoverboardOverview } from 'components/Popovers/ElemPopovers/connections';
 
@@ -28,7 +28,7 @@ import { ToolbarConfigForm } from './ToolbarConfigForm';
 export const ToolbarConfigPopover: FC<{
   onClose: () => void;
 }> = ({ onClose }) => {
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showErrorMessage } = useShowToast();
   const {
     getConfigs,
     totalLength,

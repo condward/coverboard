@@ -8,7 +8,7 @@ import {
   SaveOutlined,
 } from '@mui/icons-material';
 
-import { useToastStore } from 'store';
+import { useShowToast } from 'store';
 import { useSaveId } from 'utils';
 import { appSchema, SPACING_GAP } from 'types';
 
@@ -35,8 +35,7 @@ export const ToolbarShareActions: FC<ToolbarShareActionsProps> = ({
   showButtons,
 }) => {
   const saveId = useSaveId();
-  const showSuccessMessage = useToastStore((state) => state.showSuccessMessage);
-  const showErrorMessage = useToastStore((state) => state.showErrorMessage);
+  const { showSuccessMessage, showErrorMessage } = useShowToast();
 
   const isValidJSON = isValidJSONFn(jsonData);
 

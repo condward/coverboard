@@ -42,7 +42,7 @@ module.exports = {
           'usePreventKeys',
           'useContext',
           'useGetSizesContext',
-          'useToastStore',
+          'useShowToast',
           'useMainStore',
           'useShallowMainStore',
           'useAtom',
