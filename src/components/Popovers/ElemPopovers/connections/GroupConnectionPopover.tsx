@@ -21,14 +21,11 @@ export const GroupConnectionPopover: FC<GroupPopoverProps> = ({
   onClose,
   onChange,
 }) => {
-  const { getGroups, getCovers } = useShallowMainStore((state) => ({
-    getGroups: state.getGroups,
-    getCovers: state.getCovers,
-  }));
-  const groups = getGroups();
-  const covers = getCovers();
-
+  const disabled = useShallowMainStore(
+    (state) => state.groups.length === 1 && state.covers.length === 0,
+  );
   const [openConn, setOpenConn] = useState(false);
+
   return (
     <CommonDialog
       onClose={() => onClose(group.id)}
@@ -49,7 +46,7 @@ export const GroupConnectionPopover: FC<GroupPopoverProps> = ({
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
           <Button
-            disabled={groups.length === 1 && covers.length === 0}
+            disabled={disabled}
             variant="outlined"
             color="secondary"
             type="button"

@@ -24,7 +24,6 @@ export const useSearchValues = () => {
       getCovers: state.getCovers,
       media: state.configs.media,
     }));
-  const covers = getCovers();
 
   return useMutation({
     mutationFn: async (inputArray: SearchSchema['search']) => {
@@ -42,6 +41,7 @@ export const useSearchValues = () => {
     },
     onSuccess(results, request) {
       const resultLength = results.length;
+      const covers = getCovers();
 
       const filtereResults = results.filter(
         (filteredResult) =>

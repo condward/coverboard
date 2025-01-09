@@ -21,12 +21,9 @@ export const CoverConnectionPopover: FC<CoverPopoverProps> = ({
   onClose,
   onChange,
 }) => {
-  const { getGroups, getCovers } = useShallowMainStore((state) => ({
-    getGroups: state.getGroups,
-    getCovers: state.getCovers,
-  }));
-  const covers = getCovers();
-  const groups = getGroups();
+  const disabled = useShallowMainStore(
+    (state) => state.covers.length === 1 && state.groups.length === 0,
+  );
 
   const [openConn, setOpenConn] = useState(false);
 
@@ -50,7 +47,7 @@ export const CoverConnectionPopover: FC<CoverPopoverProps> = ({
       actions={
         <Stack direction="row" gap={SPACING_GAP} flexWrap="wrap">
           <Button
-            disabled={covers.length === 1 && groups.length === 0}
+            disabled={disabled}
             variant="outlined"
             color="secondary"
             type="button"

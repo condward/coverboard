@@ -38,8 +38,6 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
       refreshGroups: state.refreshGroups,
       refreshCovers: state.refreshCovers,
     }));
-  const covers = getCovers();
-  const groups = getGroups();
 
   const [hintArrows, setHintArrows] = useState<
     [
@@ -66,6 +64,8 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
   const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
     e.cancelBubble = true;
     e.currentTarget.opacity(0.5);
+    const covers = getCovers();
+    const groups = getGroups();
 
     if (covers.some((cov) => cov.id === id)) {
       refreshCovers(id);
@@ -84,6 +84,8 @@ export const CommonDraggable: FC<CommonDraggableProps> = ({
     e.cancelBubble = true;
     const targetY = Math.round(e.target.y());
     const targetX = Math.round(e.target.x());
+    const covers = getCovers();
+    const groups = getGroups();
 
     const foundY =
       covers.find((cover) => cover.id !== id && cover.pos.y === targetY) ??
