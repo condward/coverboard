@@ -314,7 +314,6 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
                     input={
                       <TextInput
                         label="text"
-                        autoFocus
                         fullWidth
                         value={field.value}
                         onChange={field.onChange}

@@ -37,31 +37,6 @@ export const ToolbarConfigForm: FC<{
           value: 'layout',
           component: (
             <Stack direction="column" gap={SPACING_GAP}>
-              <Controller
-                name="layout.color"
-                control={control}
-                render={({ field }) => (
-                  <ColorPicker
-                    autoFocus
-                    name={field.name}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-
-              <Controller
-                name="layout.backColor"
-                control={control}
-                render={({ field }) => (
-                  <BackColorPicker
-                    name={field.name}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-
               <FieldSet label="Title" direction="column" gap={SPACING_GAP}>
                 <Controller
                   name="title.text"
@@ -69,6 +44,7 @@ export const ToolbarConfigForm: FC<{
                   render={({ field, fieldState: { error } }) => (
                     <TextInput
                       fullWidth
+                      autoFocus
                       label="Title"
                       value={field.value}
                       onChange={field.onChange}
@@ -90,6 +66,30 @@ export const ToolbarConfigForm: FC<{
                 />
               </FieldSet>
 
+              <Controller
+                name="layout.color"
+                control={control}
+                render={({ field }) => (
+                  <ColorPicker
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+
+              <Controller
+                name="layout.backColor"
+                control={control}
+                render={({ field }) => (
+                  <BackColorPicker
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+
               <Stack direction="column" gap={SPACING_GAP}>
                 <Controller
                   name="layout.scale"
@@ -108,18 +108,34 @@ export const ToolbarConfigForm: FC<{
                   )}
                 />
 
-                <Controller
-                  name="layout.fitToScreen"
-                  control={control}
-                  render={({ field }) => (
-                    <ShowSwitch
-                      name={field.name}
-                      value={field.value}
-                      onChange={field.onChange}
-                      label="Fit to screen"
-                    />
-                  )}
-                />
+                <Stack direction="row">
+                  <Controller
+                    name="layout.fitToScreen"
+                    control={control}
+                    render={({ field }) => (
+                      <ShowSwitch
+                        name={field.name}
+                        value={field.value}
+                        onChange={field.onChange}
+                        label="Fit to screen"
+                      />
+                    )}
+                  />
+
+                  <Controller
+                    name="layout.helpers"
+                    control={control}
+                    render={({ field }) => (
+                      <ShowSwitch
+                        name={field.name}
+                        value={field.value}
+                        onChange={field.onChange}
+                        label="Show empty texts helpers"
+                      />
+                    )}
+                  />
+                </Stack>
+
                 <Stack direction="row" gap={SPACING_GAP}>
                   <Controller
                     name="layout.width"
@@ -170,19 +186,6 @@ export const ToolbarConfigForm: FC<{
                     )}
                   />
                 </Stack>
-
-                <Controller
-                  name="layout.helpers"
-                  control={control}
-                  render={({ field }) => (
-                    <ShowSwitch
-                      name={field.name}
-                      value={field.value}
-                      onChange={field.onChange}
-                      label="Show empty texts helpers"
-                    />
-                  )}
-                />
               </Stack>
             </Stack>
           ),

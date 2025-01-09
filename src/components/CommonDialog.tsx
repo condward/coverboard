@@ -70,6 +70,7 @@ export const CommonDialog: FC<CommonDialogProps> = ({
 
   return (
     <Dialog
+      disableRestoreFocus
       fullScreen={fullScreen}
       open
       onClose={handleClose}
