@@ -14,7 +14,7 @@ interface CommonTabsProps {
 export const CommonTabs: FC<CommonTabsProps> = ({ tabs }) => {
   const [tabState, setTabsState] = useState(tabs[0].value);
 
-  const componentList = tabs.filter((tab) => tab.component);
+  const componentList = tabs.filter((tab) => Boolean(tab.component));
 
   if (componentList.length === 1) {
     return (
