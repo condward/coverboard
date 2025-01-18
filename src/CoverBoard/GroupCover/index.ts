@@ -4,4 +4,3 @@ export * from './GroupCountLabel';
 export * from './GroupCoverLabels';
 export * from './GroupDraggable';
 export * from './GroupCoverSelected';
-export * from './GroupCoverSelected/GroupCoverSelectedArrows';

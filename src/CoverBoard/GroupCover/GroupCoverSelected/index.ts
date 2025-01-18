@@ -1,2 +1,3 @@
 export * from './GroupCoverSelected';
-export * from './GroupCoverSelectedArrows';
+export * from './GroupPointSelected';
+export * from './GroupPointUnselected';

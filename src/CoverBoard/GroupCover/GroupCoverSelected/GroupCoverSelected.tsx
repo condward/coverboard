@@ -1,28 +1,43 @@
 import { FC } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { useShallowMainStore, pointsAtom, useGetSelectedId } from 'store';
+import {
+  useShallowMainStore,
+  pointsAtom,
+  useGetSelectedId,
+  useGetPointDirection,
+} from 'store';
 
-import { GroupCoverSelectedArrows } from './GroupCoverSelectedArrows';
+import { GroupPointSelected, GroupPointUnselected } from '.';
+import { CommonSelectedArrows } from 'CoverBoard/Common';
 
 export const GroupCoverSelected: FC<{
   index: number;
 }> = ({ index }) => {
   const {
     id,
+    scaleX,
+    scaleY,
     getGroups,
     getGroupsOfGroup,
     getGroupsInsideGroup,
     getCoversInsideGroup,
-  } = useShallowMainStore((state) => ({
-    id: state.getGroupByIdx(index).id,
-    getGroups: state.getGroups,
-    getGroupsOfGroup: state.getGroupsOfGroup,
-    getGroupsInsideGroup: state.getGroupsInsideGroup,
-    getCoversInsideGroup: state.getCoversInsideGroup,
-  }));
+  } = useShallowMainStore((state) => {
+    const { scale, id } = state.getGroupByIdx(index);
+
+    return {
+      id,
+      scaleX: scale.x,
+      scaleY: scale.y,
+      getGroups: state.getGroups,
+      getGroupsOfGroup: state.getGroupsOfGroup,
+      getGroupsInsideGroup: state.getGroupsInsideGroup,
+      getCoversInsideGroup: state.getCoversInsideGroup,
+    };
+  });
 
   const points = useAtomValue(pointsAtom);
+  const pointDirection = useGetPointDirection(id);
   const isSelected = useGetSelectedId(id);
 
   if (!points && !isSelected) return null;
@@ -40,5 +55,14 @@ export const GroupCoverSelected: FC<{
     }
   }
 
-  return <GroupCoverSelectedArrows index={index} />;
+  return (
+    <>
+      {pointDirection ? (
+        <GroupPointSelected index={index} pointDirection={pointDirection} />
+      ) : (
+        <GroupPointUnselected index={index} />
+      )}
+      <CommonSelectedArrows id={id} scaleX={scaleX} scaleY={scaleY} />
+    </>
+  );
 };

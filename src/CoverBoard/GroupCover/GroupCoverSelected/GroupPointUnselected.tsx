@@ -1,37 +1,26 @@
 import { FC, useEffect } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 
-import { KeyboardShortcuts, PosTypes } from 'types';
+import { KeyboardShortcuts } from 'types';
 import {
   pointsAtom,
   selectedAtom,
   useGetPointDirection,
   useShallowMainStore,
 } from 'store';
-import { CommonSelectedArrows } from 'CoverBoard/Common';
 
-export const GroupCoverSelectedArrows: FC<{
+export const GroupPointUnselected: FC<{
   index: number;
 }> = ({ index }) => {
-  const {
-    id,
-    scaleX,
-    scaleY,
-    updateGroup,
-    removeGroupAndRelatedArrows,
-    getGroups,
-  } = useShallowMainStore((state) => {
-    const { id, scale } = state.getGroupByIdx(index);
-
-    return {
-      scaleX: scale.x,
-      scaleY: scale.y,
-      id,
-      updateGroup: state.updateGroup,
-      removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
-      getGroups: state.getGroups,
-    };
-  });
+  const { id, updateGroup, removeGroupAndRelatedArrows, getGroups } =
+    useShallowMainStore((state) => {
+      return {
+        id: state.getGroupByIdx(index).id,
+        updateGroup: state.updateGroup,
+        removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
+        getGroups: state.getGroups,
+      };
+    });
 
   const pointDirection = useGetPointDirection(id);
   const setSelected = useSetAtom(selectedAtom);
@@ -39,36 +28,7 @@ export const GroupCoverSelectedArrows: FC<{
 
   useEffect(() => {
     const keyFn = (e: KeyboardEvent) => {
-      if (
-        e.key === 'ArrowRight' ||
-        e.key === 'ArrowLeft' ||
-        e.key === 'ArrowUp' ||
-        e.key === 'ArrowDown'
-      ) {
-        const group = getGroups().find((group) => id === group.id);
-
-        if (group) {
-          if (e.key === 'ArrowRight' && pointDirection === PosTypes.RIGHT) {
-            updateGroup(group.id, { pos: { x: group.pos.x + 1 } });
-            e.preventDefault();
-          } else if (
-            e.key === 'ArrowLeft' &&
-            pointDirection === PosTypes.LEFT
-          ) {
-            updateGroup(group.id, { pos: { x: group.pos.x - 1 } });
-            e.preventDefault();
-          } else if (e.key === 'ArrowUp' && pointDirection === PosTypes.TOP) {
-            updateGroup(group.id, { pos: { y: group.pos.y - 1 } });
-            e.preventDefault();
-          } else if (
-            e.key === 'ArrowDown' &&
-            pointDirection === PosTypes.BOTTOM
-          ) {
-            updateGroup(group.id, { pos: { y: group.pos.y + 1 } });
-            e.preventDefault();
-          }
-        }
-      } else if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
         setPoints(null);
         e.preventDefault();
       } else if (
@@ -120,5 +80,5 @@ export const GroupCoverSelectedArrows: FC<{
     updateGroup,
   ]);
 
-  return <CommonSelectedArrows id={id} scaleX={scaleX} scaleY={scaleY} />;
+  return null;
 };
