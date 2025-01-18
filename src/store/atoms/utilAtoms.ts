@@ -14,6 +14,12 @@ interface SelectedElement {
 
 export const pointsAtom = atom<ArrowPointSchema | null>(null);
 
+export const useGetPointDirection = (id: string) => {
+  const points = useAtomValue(pointsAtom);
+
+  return points?.id === id ? points.dir : null;
+};
+
 export const parentSelectedAtom = atom<Array<string>>([]);
 
 export const selectedAtom = atom<SelectedElement | null>(null);

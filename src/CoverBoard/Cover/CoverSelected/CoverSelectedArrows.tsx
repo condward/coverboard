@@ -1,8 +1,13 @@
 import { FC, useEffect } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 
 import { KeyboardShortcuts, PosTypes } from 'types';
-import { pointsAtom, selectedAtom, useShallowMainStore } from 'store';
+import {
+  pointsAtom,
+  selectedAtom,
+  useGetPointDirection,
+  useShallowMainStore,
+} from 'store';
 import { CommonSelectedArrows } from 'CoverBoard/Common';
 
 export const CoverSelectedArrows: FC<{
@@ -18,9 +23,9 @@ export const CoverSelectedArrows: FC<{
       };
     });
 
-  const [points, setPoints] = useAtom(pointsAtom);
-  const selection = points?.id === id ? points.dir : null;
+  const pointDirection = useGetPointDirection(id);
   const setSelected = useSetAtom(selectedAtom);
+  const setPoints = useSetAtom(pointsAtom);
 
   useEffect(() => {
     const keyFn = (e: KeyboardEvent) => {
@@ -33,16 +38,22 @@ export const CoverSelectedArrows: FC<{
         const cover = getCovers().find((cover) => id === cover.id);
 
         if (cover) {
-          if (e.key === 'ArrowRight' && selection === PosTypes.RIGHT) {
+          if (e.key === 'ArrowRight' && pointDirection === PosTypes.RIGHT) {
             updateCover(cover.id, { pos: { x: cover.pos.x + 1 } });
             e.preventDefault();
-          } else if (e.key === 'ArrowLeft' && selection === PosTypes.LEFT) {
+          } else if (
+            e.key === 'ArrowLeft' &&
+            pointDirection === PosTypes.LEFT
+          ) {
             updateCover(cover.id, { pos: { x: cover.pos.x - 1 } });
             e.preventDefault();
-          } else if (e.key === 'ArrowUp' && selection === PosTypes.TOP) {
+          } else if (e.key === 'ArrowUp' && pointDirection === PosTypes.TOP) {
             updateCover(cover.id, { pos: { y: cover.pos.y - 1 } });
             e.preventDefault();
-          } else if (e.key === 'ArrowDown' && selection === PosTypes.BOTTOM) {
+          } else if (
+            e.key === 'ArrowDown' &&
+            pointDirection === PosTypes.BOTTOM
+          ) {
             updateCover(cover.id, { pos: { y: cover.pos.y + 1 } });
             e.preventDefault();
           }
@@ -93,7 +104,7 @@ export const CoverSelectedArrows: FC<{
     id,
     index,
     removeCoverAndRelatedArrows,
-    selection,
+    pointDirection,
     setPoints,
     setSelected,
     updateCover,

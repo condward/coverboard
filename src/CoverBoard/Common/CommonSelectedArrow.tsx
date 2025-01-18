@@ -10,6 +10,7 @@ import { useGetSizesContext } from 'providers';
 import {
   pointsAtom,
   selectedAtom,
+  useGetPointDirection,
   useShallowMainStore,
   useShowToast,
 } from 'store';
@@ -34,7 +35,7 @@ export const CommonSelectedArrows: FC<{
   );
 
   const [points, setPoints] = useAtom(pointsAtom);
-  const selection = points?.id === id ? points.dir : null;
+  const pointDirection = useGetPointDirection(id);
   const setSelected = useSetAtom(selectedAtom);
 
   const handleDrawArrow = useCallback(
@@ -118,16 +119,16 @@ export const CommonSelectedArrows: FC<{
 
   useEffect(() => {
     const keyFn = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' && !selection) {
+      if (e.key === 'ArrowRight' && !pointDirection) {
         handleDrawArrow(id, PosTypes.RIGHT);
         e.preventDefault();
-      } else if (e.key === 'ArrowLeft' && !selection) {
+      } else if (e.key === 'ArrowLeft' && !pointDirection) {
         handleDrawArrow(id, PosTypes.LEFT);
         e.preventDefault();
-      } else if (e.key === 'ArrowUp' && !selection) {
+      } else if (e.key === 'ArrowUp' && !pointDirection) {
         handleDrawArrow(id, PosTypes.TOP);
         e.preventDefault();
-      } else if (e.key === 'ArrowDown' && !selection) {
+      } else if (e.key === 'ArrowDown' && !pointDirection) {
         handleDrawArrow(id, PosTypes.BOTTOM);
         e.preventDefault();
       } else if (e.key === 'Escape') {
@@ -141,7 +142,7 @@ export const CommonSelectedArrows: FC<{
     document.addEventListener('keydown', keyFn);
 
     return () => document.removeEventListener('keydown', keyFn);
-  }, [handleDrawArrow, id, selection, setPoints, setSelected]);
+  }, [handleDrawArrow, id, pointDirection, setPoints, setSelected]);
 
   const square = 25 + (coverSizeWidth * scaleX) / 20;
   const posArray = [
@@ -184,19 +185,19 @@ export const CommonSelectedArrows: FC<{
           y={pos.y}
           width={pos.width}
           height={pos.height}
-          fill={selection === pos.dir ? 'red' : 'white'}
+          fill={pointDirection === pos.dir ? 'red' : 'white'}
           rotation={45}
-          opacity={selection === pos.dir ? 0.3 : 0.05}
-          visible={!selection || selection === pos.dir}
+          opacity={pointDirection === pos.dir ? 0.3 : 0.05}
+          visible={!pointDirection || pointDirection === pos.dir}
           onClick={() => handleDrawArrow(id, pos.dir)}
           onTap={() => handleDrawArrow(id, pos.dir)}
           onMouseMove={(evt: KonvaEventObject<MouseEvent>) => {
-            if (selection !== pos.dir) {
+            if (pointDirection !== pos.dir) {
               evt.currentTarget.opacity(0.3);
             }
           }}
           onMouseLeave={(evt: KonvaEventObject<MouseEvent>) => {
-            evt.currentTarget.opacity(selection === pos.dir ? 0.3 : 0.05);
+            evt.currentTarget.opacity(pointDirection === pos.dir ? 0.3 : 0.05);
           }}
         />
       ))}
