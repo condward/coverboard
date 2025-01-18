@@ -1,23 +1,21 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Circle, Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useSetAtom } from 'jotai';
 
 import { selectedAtom, useGetSelectedId, useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
-import { KeyboardShortcuts } from 'types';
+import { ArrowSelected } from '.';
 
 export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
   const { circleRadius } = useGetSizesContext();
 
-  const { id, color, showArrow, removeArrow } = useShallowMainStore((state) => {
+  const { id, color } = useShallowMainStore((state) => {
     const { id } = state.getArrowByIdx(index);
 
     return {
       id,
       color: state.getArrowColor(),
-      showArrow: state.configs.arrows.circle.show,
-      removeArrow: state.removeArrow,
     };
   });
 
@@ -28,34 +26,13 @@ export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
     setSelected({ id, open: !!selectedId });
   };
 
-  useEffect(() => {
-    if (!selectedId) return;
-
-    const keyFn = (e: KeyboardEvent) => {
-      if (
-        e.key === 'Delete' ||
-        (e.key as KeyboardShortcuts) === KeyboardShortcuts.DELETE
-      ) {
-        removeArrow(selectedId);
-        e.preventDefault();
-      } else if (e.key === 'Escape') {
-        setSelected(null);
-        e.preventDefault();
-      }
-    };
-    window.addEventListener('keydown', keyFn);
-
-    return () => window.removeEventListener('keydown', keyFn);
-  }, [removeArrow, selectedId, setSelected]);
-
-  if (!showArrow) return null;
-
   return (
     <Group
       width={circleRadius * 3}
       height={circleRadius * 3}
       onClick={handleSelect}
       onTap={handleSelect}>
+      {selectedId && <ArrowSelected id={selectedId} />}
       <Circle
         radius={selectedId ? circleRadius * 1.4 : circleRadius}
         fill={color}

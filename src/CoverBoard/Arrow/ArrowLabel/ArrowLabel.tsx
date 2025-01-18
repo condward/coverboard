@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Group } from 'react-konva';
 
 import { ArrowParams } from 'types';
-import { useMainStore } from 'store';
+import { useShallowMainStore } from 'store';
 
 import { ArrowCircle } from '.';
 import { ArrowDraggable } from './ArrowDraggable';
@@ -13,14 +13,14 @@ interface ArrowProps {
 }
 
 export const ArrowLabel: FC<ArrowProps> = ({ index, ArrowParams }) => {
-  const showLabel = useMainStore((state) => state.configs.arrows.title.show);
-
-  if (!showLabel) return null;
+  const { showCircle } = useShallowMainStore((state) => ({
+    showCircle: state.configs.arrows.circle.show,
+  }));
 
   return (
     <Group x={ArrowParams.midX} y={ArrowParams.midY}>
       <ArrowDraggable index={index} ArrowParams={ArrowParams} />
-      <ArrowCircle index={index} />
+      {showCircle && <ArrowCircle index={index} />}
     </Group>
   );
 };

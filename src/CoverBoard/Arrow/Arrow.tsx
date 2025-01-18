@@ -119,8 +119,8 @@ const useGetArrowParams = ({
 export const Arrow: FC<{
   index: number;
 }> = ({ index }) => {
-  const { originId, originDir, targetId, targetDir } = useShallowMainStore(
-    (state) => {
+  const { originId, originDir, targetId, targetDir, showLabel } =
+    useShallowMainStore((state) => {
       const {
         origin: { id: originId, dir: originDir },
         target: { id: targetId, dir: targetDir },
@@ -131,9 +131,9 @@ export const Arrow: FC<{
         originDir,
         targetId,
         targetDir,
+        showLabel: state.configs.arrows.title.show,
       };
-    },
-  );
+    });
 
   const ArrowParams = useGetArrowParams({
     originId,
@@ -147,7 +147,7 @@ export const Arrow: FC<{
   return (
     <Group>
       <ArrowPointer ArrowParams={ArrowParams} />
-      <ArrowLabel index={index} ArrowParams={ArrowParams} />
+      {showLabel && <ArrowLabel index={index} ArrowParams={ArrowParams} />}
     </Group>
   );
 };
