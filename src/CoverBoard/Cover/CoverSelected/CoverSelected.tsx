@@ -1,9 +1,16 @@
 import { FC } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { useShallowMainStore, pointsAtom, useGetSelectedId } from 'store';
+import {
+  useShallowMainStore,
+  pointsAtom,
+  useGetSelectedId,
+  useGetPointDirection,
+} from 'store';
 
-import { CoverSelectedArrows } from './CoverSelectedArrows';
+import { CommonSelectedArrows } from 'CoverBoard/Common';
+import { CoverPointSelected } from './CoverPointSelected';
+import { CoverPointUnselected } from './CoverPointUnselected';
 
 export const CoverSelected: FC<{
   index: number;
@@ -15,6 +22,7 @@ export const CoverSelected: FC<{
   }));
 
   const points = useAtomValue(pointsAtom);
+  const pointDirection = useGetPointDirection(id);
   const isSelected = useGetSelectedId(id);
 
   if (!points && !isSelected) return null;
@@ -27,5 +35,14 @@ export const CoverSelected: FC<{
     }
   }
 
-  return <CoverSelectedArrows index={index} />;
+  return (
+    <>
+      {pointDirection ? (
+        <CoverPointSelected index={index} pointDirection={pointDirection} />
+      ) : (
+        <CoverPointUnselected index={index} />
+      )}
+      <CommonSelectedArrows id={id} />
+    </>
+  );
 };

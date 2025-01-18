@@ -8,4 +8,3 @@ export * from './CoverStars';
 export * from './CoverLabels';
 export * from './CoverDraggable';
 export * from './CoverSelected';
-export * from './CoverSelected/CoverSelectedArrows';

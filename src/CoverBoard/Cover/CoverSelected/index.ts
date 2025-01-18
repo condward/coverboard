@@ -1,2 +1,3 @@
 export * from './CoverSelected';
-export * from './CoverSelectedArrows';
+export * from './CoverPointSelected';
+export * from './CoverPointUnselected';

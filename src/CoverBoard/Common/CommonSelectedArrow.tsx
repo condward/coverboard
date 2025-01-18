@@ -9,11 +9,11 @@ import { PosTypes } from 'types';
 import { useGetSizesContext } from 'providers';
 import {
   pointsAtom,
-  selectedAtom,
   useGetPointDirection,
   useShallowMainStore,
   useShowToast,
 } from 'store';
+import { CommonPointUnselected } from '.';
 
 export const CommonSelectedArrows: FC<{
   id: string;
@@ -36,7 +36,6 @@ export const CommonSelectedArrows: FC<{
 
   const [points, setPoints] = useAtom(pointsAtom);
   const pointDirection = useGetPointDirection(id);
-  const setSelected = useSetAtom(selectedAtom);
 
   const handleDrawArrow = useCallback(
     (id: string, dir: PosTypes) => {
@@ -117,33 +116,6 @@ export const CommonSelectedArrows: FC<{
     ],
   );
 
-  useEffect(() => {
-    const keyFn = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' && !pointDirection) {
-        handleDrawArrow(id, PosTypes.RIGHT);
-        e.preventDefault();
-      } else if (e.key === 'ArrowLeft' && !pointDirection) {
-        handleDrawArrow(id, PosTypes.LEFT);
-        e.preventDefault();
-      } else if (e.key === 'ArrowUp' && !pointDirection) {
-        handleDrawArrow(id, PosTypes.TOP);
-        e.preventDefault();
-      } else if (e.key === 'ArrowDown' && !pointDirection) {
-        handleDrawArrow(id, PosTypes.BOTTOM);
-        e.preventDefault();
-      } else if (e.key === 'Escape') {
-        setPoints(null);
-        e.preventDefault();
-      } else if (e.key === 'Enter') {
-        setSelected({ id, open: true });
-        e.preventDefault();
-      }
-    };
-    document.addEventListener('keydown', keyFn);
-
-    return () => document.removeEventListener('keydown', keyFn);
-  }, [handleDrawArrow, id, pointDirection, setPoints, setSelected]);
-
   const square = 25 + (coverSizeWidth * scaleX) / 20;
   const posArray = [
     {
@@ -178,6 +150,9 @@ export const CommonSelectedArrows: FC<{
 
   return (
     <Group>
+      {points !== null && (
+        <CommonPointUnselected id={id} handleDrawArrow={handleDrawArrow} />
+      )}
       {posArray.map((pos) => (
         <Rect
           key={pos.dir}
