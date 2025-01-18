@@ -87,7 +87,7 @@ export const CommonDrawArrow: FC<CommonDrawArrowProps> = ({ index, type }) => {
   return <CommonDrawArrowChild id={id} scaleX={scaleX} scaleY={scaleY} />;
 };
 
-const CommonDrawArrowChild: FC<{
+export const CommonDrawArrowChild: FC<{
   id: string;
   scaleX: number;
   scaleY: number;

@@ -78,7 +78,6 @@ export const useKeysListener = () => {
 
     return () => window.removeEventListener('keydown', keyFn);
   }, [
-    editTitle,
     fitToScreen,
     getCovers,
     getGroups,

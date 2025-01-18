@@ -10,6 +10,7 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:deprecation/recommended',
     'plugin:jsx-a11y/recommended',
+    'plugin:react-hooks-addons/recommended-legacy',
   ],
   ignorePatterns: [
     'dist',

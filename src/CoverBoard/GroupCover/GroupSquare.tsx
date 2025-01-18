@@ -1,4 +1,4 @@
-import { FC, useRef, useEffect } from 'react';
+import { FC, useRef } from 'react';
 import { Group, Rect, Transformer } from 'react-konva';
 
 import Konva from 'konva';
@@ -6,8 +6,6 @@ import { useSetAtom } from 'jotai';
 
 import { useShallowMainStore, useGetSelectedId, selectedAtom } from 'store';
 import { useGetSizesContext } from 'providers';
-import { KeyboardShortcuts } from 'types';
-
 interface CoverImageProps {
   index: number;
 }
@@ -22,11 +20,7 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
     color,
     groupBackColor,
     updateGroupScale,
-    removeCoverAndRelatedArrows,
-    removeGroupAndRelatedArrows,
     refreshGroups,
-    getCovers,
-    getGroups,
   } = useShallowMainStore((state) => {
     const {
       scale: { x: scaleX, y: scaleY },
@@ -40,11 +34,7 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
       color: state.getGroupColor(),
       groupBackColor: state.getGroupBackColor(),
       updateGroupScale: state.updateGroupScale,
-      removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
-      removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
       refreshGroups: state.refreshGroups,
-      getCovers: state.getCovers,
-      getGroups: state.getGroups,
     };
   });
 
@@ -53,7 +43,6 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
 
   const boxRef = useRef<null | { width: number; height: number }>(null);
   const rectRef = useRef<Konva.Rect>(null);
-  const trRef = useRef<Konva.Transformer>(null);
 
   const coverSizeWidthScaled = coverSizeWidth * scaleX;
   const coverSizeHeightScaled = coverSizeHeight * scaleY;
@@ -62,76 +51,6 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
     setSelected({ id, open: !!selectedId });
     refreshGroups(id);
   };
-
-  useEffect(() => {
-    if (trRef.current && rectRef.current && selectedId) {
-      trRef.current.nodes([rectRef.current]);
-    }
-  }, [selectedId, removeCoverAndRelatedArrows]);
-
-  useEffect(() => {
-    if (!selectedId) return;
-
-    const keyFn = (e: KeyboardEvent) => {
-      if (
-        e.key === 'Delete' ||
-        (e.key as KeyboardShortcuts) === KeyboardShortcuts.DELETE
-      ) {
-        removeGroupAndRelatedArrows(selectedId);
-        e.preventDefault();
-      } else if (e.key === 'Escape') {
-        setSelected(null);
-        e.preventDefault();
-      } else if (e.key === 'Enter') {
-        setSelected({ id: selectedId, open: true });
-        e.preventDefault();
-      } else if ((e.key as KeyboardShortcuts) === KeyboardShortcuts.NEXT) {
-        const groups = getGroups();
-        const covers = getCovers();
-        if (index > -1 && Boolean(groups[index - 1])) {
-          setSelected({
-            id: groups[index - 1].id,
-            open: false,
-          });
-          e.preventDefault();
-        } else if (covers.length > 0) {
-          setSelected({
-            id: covers[covers.length - 1].id,
-            open: false,
-          });
-          e.preventDefault();
-        } else {
-          setSelected({
-            id: groups[groups.length - 1].id,
-            open: false,
-          });
-          e.preventDefault();
-        }
-      } else if ((e.key as KeyboardShortcuts) === KeyboardShortcuts.PREV) {
-        const groups = getGroups();
-        if (index > -1 && Boolean(groups[index + 1])) {
-          setSelected({
-            id: groups[index + 1].id,
-            open: false,
-          });
-          e.preventDefault();
-        } else {
-          setSelected({ id: groups[0].id, open: false });
-          e.preventDefault();
-        }
-      }
-    };
-    window.addEventListener('keydown', keyFn);
-
-    return () => window.removeEventListener('keydown', keyFn);
-  }, [
-    getCovers,
-    getGroups,
-    index,
-    selectedId,
-    removeGroupAndRelatedArrows,
-    setSelected,
-  ]);
 
   const handleTransform = () => {
     if (rectRef.current && boxRef.current) {
@@ -165,7 +84,11 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
       />
       {selectedId && (
         <Transformer
-          ref={trRef}
+          ref={(node) => {
+            if (node && rectRef.current) {
+              node.nodes([rectRef.current]);
+            }
+          }}
           centeredScaling
           boundBoxFunc={(oldBox, newBox) => {
             if (
