@@ -5,3 +5,6 @@ export * from './TitleLabel';
 export * from './CoverBoard';
 export * from './BoundaryArrow';
 export * from './useKeysListener';
+export * from './Covers';
+export * from './GroupCovers';
+export * from './Arrows';

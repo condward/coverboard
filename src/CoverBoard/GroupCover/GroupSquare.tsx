@@ -53,16 +53,17 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
   };
 
   const handleTransform = () => {
-    if (rectRef.current && boxRef.current) {
+    const node = rectRef.current;
+    if (node && boxRef.current) {
       const scaleX =
         Math.round(boxRef.current.width / coverSizeWidth / 0.5) * 0.5;
       const scaleY =
         Math.round(boxRef.current.height / coverSizeHeight / 0.5) * 0.5;
 
-      rectRef.current.x(0);
-      rectRef.current.y(0);
-      rectRef.current.scaleX(1);
-      rectRef.current.scaleY(1);
+      node.x(0);
+      node.y(0);
+      node.scaleX(1);
+      node.scaleY(1);
       updateGroupScale(id, { scaleX, scaleY });
 
       boxRef.current = null;
