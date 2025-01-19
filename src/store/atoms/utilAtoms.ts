@@ -1,4 +1,4 @@
-import { atom, useAtom, useAtomValue } from 'jotai';
+import { atom, useAtom } from 'jotai';
 
 import { LabelTypes, ArrowPointSchema, TextTypes } from 'types';
 
@@ -12,22 +12,46 @@ interface SelectedElement {
   open: boolean;
 }
 
+interface UseSelected {
+  id: string;
+  onSuccess?: () => void;
+}
+
 export const pointsAtom = atom<ArrowPointSchema | null>(null);
-
-export const useGetPointDirection = (id: string) => {
-  const points = useAtomValue(pointsAtom);
-
-  return points?.id === id ? points.dir : null;
-};
 
 export const parentSelectedAtom = atom<Array<string>>([]);
 
 export const selectedAtom = atom<SelectedElement | null>(null);
 
-interface UseSelected {
-  id: string;
-  onSuccess?: () => void;
-}
+const editingTextAtomBase = atom<SelectedText | null>(null);
+export const editingTextAtom = atom(
+  (get) => get(editingTextAtomBase),
+  (_, set, value: SelectedText | null) => {
+    set(pointsAtom, null);
+    set(selectedAtom, null);
+    set(editingTextAtomBase, value);
+  },
+);
+
+const editTitleBaseAtom = atom(false);
+export const editTitleAtom = atom(
+  (get) => get(editTitleBaseAtom),
+  (_, set, value: boolean) => {
+    set(pointsAtom, null);
+    set(selectedAtom, null);
+    set(editTitleBaseAtom, value);
+  },
+);
+
+export const usePoints = (id: string) => {
+  const [points, setPoints] = useAtom(pointsAtom);
+
+  return {
+    points,
+    setPoints,
+    pointDirection: points?.id === id ? points.dir : null,
+  };
+};
 
 export const useSelected = ({ id, onSuccess }: UseSelected) => {
   const [selected, setSelected] = useAtom(selectedAtom);
@@ -44,27 +68,12 @@ export const useSelected = ({ id, onSuccess }: UseSelected) => {
   };
 };
 
-const editingTextAtomBase = atom<SelectedText | null>(null);
-export const editingTextAtom = atom(
-  (get) => get(editingTextAtomBase),
-  (_, set, value: SelectedText | null) => {
-    set(pointsAtom, null);
-    set(selectedAtom, null);
-    set(editingTextAtomBase, value);
-  },
-);
-export const useIsCurrentTextSelected = ({ id, text }: SelectedText) => {
-  const editingText = useAtomValue(editingTextAtom);
+export const useTextSelected = ({ id, text }: SelectedText) => {
+  const [editingText, setEditingText] = useAtom(editingTextAtom);
 
-  return !!editingText && editingText.id === id && editingText.text === text;
+  return {
+    setEditingText,
+    isCurrentTextSelected:
+      !!editingText && editingText.id === id && editingText.text === text,
+  };
 };
-
-const editTitleBaseAtom = atom(false);
-export const editTitleAtom = atom(
-  (get) => get(editTitleBaseAtom),
-  (_, set, value: boolean) => {
-    set(pointsAtom, null);
-    set(selectedAtom, null);
-    set(editTitleBaseAtom, value);
-  },
-);

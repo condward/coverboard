@@ -1,14 +1,8 @@
 import { FC } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 
 import { CoverSchema, GroupSchema, PosTypes, LabelTypes } from 'types';
-import {
-  editingTextAtom,
-  pointsAtom,
-  useIsCurrentTextSelected,
-  useMainStore,
-  useSelected,
-} from 'store';
+import { pointsAtom, useTextSelected, useMainStore, useSelected } from 'store';
 
 import { CommonTextLabel } from '.';
 
@@ -49,8 +43,7 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
   width,
 }) => {
   const showHelpers = useMainStore((state) => state.configs.layout.helpers);
-  const setEditingText = useSetAtom(editingTextAtom);
-  const isCurrentTextSelected = useIsCurrentTextSelected({
+  const { isCurrentTextSelected, setEditingText } = useTextSelected({
     id,
     text: coverLabel,
   });

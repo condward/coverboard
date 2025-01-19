@@ -1,12 +1,6 @@
 import { FC } from 'react';
-import { useAtomValue } from 'jotai';
 
-import {
-  useShallowMainStore,
-  pointsAtom,
-  useSelected,
-  useGetPointDirection,
-} from 'store';
+import { useShallowMainStore, useSelected, usePoints } from 'store';
 
 import { CommonSelectedArrows } from 'CoverBoard/Common';
 
@@ -22,8 +16,7 @@ export const CoverSelected: FC<{
     getGroupsOfCover: state.getGroupsOfCover,
   }));
 
-  const points = useAtomValue(pointsAtom);
-  const pointDirection = useGetPointDirection(id);
+  const { points, pointDirection } = usePoints(id);
   const { selectedId } = useSelected({ id });
 
   if (!points && !selectedId) return null;

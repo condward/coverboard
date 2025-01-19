@@ -1,18 +1,13 @@
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback } from 'react';
 import { Group, Rect } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { v4 as uuidv4 } from 'uuid';
-import { useAtom, useSetAtom } from 'jotai';
 import { ZodError } from 'zod';
 
 import { PosTypes } from 'types';
 import { useGetSizesContext } from 'providers';
-import {
-  pointsAtom,
-  useGetPointDirection,
-  useShallowMainStore,
-  useShowToast,
-} from 'store';
+import { usePoints, useShallowMainStore, useShowToast } from 'store';
+
 import { CommonPointUnselected } from '.';
 
 export const CommonSelectedArrows: FC<{
@@ -33,9 +28,7 @@ export const CommonSelectedArrows: FC<{
       };
     },
   );
-
-  const [points, setPoints] = useAtom(pointsAtom);
-  const pointDirection = useGetPointDirection(id);
+  const { points, setPoints, pointDirection } = usePoints(id);
 
   const handleDrawArrow = useCallback(
     (id: string, dir: PosTypes) => {

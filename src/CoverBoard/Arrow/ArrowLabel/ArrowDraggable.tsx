@@ -1,13 +1,7 @@
 import { FC } from 'react';
-import { useSetAtom } from 'jotai';
 
 import { ArrowParams, TextTypes } from 'types';
-import {
-  editingTextAtom,
-  useIsCurrentTextSelected,
-  useShallowMainStore,
-  useSelected,
-} from 'store';
+import { useTextSelected, useShallowMainStore, useSelected } from 'store';
 import { CommonTextLabel } from 'CoverBoard/Common';
 import { useGetSizesContext } from 'providers';
 
@@ -38,9 +32,8 @@ export const ArrowDraggable: FC<ArrowProps> = ({ index, ArrowParams }) => {
       };
     });
 
-  const setEditingText = useSetAtom(editingTextAtom);
   const { selectedId } = useSelected({ id });
-  const isCurrentTextSelected = useIsCurrentTextSelected({
+  const { isCurrentTextSelected, setEditingText } = useTextSelected({
     id,
     text: TextTypes.ArrowLABEL,
   });
