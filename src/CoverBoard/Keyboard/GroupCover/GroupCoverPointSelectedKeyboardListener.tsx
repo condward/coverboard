@@ -3,15 +3,14 @@ import { FC, useEffect } from 'react';
 import { useShallowMainStore } from 'store';
 import { PosTypes } from 'types';
 
-interface GroupPointSelected {
+interface GroupCoverPointSelectedKeyboardListenerProps {
   index: number;
   pointDirection: PosTypes;
 }
 
-export const GroupPointSelected: FC<GroupPointSelected> = ({
-  index,
-  pointDirection,
-}) => {
+export const GroupCoverPointSelectedKeyboardListener: FC<
+  GroupCoverPointSelectedKeyboardListenerProps
+> = ({ index, pointDirection }) => {
   const { id, updateGroup, getGroups } = useShallowMainStore((state) => {
     return {
       id: state.getGroupByIdx(index).id,

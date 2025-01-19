@@ -6,9 +6,13 @@ import { ZodError } from 'zod';
 
 import { PosTypes } from 'types';
 import { useGetSizesContext } from 'providers';
-import { usePoints, useShallowMainStore, useShowToast } from 'store';
-
-import { CommonPointUnselected } from '.';
+import {
+  usePoints,
+  useSelected,
+  useShallowMainStore,
+  useShowToast,
+} from 'store';
+import { CommonPointSelectedKeyboardListener } from 'CoverBoard/Keyboard/Common/CommonPointSelectedKeyboardListener';
 
 export const CommonSelectedArrows: FC<{
   id: string;
@@ -29,6 +33,7 @@ export const CommonSelectedArrows: FC<{
     },
   );
   const { points, setPoints, pointDirection } = usePoints(id);
+  const { selectedId } = useSelected({ id });
 
   const handleDrawArrow = useCallback(
     (id: string, dir: PosTypes) => {
@@ -143,8 +148,11 @@ export const CommonSelectedArrows: FC<{
 
   return (
     <Group>
-      {points !== null && (
-        <CommonPointUnselected id={id} handleDrawArrow={handleDrawArrow} />
+      {selectedId && (
+        <CommonPointSelectedKeyboardListener
+          id={id}
+          handleDrawArrow={handleDrawArrow}
+        />
       )}
       {posArray.map((pos) => (
         <Rect

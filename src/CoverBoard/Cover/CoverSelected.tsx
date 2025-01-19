@@ -4,8 +4,7 @@ import { useShallowMainStore, useSelected, usePoints } from 'store';
 
 import { CommonSelectedArrows } from 'CoverBoard/Common';
 
-import { CoverPointSelected } from './CoverPointSelected';
-import { CoverPointUnselected } from './CoverPointUnselected';
+import { CoverSelectedKeyboardListener } from 'CoverBoard/Keyboard';
 
 export const CoverSelected: FC<{
   index: number;
@@ -16,7 +15,7 @@ export const CoverSelected: FC<{
     getGroupsOfCover: state.getGroupsOfCover,
   }));
 
-  const { points, pointDirection } = usePoints(id);
+  const { points } = usePoints(id);
   const { selectedId } = useSelected({ id });
 
   if (!points && !selectedId) return null;
@@ -31,11 +30,7 @@ export const CoverSelected: FC<{
 
   return (
     <>
-      {pointDirection ? (
-        <CoverPointSelected index={index} pointDirection={pointDirection} />
-      ) : (
-        <CoverPointUnselected index={index} />
-      )}
+      {selectedId && <CoverSelectedKeyboardListener index={index} />}
       <CommonSelectedArrows id={id} />
     </>
   );

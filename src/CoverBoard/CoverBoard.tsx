@@ -19,11 +19,11 @@ import {
   GroupCovers,
   Arrows,
   TitleLabel,
+  MainKeyboardListener,
   BoundaryCoverArrows,
   BoundaryGroupArrows,
   CoverCountLabel,
   GroupCountLabel,
-  useKeysListener,
 } from './';
 
 export const CoverBoard: FC = () => {
@@ -57,8 +57,6 @@ export const CoverBoard: FC = () => {
     [setPoints, setSelected],
   );
 
-  useKeysListener();
-
   return (
     <Stack
       direction={isLandscape ? 'row' : 'column'}
@@ -78,6 +76,7 @@ export const CoverBoard: FC = () => {
           <Logo />
         </Stack>
       )}
+      <MainKeyboardListener />
       <Stack border={`3px solid ${color}`}>
         <Stage
           width={canvasLimits.width}

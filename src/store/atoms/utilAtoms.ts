@@ -63,6 +63,7 @@ export const useSelected = ({ id, onSuccess }: UseSelected) => {
   };
 
   return {
+    selected,
     selectedId,
     handleSelect,
   };

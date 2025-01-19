@@ -4,8 +4,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 
 import { useSelected, useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
-
-import { ArrowSelected } from '.';
+import { ArrowSelectedKeyboardListener } from 'CoverBoard/Keyboard';
 
 export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
   const { circleRadius } = useGetSizesContext();
@@ -27,7 +26,7 @@ export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
       height={circleRadius * 3}
       onClick={handleSelect}
       onTap={handleSelect}>
-      {selectedId && <ArrowSelected id={selectedId} />}
+      {selectedId && <ArrowSelectedKeyboardListener id={selectedId} />}
       <Circle
         radius={selectedId ? circleRadius * 1.4 : circleRadius}
         fill={color}

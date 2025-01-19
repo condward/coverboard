@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect } from 'react';
+import { FC, useEffect } from 'react';
 
 import {
   editTitleAtom,
@@ -12,7 +12,7 @@ import {
 import { KeyboardShortcuts } from 'types';
 import { usePreventKeys } from 'utils';
 
-export const useKeysListener = () => {
+export const MainKeyboardListener: FC = () => {
   const preventKeys = usePreventKeys();
 
   const { fitToScreen, updateConfigs, getCovers, getGroups } =
@@ -87,4 +87,6 @@ export const useKeysListener = () => {
     setSelected,
     updateConfigs,
   ]);
+
+  return null;
 };

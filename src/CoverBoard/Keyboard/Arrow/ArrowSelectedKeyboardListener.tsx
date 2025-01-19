@@ -4,7 +4,7 @@ import { useSetAtom } from 'jotai';
 import { selectedAtom, useShallowMainStore } from 'store';
 import { KeyboardShortcuts } from 'types';
 
-export const ArrowSelected: FC<{ id: string }> = ({ id }) => {
+export const ArrowSelectedKeyboardListener: FC<{ id: string }> = ({ id }) => {
   const { removeArrow } = useShallowMainStore((state) => ({
     removeArrow: state.removeArrow,
   }));

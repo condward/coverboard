@@ -3,15 +3,14 @@ import { FC, useEffect } from 'react';
 import { useShallowMainStore } from 'store';
 import { PosTypes } from 'types';
 
-interface CoverPointSelected {
+interface CoverPointSelectedKeyboardListenerProps {
   index: number;
   pointDirection: PosTypes;
 }
 
-export const CoverPointSelected: FC<CoverPointSelected> = ({
-  index,
-  pointDirection,
-}) => {
+export const CoverPointSelectedKeyboardListener: FC<
+  CoverPointSelectedKeyboardListenerProps
+> = ({ index, pointDirection }) => {
   const { id, updateCover, getCovers } = useShallowMainStore((state) => {
     return {
       id: state.getCoverByIdx(index).id,

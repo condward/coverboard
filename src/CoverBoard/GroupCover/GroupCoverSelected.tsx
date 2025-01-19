@@ -4,7 +4,7 @@ import { useShallowMainStore, useSelected, usePoints } from 'store';
 
 import { CommonSelectedArrows } from 'CoverBoard/Common';
 
-import { GroupPointSelected, GroupPointUnselected } from '.';
+import { GroupCoverSelectedKeyboardListener } from 'CoverBoard/Keyboard';
 
 export const GroupCoverSelected: FC<{
   index: number;
@@ -31,7 +31,7 @@ export const GroupCoverSelected: FC<{
     };
   });
 
-  const { points, pointDirection } = usePoints(id);
+  const { points } = usePoints(id);
   const { selectedId } = useSelected({ id });
 
   if (!points && !selectedId) return null;
@@ -51,11 +51,7 @@ export const GroupCoverSelected: FC<{
 
   return (
     <>
-      {pointDirection ? (
-        <GroupPointSelected index={index} pointDirection={pointDirection} />
-      ) : (
-        <GroupPointUnselected index={index} />
-      )}
+      {selectedId && <GroupCoverSelectedKeyboardListener index={index} />}
       <CommonSelectedArrows id={id} scaleX={scaleX} scaleY={scaleY} />
     </>
   );

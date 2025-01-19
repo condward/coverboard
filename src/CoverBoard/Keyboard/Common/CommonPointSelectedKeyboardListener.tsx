@@ -5,7 +5,7 @@ import { PosTypes } from 'types';
 
 import { selectedAtom } from 'store';
 
-export const CommonPointUnselected: FC<{
+export const CommonPointSelectedKeyboardListener: FC<{
   id: string;
   handleDrawArrow: (id: string, dir: PosTypes) => void;
 }> = ({ id, handleDrawArrow }) => {

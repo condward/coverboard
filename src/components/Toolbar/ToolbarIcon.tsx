@@ -1,11 +1,12 @@
 import { Box, Button, Tooltip } from '@mui/material';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback } from 'react';
 import { useSetAtom } from 'jotai';
 
-import { KeyboardShortcuts, ToolConfig } from 'types';
-import { clearHash, usePreventKeys } from 'utils';
+import { ToolConfig } from 'types';
+import { clearHash } from 'utils';
 import { pointsAtom } from 'store';
 import { useGetSizesContext } from 'providers';
+import { ToobarKeyboardListener } from 'CoverBoard/Keyboard';
 
 const MIN_OPACITY = 0.3;
 
@@ -15,8 +16,6 @@ interface ToolbarIconProps {
 }
 
 export const ToolbarIcon: FC<ToolbarIconProps> = ({ config }) => {
-  const preventKeys = usePreventKeys();
-
   const { coverSizeWidth, fontSize } = useGetSizesContext();
 
   const setPoints = useSetAtom(pointsAtom);
@@ -25,27 +24,21 @@ export const ToolbarIcon: FC<ToolbarIconProps> = ({ config }) => {
     setPoints(null);
     clearHash();
 
+    if (!config.enabled) return;
+
     return config.value
       ? config.valueModifier(false)
       : config.valueModifier(true);
   }, [config, setPoints]);
 
-  useEffect(() => {
-    if (preventKeys) return;
-
-    const keyFn = (e: KeyboardEvent) => {
-      if ((e.key as KeyboardShortcuts) === config.shortcut) {
-        handleClick();
-        e.preventDefault();
-      }
-    };
-    window.addEventListener('keydown', keyFn);
-
-    return () => window.removeEventListener('keydown', keyFn);
-  }, [config.shortcut, handleClick, preventKeys]);
-
   return (
     <>
+      {config.enabled && (
+        <ToobarKeyboardListener
+          shortcut={config.shortcut}
+          onKeyPress={handleClick}
+        />
+      )}
       <Tooltip title={config.tooltip} key={config.id}>
         <Button
           onClick={handleClick}

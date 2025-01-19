@@ -1,67 +1,59 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 
-import { KeyboardShortcuts, PosTypes } from 'types';
+import { PosTypes } from 'types';
 import { editTitleAtom, hideToolbarAtom, useShallowMainStore } from 'store';
 import { CommonTextLabel } from 'CoverBoard/Common';
-import { usePreventKeys, useSaveId } from 'utils';
+import { useSaveId } from 'utils';
 import { useGetSizesContext } from 'providers';
+import { TitleKeyboardListener } from 'CoverBoard/Keyboard';
 
 const fillValue = 0.9;
 
 export const TitleLabel: FC = () => {
   const saveId = useSaveId();
-  const preventKeys = usePreventKeys();
 
   const { canvasLimits, fontSize } = useGetSizesContext();
 
-  const { titleMode, color, updateConfigs } = useShallowMainStore((state) => ({
-    titleMode: state.configs.title.show
-      ? state.configs.title.text ||
-        (state.configs.layout.helpers ? `<edit ${saveId} title>` : '')
-      : '',
-    updateConfigs: state.updateConfigs,
-    color: state.getColor(),
-  }));
+  const { titleText, color, updateConfigs, showTitle, showHelpers } =
+    useShallowMainStore((state) => ({
+      titleText: state.configs.title.text,
+      showTitle: state.configs.title.show,
+      showHelpers: state.configs.layout.helpers,
+      updateConfigs: state.updateConfigs,
+      color: state.getColor(),
+    }));
 
-  const { open, setOpen, setHideToolBar, setEditTitle } = {
+  const { open, setOpen, setHideToolBar } = {
     open: useAtomValue(editTitleAtom),
     setOpen: useSetAtom(editTitleAtom),
     setHideToolBar: useSetAtom(hideToolbarAtom),
-    setEditTitle: useSetAtom(editTitleAtom),
   };
 
-  useEffect(() => {
-    if (preventKeys) return;
-
-    const keyFn = (e: KeyboardEvent) => {
-      if (e.key === KeyboardShortcuts.TITLE.toLowerCase()) {
-        setEditTitle(true);
-        e.preventDefault();
-      }
-    };
-    window.addEventListener('keydown', keyFn);
-
-    return () => window.removeEventListener('keydown', keyFn);
-  }, [preventKeys, setEditTitle]);
+  const titleMode = showTitle
+    ? titleText || (showHelpers ? `<edit ${saveId} title>` : '')
+    : '';
 
   return (
-    <CommonTextLabel
-      color={color}
-      title="title"
-      open={open}
-      setOpen={(val) => {
-        setHideToolBar(false);
-        setOpen(val);
-      }}
-      onReset={() => updateConfigs({ title: { text: '' } })}
-      label={titleMode}
-      setLabel={(text) => updateConfigs({ title: { text } })}
-      x={(canvasLimits.width * (1 - fillValue)) / 2}
-      y={2 * fontSize}
-      width={canvasLimits.width * fillValue}
-      dir={PosTypes.TOP}
-      labelSize={2}
-    />
+    <>
+      {showTitle && <TitleKeyboardListener />}
+      <CommonTextLabel
+        color={color}
+        title="title"
+        open={open}
+        setOpen={(val) => {
+          setHideToolBar(false);
+          setOpen(val);
+        }}
+        onReset={() => updateConfigs({ title: { text: '' } })}
+        label={titleMode}
+        setLabel={(text) => updateConfigs({ title: { text } })}
+        x={(canvasLimits.width * (1 - fillValue)) / 2}
+        y={2 * fontSize}
+        width={canvasLimits.width * fillValue}
+        dir={PosTypes.TOP}
+        labelSize={2}
+      />
+    </>
   );
 };

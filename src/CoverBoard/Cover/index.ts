@@ -3,7 +3,6 @@ export * from './CoverStars/CoverStarDraggable';
 export * from './CoverLoadImage/CoverImage';
 export * from './CoverLoadImage';
 export * from './CoverStars/CoverStar';
-export * from './CoverCountLabel';
 export * from './CoverStars';
 export * from './CoverLabels';
 export * from './CoverDraggable';
