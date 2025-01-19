@@ -1,5 +1,5 @@
 import { Box, Button, Tooltip } from '@mui/material';
-import { FC, useCallback } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { useSetAtom } from 'jotai';
 
 import { ToolConfig } from 'types';
@@ -15,7 +15,7 @@ interface ToolbarIconProps {
   index: number;
 }
 
-export const ToolbarIcon: FC<ToolbarIconProps> = ({ config }) => {
+const ToolbarIconWithoutMemo: FC<ToolbarIconProps> = ({ config }) => {
   const { coverSizeWidth, fontSize } = useGetSizesContext();
 
   const setPoints = useSetAtom(pointsAtom);
@@ -83,3 +83,5 @@ export const ToolbarIcon: FC<ToolbarIconProps> = ({ config }) => {
     </>
   );
 };
+
+export const ToolbarIcon = memo(ToolbarIconWithoutMemo);

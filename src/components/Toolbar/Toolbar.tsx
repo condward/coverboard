@@ -8,9 +8,11 @@ import {
   SettingsOutlined,
   ShareOutlined,
   DownloadOutlined,
+  UndoOutlined,
 } from '@mui/icons-material';
 import { ZodError } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
+import { useStore } from 'zustand';
 
 import {
   colorMap,
@@ -29,10 +31,12 @@ import {
   pointsAtom,
   selectedAtom,
   useShowToast,
+  useMainStore,
 } from 'store';
 import { useGetSizesContext } from 'providers';
+import { UndoKeyboardListener } from 'CoverBoard/Keyboard';
 
-import { ToolbarActionIcon, ToolbarIcon } from '.';
+import { ToolbarIcon } from '.';
 
 interface ToolbarProps {
   takeScreenshot: () => void;
@@ -115,6 +119,8 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot }) => {
   const isLandscape = useIsLandscape();
   const elemName = useGetElemName();
   const { coverSizeWidth, padding } = useGetSizesContext();
+  const { undo: undoAction, pastStates } = useStore(useMainStore.temporal);
+  const actionsLength = pastStates.length;
 
   const {
     color,
@@ -238,6 +244,17 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot }) => {
       enabled: !editArrows && !selected,
       shortcut: KeyboardShortcuts.SCREENSHOT,
     },
+    {
+      id: ToolConfigIDs.UNDO,
+      tooltip: `Undo (moves: ${actionsLength}/10)`,
+      color: colorMap[Colors.PINK],
+      icon: <UndoOutlined />,
+      value: actionsLength < 1,
+      valueModifier: () => undoAction(),
+      badge: actionsLength > 0 ? actionsLength : null,
+      enabled: true,
+      shortcut: KeyboardShortcuts.UNDO,
+    },
   ];
 
   return (
@@ -246,10 +263,10 @@ export const Toolbar: FC<ToolbarProps> = ({ takeScreenshot }) => {
       gap={`${padding}px`}
       border={`3px solid ${color}`}
       padding={`${padding}px`}>
+      {actionsLength > 0 && <UndoKeyboardListener />}
       {configTools.map((config, index) => (
         <ToolbarIcon config={config} key={config.id} index={index} />
       ))}
-      <ToolbarActionIcon />
     </Stack>
   );
 };
