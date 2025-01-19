@@ -1,4 +1,4 @@
-import { atom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 
 import { LabelTypes, ArrowPointSchema, TextTypes } from 'types';
 
@@ -23,10 +23,25 @@ export const useGetPointDirection = (id: string) => {
 export const parentSelectedAtom = atom<Array<string>>([]);
 
 export const selectedAtom = atom<SelectedElement | null>(null);
-export const useGetSelectedId = (id: string) => {
-  const selected = useAtomValue(selectedAtom);
 
-  return selected && selected.id === id ? id : null;
+interface UseSelected {
+  id: string;
+  onSuccess?: () => void;
+}
+
+export const useSelected = ({ id, onSuccess }: UseSelected) => {
+  const [selected, setSelected] = useAtom(selectedAtom);
+  const selectedId = selected && selected.id === id ? id : null;
+
+  const handleSelect = () => {
+    setSelected({ id, open: !!selectedId });
+    onSuccess?.();
+  };
+
+  return {
+    selectedId,
+    handleSelect,
+  };
 };
 
 const editingTextAtomBase = atom<SelectedText | null>(null);

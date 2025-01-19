@@ -19,13 +19,10 @@ export const ToolbarActionIcon: FC = () => {
   const preventKeys = usePreventKeys();
 
   useEffect(() => {
-    if (preventKeys) return;
+    if (preventKeys && actionsLength < 1) return;
 
     const keyFn = (e: KeyboardEvent) => {
-      if (e.key === 'u') {
-        undoAction();
-        e.preventDefault();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
         undoAction();
         e.preventDefault();
       }
@@ -33,7 +30,7 @@ export const ToolbarActionIcon: FC = () => {
     window.addEventListener('keydown', keyFn);
 
     return () => window.removeEventListener('keydown', keyFn);
-  }, [preventKeys, undoAction]);
+  }, [actionsLength, preventKeys, undoAction]);
 
   const actionConfig: ToolConfig = {
     id: ToolConfigIDs.UNDO,

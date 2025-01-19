@@ -1,10 +1,10 @@
 import { FC } from 'react';
 import { Circle, Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useSetAtom } from 'jotai';
 
-import { selectedAtom, useGetSelectedId, useShallowMainStore } from 'store';
+import { useSelected, useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
+
 import { ArrowSelected } from '.';
 
 export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
@@ -19,12 +19,7 @@ export const ArrowCircle: FC<{ index: number }> = ({ index }) => {
     };
   });
 
-  const setSelected = useSetAtom(selectedAtom);
-  const selectedId = useGetSelectedId(id);
-
-  const handleSelect = () => {
-    setSelected({ id, open: !!selectedId });
-  };
+  const { selectedId, handleSelect } = useSelected({ id });
 
   return (
     <Group

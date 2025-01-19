@@ -3,7 +3,7 @@ import { Group, Rect, Star } from 'react-konva';
 import { FC } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { pointsAtom, useGetSelectedId, useShallowMainStore } from 'store';
+import { pointsAtom, useSelected, useShallowMainStore } from 'store';
 import { CoverSchema } from 'types';
 import { useGetSizesContext } from 'providers';
 
@@ -15,7 +15,7 @@ interface CoverStarProps {
 
 export const CoverStar: FC<CoverStarProps> = (props) => {
   const editArrows = useAtomValue(pointsAtom);
-  const selectedId = useGetSelectedId(props.id);
+  const { selectedId } = useSelected({ id: props.id });
 
   if (editArrows || selectedId) return null;
 

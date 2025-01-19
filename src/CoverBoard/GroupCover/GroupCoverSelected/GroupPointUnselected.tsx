@@ -2,27 +2,21 @@ import { FC, useEffect } from 'react';
 import { useSetAtom } from 'jotai';
 
 import { KeyboardShortcuts } from 'types';
-import {
-  pointsAtom,
-  selectedAtom,
-  useGetPointDirection,
-  useShallowMainStore,
-} from 'store';
+import { pointsAtom, selectedAtom, useShallowMainStore } from 'store';
 
 export const GroupPointUnselected: FC<{
   index: number;
 }> = ({ index }) => {
-  const { id, updateGroup, removeGroupAndRelatedArrows, getGroups } =
-    useShallowMainStore((state) => {
+  const { id, removeGroupAndRelatedArrows, getGroups } = useShallowMainStore(
+    (state) => {
       return {
         id: state.getGroupByIdx(index).id,
-        updateGroup: state.updateGroup,
         removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
         getGroups: state.getGroups,
       };
-    });
+    },
+  );
 
-  const pointDirection = useGetPointDirection(id);
   const setSelected = useSetAtom(selectedAtom);
   const setPoints = useSetAtom(pointsAtom);
 
@@ -74,10 +68,8 @@ export const GroupPointUnselected: FC<{
     id,
     index,
     removeGroupAndRelatedArrows,
-    pointDirection,
     setPoints,
     setSelected,
-    updateGroup,
   ]);
 
   return null;

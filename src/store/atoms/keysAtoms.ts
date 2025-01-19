@@ -45,7 +45,5 @@ export const useUpdateApiKey = (apiName: ApiKeys) => {
 export const useGetApiKey = (apiName: ApiKeys | null) => {
   const apiKey = useAtomValue(apiKeysAtom);
 
-  if (apiName === null) return null;
-
-  return apiKey[apiName];
+  return apiName === null ? null : apiKey[apiName];
 };

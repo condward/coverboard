@@ -1,9 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useSetAtom } from 'jotai';
 
-import { selectedAtom, useGetSelectedId, useShallowMainStore } from 'store';
+import { useSelected, useShallowMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
 
 import { CoverImage } from '.';
@@ -29,16 +28,13 @@ export const CoverLoadImage: FC<{
     },
   );
 
-  const setSelected = useSetAtom(selectedAtom);
-  const selectedId = useGetSelectedId(id);
-
   const [shouldRender, setShouldRender] = useState(false);
   const [hasRetries, setHasRetries] = useState(false);
 
-  const handleSelect = () => {
-    setSelected({ id, open: !!selectedId });
-    refreshCovers(id);
-  };
+  const { handleSelect } = useSelected({
+    id,
+    onSuccess: () => refreshCovers(id),
+  });
 
   const onRetry = (evt: KonvaEventObject<MouseEvent>) => {
     evt.cancelBubble = true;

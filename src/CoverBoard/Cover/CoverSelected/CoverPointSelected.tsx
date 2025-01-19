@@ -1,4 +1,5 @@
 import { FC, useEffect } from 'react';
+
 import { useShallowMainStore } from 'store';
 import { PosTypes } from 'types';
 
@@ -11,15 +12,14 @@ export const CoverPointSelected: FC<CoverPointSelected> = ({
   index,
   pointDirection,
 }) => {
-  const { id, updateCover, removeCoverAndRelatedArrows, getCovers } =
-    useShallowMainStore((state) => {
-      return {
-        id: state.getCoverByIdx(index).id,
-        updateCover: state.updateCover,
-        removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
-        getCovers: state.getCovers,
-      };
-    });
+  const { id, updateCover, getCovers } = useShallowMainStore((state) => {
+    return {
+      id: state.getCoverByIdx(index).id,
+      updateCover: state.updateCover,
+      removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
+      getCovers: state.getCovers,
+    };
+  });
 
   useEffect(() => {
     const keyFn = (e: KeyboardEvent) => {
@@ -57,14 +57,7 @@ export const CoverPointSelected: FC<CoverPointSelected> = ({
     document.addEventListener('keydown', keyFn);
 
     return () => document.removeEventListener('keydown', keyFn);
-  }, [
-    getCovers,
-    id,
-    index,
-    removeCoverAndRelatedArrows,
-    pointDirection,
-    updateCover,
-  ]);
+  }, [getCovers, id, pointDirection, updateCover]);
 
   return null;
 };

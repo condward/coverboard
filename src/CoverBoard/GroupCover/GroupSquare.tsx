@@ -2,9 +2,8 @@ import { FC, useRef } from 'react';
 import { Group, Rect, Transformer } from 'react-konva';
 
 import Konva from 'konva';
-import { useSetAtom } from 'jotai';
 
-import { useShallowMainStore, useGetSelectedId, selectedAtom } from 'store';
+import { useShallowMainStore, useSelected } from 'store';
 import { useGetSizesContext } from 'providers';
 interface CoverImageProps {
   index: number;
@@ -38,19 +37,16 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
     };
   });
 
-  const setSelected = useSetAtom(selectedAtom);
-  const selectedId = useGetSelectedId(id);
+  const { selectedId, handleSelect } = useSelected({
+    id,
+    onSuccess: () => refreshGroups(id),
+  });
 
   const boxRef = useRef<null | { width: number; height: number }>(null);
   const rectRef = useRef<Konva.Rect>(null);
 
   const coverSizeWidthScaled = coverSizeWidth * scaleX;
   const coverSizeHeightScaled = coverSizeHeight * scaleY;
-
-  const handlesSelect = () => {
-    setSelected({ id, open: !!selectedId });
-    refreshGroups(id);
-  };
 
   const handleTransform = () => {
     const node = rectRef.current;
@@ -71,7 +67,7 @@ export const GroupSquare: FC<CoverImageProps> = ({ index }) => {
   };
 
   return (
-    <Group onClick={handlesSelect} onTap={handlesSelect}>
+    <Group onClick={handleSelect} onTap={handleSelect}>
       <Rect
         width={coverSizeWidthScaled - 2}
         height={coverSizeHeightScaled - 2}

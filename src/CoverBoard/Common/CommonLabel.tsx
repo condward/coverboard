@@ -6,8 +6,8 @@ import {
   editingTextAtom,
   pointsAtom,
   useIsCurrentTextSelected,
-  useGetSelectedId,
   useMainStore,
+  useSelected,
 } from 'store';
 
 import { CommonTextLabel } from '.';
@@ -29,22 +29,11 @@ interface CommonLabelProps {
 
 export const CommonLabel: FC<CommonLabelProps> = (props) => {
   const editArrows = useAtomValue(pointsAtom);
-  const selectedId = useGetSelectedId(props.id);
+  const { selectedId } = useSelected({ id: props.id });
 
   if (editArrows || selectedId) return null;
 
   return <CommonLabelChild {...props} />;
-};
-
-const useGetTitleText = (text: string, coverLabel: LabelTypes) => {
-  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
-
-  if (text) {
-    return text;
-  } else if (text === '' && showHelpers && coverLabel === LabelTypes.TITLE) {
-    return '<add title>';
-  }
-  return '';
 };
 
 const CommonLabelChild: FC<CommonLabelProps> = ({
@@ -59,12 +48,16 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
   y,
   width,
 }) => {
+  const showHelpers = useMainStore((state) => state.configs.layout.helpers);
   const setEditingText = useSetAtom(editingTextAtom);
   const isCurrentTextSelected = useIsCurrentTextSelected({
     id,
     text: coverLabel,
   });
-  const label = useGetTitleText(text, coverLabel);
+  const label =
+    text || (showHelpers && coverLabel === LabelTypes.TITLE)
+      ? '<add title>'
+      : '';
 
   return (
     <CommonTextLabel
@@ -73,9 +66,7 @@ const CommonLabelChild: FC<CommonLabelProps> = ({
       fontStyle={fontStyle}
       hasReset
       open={isCurrentTextSelected}
-      setOpen={(open: boolean) =>
-        setEditingText(open ? { id, text: coverLabel } : null)
-      }
+      setOpen={(open) => setEditingText(open ? { id, text: coverLabel } : null)}
       editable={true}
       label={label}
       onReset={() => void 0}

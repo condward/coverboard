@@ -1,4 +1,5 @@
 import { FC, useEffect } from 'react';
+
 import { useShallowMainStore } from 'store';
 import { PosTypes } from 'types';
 
@@ -11,15 +12,13 @@ export const GroupPointSelected: FC<GroupPointSelected> = ({
   index,
   pointDirection,
 }) => {
-  const { id, updateGroup, removeGroupAndRelatedArrows, getGroups } =
-    useShallowMainStore((state) => {
-      return {
-        id: state.getGroupByIdx(index).id,
-        updateGroup: state.updateGroup,
-        removeGroupAndRelatedArrows: state.removeGroupAndRelatedArrows,
-        getGroups: state.getGroups,
-      };
-    });
+  const { id, updateGroup, getGroups } = useShallowMainStore((state) => {
+    return {
+      id: state.getGroupByIdx(index).id,
+      updateGroup: state.updateGroup,
+      getGroups: state.getGroups,
+    };
+  });
 
   useEffect(() => {
     const keyFn = (e: KeyboardEvent) => {
@@ -57,14 +56,7 @@ export const GroupPointSelected: FC<GroupPointSelected> = ({
     document.addEventListener('keydown', keyFn);
 
     return () => document.removeEventListener('keydown', keyFn);
-  }, [
-    getGroups,
-    id,
-    index,
-    removeGroupAndRelatedArrows,
-    pointDirection,
-    updateGroup,
-  ]);
+  }, [getGroups, pointDirection, updateGroup, id]);
 
   return null;
 };

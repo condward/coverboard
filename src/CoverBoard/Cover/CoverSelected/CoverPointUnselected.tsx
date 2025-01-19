@@ -2,27 +2,21 @@ import { FC, useEffect } from 'react';
 import { useSetAtom } from 'jotai';
 
 import { KeyboardShortcuts } from 'types';
-import {
-  pointsAtom,
-  selectedAtom,
-  useGetPointDirection,
-  useShallowMainStore,
-} from 'store';
+import { pointsAtom, selectedAtom, useShallowMainStore } from 'store';
 
 export const CoverPointUnselected: FC<{
   index: number;
 }> = ({ index }) => {
-  const { id, updateCover, removeCoverAndRelatedArrows, getCovers } =
-    useShallowMainStore((state) => {
+  const { id, removeCoverAndRelatedArrows, getCovers } = useShallowMainStore(
+    (state) => {
       return {
         id: state.getCoverByIdx(index).id,
-        updateCover: state.updateCover,
         removeCoverAndRelatedArrows: state.removeCoverAndRelatedArrows,
         getCovers: state.getCovers,
       };
-    });
+    },
+  );
 
-  const pointDirection = useGetPointDirection(id);
   const setSelected = useSetAtom(selectedAtom);
   const setPoints = useSetAtom(pointsAtom);
 
@@ -74,10 +68,8 @@ export const CoverPointUnselected: FC<{
     id,
     index,
     removeCoverAndRelatedArrows,
-    pointDirection,
     setPoints,
     setSelected,
-    updateCover,
   ]);
 
   return null;

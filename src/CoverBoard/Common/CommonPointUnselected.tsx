@@ -33,7 +33,7 @@ export const CommonPointUnselected: FC<{
     document.addEventListener('keydown', keyFn);
 
     return () => document.removeEventListener('keydown', keyFn);
-  }, []);
+  }, [handleDrawArrow, id, setSelected]);
 
   return null;
 };

@@ -4,11 +4,12 @@ import { useAtomValue } from 'jotai';
 import {
   useShallowMainStore,
   pointsAtom,
-  useGetSelectedId,
+  useSelected,
   useGetPointDirection,
 } from 'store';
 
 import { CommonSelectedArrows } from 'CoverBoard/Common';
+
 import { CoverPointSelected } from './CoverPointSelected';
 import { CoverPointUnselected } from './CoverPointUnselected';
 
@@ -23,9 +24,9 @@ export const CoverSelected: FC<{
 
   const points = useAtomValue(pointsAtom);
   const pointDirection = useGetPointDirection(id);
-  const isSelected = useGetSelectedId(id);
+  const { selectedId } = useSelected({ id });
 
-  if (!points && !isSelected) return null;
+  if (!points && !selectedId) return null;
 
   if (points) {
     const cover = getCovers().find((cover) => cover.id === points.id);

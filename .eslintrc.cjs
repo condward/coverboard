@@ -49,7 +49,7 @@ module.exports = {
           'useAtom',
           'useAtomValue',
           'useSetAtom',
-          'useGetSelectedId',
+          'useGetSelected',
           'useIsCurrentTextSelected',
           'useRef',
           'useState',
