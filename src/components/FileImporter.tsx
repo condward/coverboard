@@ -1,6 +1,7 @@
 import {
   ChangeEvent,
   DetailedHTMLProps,
+  FC,
   InputHTMLAttributes,
   useState,
 } from 'react';
@@ -18,7 +19,7 @@ interface FileImporterProps
   helperText?: string;
 }
 
-const FileImporter: React.FC<FileImporterProps> = (props) => {
+const FileImporter: FC<FileImporterProps> = (props) => {
   const { onFileRead, required, helperText, ...restProps } = props;
   const { id, label, disabled } = restProps;
 

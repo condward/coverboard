@@ -10,7 +10,12 @@ import {
   SwapHorizOutlined,
 } from '@mui/icons-material';
 
-import { ArrowSchema, ArrowSchemaOutput, SPACING_GAP } from 'types';
+import {
+  ArrowSchema,
+  ArrowSchemaOutput,
+  SPACING_GAP,
+  arrowSchema,
+} from 'types';
 import {
   CommonDialog,
   DirectionRadio,
@@ -65,7 +70,7 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
     unknown,
     ArrowSchemaOutput
   >({
-    resolver: zodResolver(ArrowSchema),
+    resolver: zodResolver(arrowSchema),
     defaultValues: arrow,
   });
 

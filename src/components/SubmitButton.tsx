@@ -1,12 +1,13 @@
 import { SaveOutlined } from '@mui/icons-material';
 import { Button, CircularProgress } from '@mui/material';
+import { ReactNode } from 'react';
 import { useFormState } from 'react-hook-form';
 import type { Control, FieldValues } from 'react-hook-form';
 
 interface FormButtonProps<TFieldValues extends FieldValues = FieldValues> {
   text?: string;
   control: Control<TFieldValues>;
-  startIcon?: React.ReactNode;
+  startIcon?: ReactNode;
   disabled?: boolean;
   isPending?: boolean;
   id?: string;

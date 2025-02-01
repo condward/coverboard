@@ -1,5 +1,5 @@
 import { ThemeProvider, createTheme } from '@mui/material';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 
 import {
   backColorMap,
@@ -10,7 +10,7 @@ import {
 } from 'types';
 
 export const MuiThemeProvider: FC<{
-  children: React.ReactNode;
+  children: ReactNode;
 }> = ({ children }) => {
   const theme = createTheme({
     palette: {

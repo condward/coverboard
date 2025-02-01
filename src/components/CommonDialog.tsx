@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Dialog,
   DialogTitle,
@@ -76,11 +75,12 @@ export const CommonDialog: FC<CommonDialogProps> = ({
       onClose={handleClose}
       component={isForm ? 'form' : undefined}
       onSubmit={isForm ? onSubmit : undefined}
-      PaperProps={{
-        noValidate: true,
-        style: {
-          minWidth: fullScreen ? undefined : '35rem',
-          opacity: opaque ? 1 : 1,
+      slotProps={{
+        paper: {
+          style: {
+            minWidth: fullScreen ? undefined : '35rem',
+            opacity: opaque ? 1 : 1,
+          },
         },
       }}>
       <DialogTitle

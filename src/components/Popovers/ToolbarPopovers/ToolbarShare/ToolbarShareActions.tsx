@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { Button, Stack } from '@mui/material';
 import { ZodError } from 'zod';
 import {
@@ -25,7 +25,7 @@ interface ToolbarShareActionsProps {
   jsonData: string;
   defaultJsonData: string;
   showButtons: boolean;
-  setJsonData: React.Dispatch<React.SetStateAction<string>>;
+  setJsonData: Dispatch<SetStateAction<string>>;
 }
 
 export const ToolbarShareActions: FC<ToolbarShareActionsProps> = ({

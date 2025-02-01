@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { FC, useEffect, useMemo } from 'react';
+import { FC, useEffect, useMemo, ReactNode } from 'react';
 
 import { useShallowMainStore, sizeAtom, hideToolbarAtom } from 'store';
 import { MAX_BOUNDARY } from 'types';
@@ -8,7 +8,7 @@ import { throttle, useIsLandscape } from 'utils';
 import { SizesContext } from './useGetSizesContext';
 
 export const SizesProvider: FC<{
-  children: React.ReactNode;
+  children: ReactNode;
 }> = ({ children }) => {
   const isLandscape = useIsLandscape();
 

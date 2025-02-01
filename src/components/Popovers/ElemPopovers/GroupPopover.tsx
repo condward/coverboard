@@ -31,13 +31,13 @@ import { useGetSizesContext } from 'providers';
 import { BulkUpdateCoversPopover } from './connections';
 import { GroupConnectionPopover } from './connections/GroupConnectionPopover';
 
-interface GroupPopover {
+interface GroupPopoverProps {
   onClose: (id?: string) => void;
   onChange: (from: string, to: string) => void;
   onReturn?: () => void;
   group: GroupSchema;
 }
-export const GroupPopover: FC<GroupPopover> = ({
+export const GroupPopover: FC<GroupPopoverProps> = ({
   group,
   onClose,
   onChange,

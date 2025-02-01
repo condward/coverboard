@@ -24,10 +24,10 @@ import { useShallowMainStore, useShowToast } from 'store';
 import { useGetSizesContext } from 'providers';
 import { useForm } from 'utils';
 
-interface AddGroupPopover {
+interface AddGroupPopoverProps {
   onClose: (id?: string) => void;
 }
-export const AddGroupPopover: FC<AddGroupPopover> = ({ onClose }) => {
+export const AddGroupPopover: FC<AddGroupPopoverProps> = ({ onClose }) => {
   const { canvasLimits, coverSizeWidth, coverSizeHeight } =
     useGetSizesContext();
 

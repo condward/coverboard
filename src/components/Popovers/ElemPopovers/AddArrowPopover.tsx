@@ -5,7 +5,13 @@ import { Controller } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { AddOutlined } from '@mui/icons-material';
 
-import { ArrowSchemaOutput, ArrowSchema, SPACING_GAP, PosTypes } from 'types';
+import {
+  ArrowSchemaOutput,
+  ArrowSchema,
+  SPACING_GAP,
+  PosTypes,
+  arrowSchema,
+} from 'types';
 import {
   CommonDialog,
   DirectionRadio,
@@ -26,7 +32,6 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
   onClose,
   originId,
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { showErrorMessage } = useShowToast();
   const { getCovers, getGroups, checkIfArrowAlreadyExists, addArrow } =
     useShallowMainStore((state) => ({
@@ -54,7 +59,7 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
     unknown,
     ArrowSchemaOutput
   >({
-    resolver: zodResolver(ArrowSchema),
+    resolver: zodResolver(arrowSchema),
     defaultValues: {
       id: uuidv4(),
       title: {

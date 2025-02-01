@@ -1,7 +1,7 @@
 import { StateCreator } from 'zustand';
 import type { DeepPartial } from 'react-hook-form';
 
-import { ArrowSchema, ArrowsSchema, ArrowSchemas } from 'types';
+import { ArrowSchema, ArrowsSchema, arrowSchemas } from 'types';
 
 export interface UseArrowsParams {
   arrows: ArrowsSchema;
@@ -32,7 +32,7 @@ export const createArrowsSlice: StateCreator<
       return;
 
     set(({ arrows }) => ({
-      arrows: ArrowSchemas.parse([...arrows, arrow]),
+      arrows: arrowSchemas.parse([...arrows, arrow]),
     }));
   },
   updateArrow(ArrowId, partialArrow) {

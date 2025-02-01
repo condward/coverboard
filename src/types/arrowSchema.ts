@@ -3,13 +3,13 @@ import { z } from 'zod';
 
 import { PosTypes } from './generalTypes';
 
-const ArrowPointSchema = z.object({
+const arrowPointSchema = z.object({
   id: z.string(),
   dir: z.nativeEnum(PosTypes),
 });
-export type ArrowPointSchema = z.input<typeof ArrowPointSchema>;
+export type ArrowPointSchema = z.input<typeof arrowPointSchema>;
 
-export const ArrowSchema = z.object({
+export const arrowSchema = z.object({
   id: z
     .string({
       invalid_type_error: 'arrows:id must be a string',
@@ -33,7 +33,7 @@ export const ArrowSchema = z.object({
       },
     }),
   }),
-  origin: ArrowPointSchema.extend({
+  origin: arrowPointSchema.extend({
     id: z
       .string({
         invalid_type_error: 'arrows:origin:id must be a string',
@@ -52,7 +52,7 @@ export const ArrowSchema = z.object({
       },
     }),
   }),
-  target: ArrowPointSchema.extend({
+  target: arrowPointSchema.extend({
     id: z
       .string({
         invalid_type_error: 'arrows:target:id must be a string',
@@ -73,16 +73,16 @@ export const ArrowSchema = z.object({
   }),
 });
 
-export type ArrowSchema = z.input<typeof ArrowSchema>;
-export type ArrowSchemaOutput = z.output<typeof ArrowSchema>;
+export type ArrowSchema = z.input<typeof arrowSchema>;
+export type ArrowSchemaOutput = z.output<typeof arrowSchema>;
 
-export const ArrowSchemas = z
-  .array(ArrowSchema, {
+export const arrowSchemas = z
+  .array(arrowSchema, {
     invalid_type_error: 'arrows must be an array of objects',
     required_error: 'arrows is required',
   })
   .max(50, 'Only 50 arrows are allowed');
-export type ArrowsSchema = z.input<typeof ArrowSchemas>;
+export type ArrowsSchema = z.input<typeof arrowSchemas>;
 
 export interface ArrowParams {
   midX: number;

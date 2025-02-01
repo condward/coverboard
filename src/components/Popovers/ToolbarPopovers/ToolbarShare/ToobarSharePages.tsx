@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { Chip, Stack, Box } from '@mui/material';
 import { CancelRounded } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -17,10 +17,10 @@ const getMediaFromStorage = (storageString: string) => {
   try {
     const item = window.localStorage.getItem(storageString);
     if (item) {
-      const curentData = JSON.parse(item) as { state: AppSchema };
+      const currentData = JSON.parse(item) as { state: AppSchema };
 
-      if (Object.values(Media).includes(curentData.state.configs.media)) {
-        return curentData.state.configs.media;
+      if (Object.values(Media).includes(currentData.state.configs.media)) {
+        return currentData.state.configs.media;
       }
     }
 
@@ -33,8 +33,8 @@ const getMediaFromStorage = (storageString: string) => {
 
 interface ToolbarShareProps {
   onClose: () => void;
-  setJsonData: React.Dispatch<React.SetStateAction<string>>;
-  setKeyList: React.Dispatch<React.SetStateAction<string[]>>;
+  setJsonData: Dispatch<SetStateAction<string>>;
+  setKeyList: Dispatch<SetStateAction<string[]>>;
   keyList: Array<string>;
 }
 
