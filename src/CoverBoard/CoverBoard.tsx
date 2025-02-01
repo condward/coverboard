@@ -1,7 +1,5 @@
-import { FC, useCallback, useRef, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { Stage, Layer, Rect } from 'react-konva';
-import { flushSync } from 'react-dom';
-import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Stack } from '@mui/material';
@@ -21,11 +19,11 @@ import {
   GroupCovers,
   Arrows,
   TitleLabel,
+  MainKeyboardListener,
   BoundaryCoverArrows,
   BoundaryGroupArrows,
   CoverCountLabel,
   GroupCountLabel,
-  useKeysListener,
 } from './';
 
 export const CoverBoard: FC = () => {
@@ -45,8 +43,7 @@ export const CoverBoard: FC = () => {
     setPoints: useSetAtom(pointsAtom),
   };
 
-  const stageRef = useRef<Konva.Stage>(null);
-
+  const [screenshot, setScreenshot] = useState(false);
   const [screenshotUrl, setScreenshotUrl] = useState('');
 
   const checkDeselect = useCallback(
@@ -59,26 +56,6 @@ export const CoverBoard: FC = () => {
     },
     [setPoints, setSelected],
   );
-
-  const takeScreenshot = useCallback(() => {
-    const stage = stageRef.current;
-
-    if (stage) {
-      const uri = stage.toDataURL({ ...canvasLimits, mimeType: 'image/png' });
-
-      flushSync(() => {
-        setScreenshotUrl(uri);
-      });
-
-      const downloadLink = document.createElement('a');
-      downloadLink.href = uri;
-      downloadLink.download = `${saveId} ${formatDate(new Date())}.png`;
-      downloadLink.click();
-      setScreenshotUrl('');
-    }
-  }, [canvasLimits, saveId]);
-
-  useKeysListener();
 
   return (
     <Stack
@@ -95,15 +72,26 @@ export const CoverBoard: FC = () => {
           justifyContent="space-between"
           alignItems="center"
           direction={isLandscape ? 'column' : 'row'}>
-          <Toolbar takeScreenshot={takeScreenshot} />
+          <Toolbar takeScreenshot={() => setScreenshot(true)} />
           <Logo />
         </Stack>
       )}
+      <MainKeyboardListener />
       <Stack border={`3px solid ${color}`}>
         <Stage
           width={canvasLimits.width}
           height={canvasLimits.height}
-          ref={stageRef}
+          ref={(stage) => {
+            if (stage && screenshot) {
+              setScreenshotUrl(
+                stage.toDataURL({
+                  ...canvasLimits,
+                  mimeType: 'image/png',
+                }),
+              );
+              setScreenshot(false);
+            }
+          }}
           onMouseDown={checkDeselect}
           onTouchStart={checkDeselect}>
           <Layer>
@@ -127,7 +115,22 @@ export const CoverBoard: FC = () => {
         </Stage>
       </Stack>
 
-      {screenshotUrl && <img src={screenshotUrl} alt="Screenshot" />}
+      {screenshotUrl && (
+        <img
+          ref={(node) => {
+            if (node) {
+              const downloadLink = document.createElement('a');
+              downloadLink.href = screenshotUrl;
+              downloadLink.download = `${saveId} ${formatDate(new Date())}.png`;
+              downloadLink.click();
+
+              setScreenshotUrl('');
+            }
+          }}
+          src={screenshotUrl}
+          alt="Screenshot"
+        />
+      )}
     </Stack>
   );
 };

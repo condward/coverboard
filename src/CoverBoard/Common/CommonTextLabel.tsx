@@ -1,7 +1,6 @@
 import { Rect, Text } from 'react-konva';
 import { Html } from 'react-konva-utils';
-import { useEffect, useRef, useState, FC } from 'react';
-import Konva from 'konva';
+import { useState, FC } from 'react';
 
 import { PosTypes } from 'types';
 import { useMainStore } from 'store';
@@ -53,20 +52,12 @@ export const CommonTextLabel: FC<TitleTexProps> = ({
 
   const backColor = useMainStore((state) => state.getBackColor());
 
-  const textRef = useRef<Konva.Text>(null);
-
   const [textWidth, setTextWidth] = useState(0);
 
   const handleSubmit = (text: string) => {
     setOpen(false);
     setLabel(text);
   };
-
-  useEffect(() => {
-    if (textRef.current) {
-      setTextWidth(textRef.current.getTextWidth());
-    }
-  }, [textRef, label, fontSize]);
 
   const getXTextPos = () => {
     if (align === 'left') {
@@ -100,7 +91,11 @@ export const CommonTextLabel: FC<TitleTexProps> = ({
             height={fontSize * labelSize}
           />
           <Text
-            ref={textRef}
+            ref={(node) => {
+              if (node) {
+                setTextWidth(node.getTextWidth());
+              }
+            }}
             listening={false}
             align={align}
             text={removedLabel}

@@ -1,5 +1,7 @@
-import { FC, useEffect, useState, ChangeEvent } from 'react';
+import { FC, useState, ChangeEvent } from 'react';
 import { Box, TextField } from '@mui/material';
+
+import { CommonTextEditKeyboardListener } from 'CoverBoard/Keyboard';
 
 interface PopupProps {
   open: boolean;
@@ -42,58 +44,52 @@ export const CommonTextLabelPopover: FC<PopupProps> = ({
     onClose();
   };
 
-  useEffect(() => {
-    const keyFn = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        onSubmit(text.trim());
-        setText('');
-        onClose();
-        e.preventDefault();
-      } else if (e.key === 'Escape') {
-        onClose();
-        e.preventDefault();
-      }
-    };
-    document.addEventListener('keydown', keyFn);
-
-    return () => document.removeEventListener('keydown', keyFn);
-  }, [onClose, onSubmit, text]);
-
   return (
-    <Box
-      sx={{
-        position: 'absolute',
-        left: `${x}px`,
-        top: `${y}px`,
-        width: `${width}px`,
-      }}>
-      <form
-        onSubmit={(evt) => {
-          evt.preventDefault();
-          submitText();
+    <>
+      <CommonTextEditKeyboardListener
+        onClose={onClose}
+        onEnter={() => {
+          onSubmit(text.trim());
+          setText('');
+          onClose();
+        }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          left: `${x}px`,
+          top: `${y}px`,
+          width: `${width}px`,
         }}>
-        <TextField
-          autoFocus
-          value={text}
-          onChange={handTextChange}
-          onBlur={submitText}
-          fullWidth
-          sx={{
-            backgroundColor: fillBack,
-          }}
-          slotProps={{
-            htmlInput: {
-              sx: {
-                textAlign: align,
-                color: fill,
-                fontSize: `${fontSize}px`,
-                height: `${fontSize}px`,
-                padding: `${fontSize / 8}px`,
+        <form
+          onSubmit={(evt) => {
+            evt.preventDefault();
+            submitText();
+          }}>
+          <TextField
+            autoFocus
+            value={text}
+            onChange={handTextChange}
+            onBlur={submitText}
+            fullWidth
+            sx={{
+              backgroundColor: fillBack,
+            }}
+            slotProps={{
+              htmlInput: {
+                sx: {
+                  textAlign: align,
+                  color: fill,
+                  fontSize: `${fontSize}px`,
+                  height: `${fontSize}px`,
+                  padding: `${fontSize / 8}px`,
+                },
               },
-            },
-          }}
-        />
-      </form>
-    </Box>
+            }}
+          />
+        </form>
+      </Box>
+      1
+    </>
   );
 };

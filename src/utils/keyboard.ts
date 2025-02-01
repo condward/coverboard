@@ -1,19 +1,28 @@
 import { useAtomValue } from 'jotai';
 
 import {
-  useIsPopOpen,
   selectedAtom,
   editingTextAtom,
   editTitleAtom,
+  configAtom,
+  searchAtom,
+  shareAtom,
 } from 'store';
 
 export const usePreventKeys = () => {
-  const openPopup = useIsPopOpen();
-  const { editTitle, isContextModalOpen, isTextSelected } = {
-    editTitle: useAtomValue(editTitleAtom),
-    isContextModalOpen: !!useAtomValue(selectedAtom)?.open,
-    isTextSelected: !!useAtomValue(editingTextAtom),
-  };
+  const editTitle = useAtomValue(editTitleAtom);
+  const isContextModalOpen = !!useAtomValue(selectedAtom)?.open;
+  const isTextSelected = !!useAtomValue(editingTextAtom);
+  const searchOpen = useAtomValue(searchAtom);
+  const configOpen = useAtomValue(configAtom);
+  const shareOpen = useAtomValue(shareAtom);
 
-  return openPopup || isContextModalOpen || isTextSelected || editTitle;
+  return (
+    searchOpen ||
+    configOpen ||
+    shareOpen ||
+    isContextModalOpen ||
+    isTextSelected ||
+    editTitle
+  );
 };

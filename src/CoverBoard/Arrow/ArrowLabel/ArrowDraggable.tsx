@@ -1,13 +1,7 @@
 import { FC } from 'react';
-import { useSetAtom } from 'jotai';
 
 import { ArrowParams, TextTypes } from 'types';
-import {
-  editingTextAtom,
-  useIsCurrentTextSelected,
-  useGetSelectedId,
-  useShallowMainStore,
-} from 'store';
+import { useTextSelected, useShallowMainStore, useSelected } from 'store';
 import { CommonTextLabel } from 'CoverBoard/Common';
 import { useGetSizesContext } from 'providers';
 
@@ -21,7 +15,7 @@ interface ArrowProps {
 export const ArrowDraggable: FC<ArrowProps> = ({ index, ArrowParams }) => {
   const { fontSize, coverSizeWidth } = useGetSizesContext();
 
-  const { text, dir, id, color, updateArrow, showHelpers, showLabel } =
+  const { text, dir, id, color, updateArrow, showHelpers } =
     useShallowMainStore((state) => {
       const {
         title: { text, dir },
@@ -35,20 +29,14 @@ export const ArrowDraggable: FC<ArrowProps> = ({ index, ArrowParams }) => {
         color: state.getArrowColor(),
         updateArrow: state.updateArrow,
         showHelpers: state.configs.layout.helpers,
-        showLabel: state.configs.arrows.title.show,
       };
     });
 
-  const setEditingText = useSetAtom(editingTextAtom);
-  const selectedId = useGetSelectedId(id);
-  const isCurrentTextSelected = useIsCurrentTextSelected({
+  const { selectedId } = useSelected({ id });
+  const { isCurrentTextSelected, setEditingText } = useTextSelected({
     id,
     text: TextTypes.ArrowLABEL,
   });
-
-  const handleSetOpen = (open: boolean) => {
-    setEditingText(open ? { id, text: TextTypes.ArrowLABEL } : null);
-  };
 
   const getLabel = () => {
     if (text) {
@@ -59,8 +47,6 @@ export const ArrowDraggable: FC<ArrowProps> = ({ index, ArrowParams }) => {
     return '';
   };
 
-  if (!showLabel) return null;
-
   return (
     <ArrowLabelDraggable
       dir={dir}
@@ -70,8 +56,10 @@ export const ArrowDraggable: FC<ArrowProps> = ({ index, ArrowParams }) => {
         label={getLabel()}
         color={color}
         open={isCurrentTextSelected}
-        editable={true}
-        setOpen={handleSetOpen}
+        editable
+        setOpen={(open) => {
+          setEditingText(open ? { id, text: TextTypes.ArrowLABEL } : null);
+        }}
         onReset={() => void 0}
         setLabel={(text) => updateArrow(id, { title: { text } })}
         x={-coverSizeWidth}

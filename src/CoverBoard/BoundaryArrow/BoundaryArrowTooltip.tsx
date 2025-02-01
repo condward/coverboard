@@ -1,5 +1,4 @@
-import Konva from 'konva';
-import { useRef, useState, useEffect, FC } from 'react';
+import { useState, FC } from 'react';
 import { Group, Rect, Text } from 'react-konva';
 
 import { useGetSizesContext } from 'providers';
@@ -22,15 +21,7 @@ export const BoundaryArrowTooltip: FC<TooltipProps> = ({
 
   const backColor = useMainStore((state) => state.getBackColor());
 
-  const textRef = useRef<Konva.Text>(null);
-
   const [textWidth, setTextWidth] = useState(0);
-
-  useEffect(() => {
-    if (textRef.current) {
-      setTextWidth(textRef.current.getTextWidth());
-    }
-  }, [textRef, text]);
 
   return (
     <Group x={x} y={y}>
@@ -42,7 +33,11 @@ export const BoundaryArrowTooltip: FC<TooltipProps> = ({
         listening={false}
       />
       <Text
-        ref={textRef}
+        ref={(node) => {
+          if (node) {
+            setTextWidth(node.getTextWidth());
+          }
+        }}
         width={coverSizeWidth * 2}
         align={align}
         text={text}
