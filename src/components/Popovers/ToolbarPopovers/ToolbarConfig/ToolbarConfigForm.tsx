@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Stack } from '@mui/material';
-import { Controller, useWatch } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import type { Control } from 'react-hook-form';
 
 import { ConfigSchema, mediaMap, SPACING_GAP } from 'types';
@@ -16,15 +16,11 @@ import {
 } from 'components';
 import { useMainStore } from 'store';
 import { useGetSizesContext } from 'providers';
+import WatchController from 'utils/WatchController';
 
 export const ToolbarConfigForm: FC<{
   control: Control<ConfigSchema>;
 }> = ({ control }) => {
-  const showScreenSizes = useWatch({
-    control,
-    name: 'layout.fitToScreen',
-  });
-
   const { canvasLimits } = useGetSizesContext();
 
   const media = useMainStore((state) => state.configs.media);
@@ -137,10 +133,15 @@ export const ToolbarConfigForm: FC<{
                 </Stack>
 
                 <Stack direction="row" gap={SPACING_GAP}>
-                  <Controller
+                  <WatchController
                     name="layout.width"
+                    watch="layout.fitToScreen"
                     control={control}
-                    render={({ field, fieldState: { error } }) => (
+                    render={({
+                      field,
+                      fieldState: { error },
+                      watched: showScreenSizes,
+                    }) => (
                       <TextInput
                         fullWidth
                         formError={error}
@@ -161,10 +162,15 @@ export const ToolbarConfigForm: FC<{
                       />
                     )}
                   />
-                  <Controller
+                  <WatchController
                     name="layout.height"
                     control={control}
-                    render={({ field, fieldState: { error } }) => (
+                    watch="layout.fitToScreen"
+                    render={({
+                      field,
+                      fieldState: { error },
+                      watched: showScreenSizes,
+                    }) => (
                       <TextInput
                         fullWidth
                         formError={error}
