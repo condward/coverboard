@@ -53,16 +53,17 @@ export const searchSchema = ({
 export type SearchSchema = z.input<ReturnType<typeof searchSchema>>;
 export type SearchSchemaOutput = z.output<ReturnType<typeof searchSchema>>;
 
-export enum MediaValues {
-  ARTIST = 'artist',
-  ALBUM = 'album',
-  MOVIE = 'movie',
-  TVSHOW = 'tvshow',
-  YEAR = 'year',
-  BOOK = 'book',
-  AUTHOR = 'author',
-  GAME = 'game',
-}
+export const MediaValues = {
+  ARTIST: 'artist',
+  ALBUM: 'album',
+  MOVIE: 'movie',
+  TVSHOW: 'tvshow',
+  YEAR: 'year',
+  BOOK: 'book',
+  AUTHOR: 'author',
+  GAME: 'game',
+} as const;
+export type MediaValues = (typeof MediaValues)[keyof typeof MediaValues];
 
 export interface MediaDesc {
   label: MediaValues;
@@ -70,11 +71,12 @@ export interface MediaDesc {
   hidden: boolean;
 }
 
-export enum ApiKeys {
-  LAST_FM = 'lastFM',
-  TMDB = 'The movie DB',
-  RAWG = 'Rawg',
-}
+export const ApiKeys = {
+  LAST_FM: 'lastFM',
+  TMDB: 'The movie DB',
+  RAWG: 'Rawg',
+} as const;
+export type ApiKeys = (typeof ApiKeys)[keyof typeof ApiKeys];
 
 type MediaMapRecord = Record<
   Media,

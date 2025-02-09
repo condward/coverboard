@@ -42,6 +42,7 @@ export default [
       ...prettierPlugin.configs.recommended.rules,
       ...importPlugin.configs.recommended.rules,
       ...jsxA11yPlugin.configs.recommended.rules,
+      'no-redeclare': 'off',
       'hooks/sort': [
         2,
         {

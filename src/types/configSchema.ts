@@ -3,23 +3,25 @@ import { z } from 'zod';
 import { PosTypes } from './generalTypes';
 import { MAX_BOUNDARY } from './constants';
 
-export enum Media {
-  MUSIC = 'music',
-  MOVIE = 'movie',
-  TVSHOW = 'tvshow',
-  BOOK = 'book',
-  GAME = 'game',
-}
+export const Media = {
+  MUSIC: 'music',
+  MOVIE: 'movie',
+  TVSHOW: 'tvshow',
+  BOOK: 'book',
+  GAME: 'game',
+} as const;
+export type Media = (typeof Media)[keyof typeof Media];
 
-export enum Colors {
-  YELLOW = 'yellow',
-  RED = 'red',
-  GREEN = 'green',
-  PINK = 'pink',
-  BLUE = 'blue',
-  PURPLE = 'purple',
-  ORANGE = 'orange',
-}
+export const Colors = {
+  YELLOW: 'yellow',
+  RED: 'red',
+  GREEN: 'green',
+  PINK: 'pink',
+  BLUE: 'blue',
+  PURPLE: 'purple',
+  ORANGE: 'orange',
+} as const;
+export type Colors = (typeof Colors)[keyof typeof Colors];
 
 export const colorMap = {
   [Colors.YELLOW]: '#FFFF00',
@@ -31,12 +33,13 @@ export const colorMap = {
   [Colors.ORANGE]: '#FF6347',
 };
 
-export enum BackColors {
-  DARKER = 'darker',
-  DARK = 'dark',
-  LIGHT = 'light',
-  LIGHTER = 'lighter',
-}
+export const BackColors = {
+  DARKER: 'darker',
+  DARK: 'dark',
+  LIGHT: 'light',
+  LIGHTER: 'lighter',
+} as const;
+export type BackColors = (typeof BackColors)[keyof typeof BackColors];
 
 export const backColorMap = {
   [BackColors.DARKER]: '#1E2B38',

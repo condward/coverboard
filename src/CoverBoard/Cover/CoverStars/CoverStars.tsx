@@ -6,11 +6,12 @@ import { useGetElementSizes } from 'utils';
 
 import { CoverStar, CoverStarDraggable } from '.';
 
-enum Offsets {
-  TITLE = LabelTypes.TITLE,
-  SUBTITLE = LabelTypes.SUBTITLE,
-  STAR = 'star',
-}
+export const Offsets = {
+  TITLE: LabelTypes.TITLE,
+  SUBTITLE: LabelTypes.SUBTITLE,
+  STAR: 'star',
+} as const;
+export type Offsets = (typeof Offsets)[keyof typeof Offsets];
 
 export const CoverStars: FC<{
   index: number;
