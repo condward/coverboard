@@ -91,7 +91,6 @@ export const coverSchema = z.object({
   }),
 });
 export type CoverSchema = z.input<typeof coverSchema>;
-export type CoverSchemaOutput = z.output<typeof coverSchema>;
 
 export const coversSchema = z
   .array(coverSchema, {

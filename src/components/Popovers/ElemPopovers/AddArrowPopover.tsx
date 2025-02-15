@@ -5,13 +5,7 @@ import { Controller } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { AddOutlined } from '@mui/icons-material';
 
-import {
-  ArrowSchemaOutput,
-  ArrowSchema,
-  SPACING_GAP,
-  PosTypes,
-  arrowSchema,
-} from 'types';
+import { SPACING_GAP, PosTypes, arrowSchema } from 'types';
 import {
   CommonDialog,
   DirectionRadio,
@@ -54,25 +48,13 @@ export const AddArrowPopover: FC<AddArrowPopoverProps> = ({
     : undefined;
   const title = originCoverTitle || originGroupTitle || '';
 
-  const { control, handleSubmit, watch } = useForm<
-    ArrowSchema,
-    unknown,
-    ArrowSchemaOutput
-  >({
+  const { control, handleSubmit, watch } = useForm({
     resolver: zodResolver(arrowSchema),
     defaultValues: {
       id: uuidv4(),
-      title: {
-        text: '',
-        dir: PosTypes.BOTTOM,
-      },
-      origin: {
-        id: originId ?? undefined,
-        dir: PosTypes.BOTTOM,
-      },
-      target: {
-        dir: PosTypes.BOTTOM,
-      },
+      title: { text: '', dir: PosTypes.BOTTOM },
+      origin: { id: originId ?? undefined, dir: PosTypes.BOTTOM },
+      target: { dir: PosTypes.BOTTOM },
     },
   });
 

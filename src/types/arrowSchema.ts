@@ -74,7 +74,6 @@ export const arrowSchema = z.object({
 });
 
 export type ArrowSchema = z.input<typeof arrowSchema>;
-export type ArrowSchemaOutput = z.output<typeof arrowSchema>;
 
 export const arrowSchemas = z
   .array(arrowSchema, {

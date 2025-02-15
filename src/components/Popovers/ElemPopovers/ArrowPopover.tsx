@@ -10,12 +10,7 @@ import {
   SwapHorizOutlined,
 } from '@mui/icons-material';
 
-import {
-  ArrowSchema,
-  ArrowSchemaOutput,
-  SPACING_GAP,
-  arrowSchema,
-} from 'types';
+import { ArrowSchema, SPACING_GAP, arrowSchema } from 'types';
 import {
   CommonDialog,
   DirectionRadio,
@@ -65,11 +60,7 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
   const originTitle = originCoverTitle || originGroupTitle || '';
   const targetTitle = targetCoverTitle || targetGroupTitle || '';
 
-  const { control, handleSubmit } = useForm<
-    ArrowSchema,
-    unknown,
-    ArrowSchemaOutput
-  >({
+  const { control, handleSubmit } = useForm({
     resolver: zodResolver(arrowSchema),
     defaultValues: arrow,
   });
@@ -77,10 +68,7 @@ export const ArrowPopover: FC<ArrowPopoverProps> = ({
   const onSubmit = handleSubmit(
     (values) => {
       updateArrow(arrow.id, {
-        title: {
-          text: values.title.text,
-          dir: values.title.dir,
-        },
+        title: { text: values.title.text, dir: values.title.dir },
         origin: { dir: values.origin.dir },
         target: { dir: values.target.dir },
       });

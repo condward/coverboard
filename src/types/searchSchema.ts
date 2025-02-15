@@ -13,10 +13,7 @@ export const searchSchema = ({
     search: z
       .array(
         z
-          .object({
-            title: z.string(),
-            subtitle: z.string(),
-          })
+          .object({ title: z.string(), subtitle: z.string() })
           .refine((value) => {
             if (
               value.title === '' &&
@@ -51,7 +48,6 @@ export const searchSchema = ({
   });
 
 export type SearchSchema = z.input<ReturnType<typeof searchSchema>>;
-export type SearchSchemaOutput = z.output<ReturnType<typeof searchSchema>>;
 
 export const MediaValues = {
   ARTIST: 'artist',
@@ -95,16 +91,8 @@ type MediaMapRecord = Record<
 export const mediaMap: MediaMapRecord = {
   [Media.MUSIC]: {
     emoji: '🎵',
-    title: {
-      label: MediaValues.ALBUM,
-      required: true,
-      hidden: false,
-    },
-    subtitle: {
-      label: MediaValues.ARTIST,
-      required: true,
-      hidden: false,
-    },
+    title: { label: MediaValues.ALBUM, required: true, hidden: false },
+    subtitle: { label: MediaValues.ARTIST, required: true, hidden: false },
     heightRatio: 1,
     apiName: ApiKeys.LAST_FM,
     baseUrl: '/api/get-album',
@@ -114,16 +102,8 @@ export const mediaMap: MediaMapRecord = {
   },
   [Media.MOVIE]: {
     emoji: '🎬',
-    title: {
-      label: MediaValues.MOVIE,
-      required: true,
-      hidden: false,
-    },
-    subtitle: {
-      label: MediaValues.YEAR,
-      required: false,
-      hidden: false,
-    },
+    title: { label: MediaValues.MOVIE, required: true, hidden: false },
+    subtitle: { label: MediaValues.YEAR, required: false, hidden: false },
     heightRatio: 1.5,
     apiName: ApiKeys.TMDB,
     baseUrl: '/api/get-movie',
@@ -133,16 +113,8 @@ export const mediaMap: MediaMapRecord = {
   },
   [Media.TVSHOW]: {
     emoji: '📺',
-    title: {
-      label: MediaValues.TVSHOW,
-      required: true,
-      hidden: false,
-    },
-    subtitle: {
-      label: MediaValues.YEAR,
-      required: false,
-      hidden: false,
-    },
+    title: { label: MediaValues.TVSHOW, required: true, hidden: false },
+    subtitle: { label: MediaValues.YEAR, required: false, hidden: false },
     heightRatio: 1.5,
     apiName: ApiKeys.TMDB,
     baseUrl: '/api/get-movie',
@@ -152,16 +124,8 @@ export const mediaMap: MediaMapRecord = {
   },
   [Media.BOOK]: {
     emoji: '📚',
-    title: {
-      label: MediaValues.BOOK,
-      required: true,
-      hidden: false,
-    },
-    subtitle: {
-      label: MediaValues.AUTHOR,
-      required: false,
-      hidden: false,
-    },
+    title: { label: MediaValues.BOOK, required: true, hidden: false },
+    subtitle: { label: MediaValues.AUTHOR, required: false, hidden: false },
     heightRatio: 1.5,
     apiName: null,
     baseUrl: null,
@@ -171,16 +135,8 @@ export const mediaMap: MediaMapRecord = {
   },
   [Media.GAME]: {
     emoji: '🎮',
-    title: {
-      label: MediaValues.GAME,
-      required: true,
-      hidden: false,
-    },
-    subtitle: {
-      label: MediaValues.YEAR,
-      required: false,
-      hidden: false,
-    },
+    title: { label: MediaValues.GAME, required: true, hidden: false },
+    subtitle: { label: MediaValues.YEAR, required: false, hidden: false },
     heightRatio: 0.7,
     apiName: ApiKeys.RAWG,
     baseUrl: '/api/get-game',

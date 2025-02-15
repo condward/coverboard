@@ -11,8 +11,6 @@ import {
 } from '@mui/icons-material';
 
 import {
-  ConfigSchema,
-  ConfigSchemaOutput,
   ToolConfigIDs,
   configSchema,
   SPACING_GAP,
@@ -25,9 +23,9 @@ import { CoverboardOverview } from 'components/Popovers/ElemPopovers/connections
 
 import { ToolbarConfigForm } from './ToolbarConfigForm';
 
-export const ToolbarConfigPopover: FC<{
-  onClose: () => void;
-}> = ({ onClose }) => {
+export const ToolbarConfigPopover: FC<{ onClose: () => void }> = ({
+  onClose,
+}) => {
   const { showErrorMessage } = useShowToast();
   const {
     getConfigs,
@@ -50,11 +48,7 @@ export const ToolbarConfigPopover: FC<{
 
   const [openOverview, setOverviewOpen] = useState(false);
 
-  const { control, handleSubmit } = useForm<
-    ConfigSchema,
-    unknown,
-    ConfigSchemaOutput
-  >({
+  const { control, handleSubmit } = useForm({
     resolver: zodResolver(
       configSchema.extend({
         layout: configSchema.shape.layout.extend({
@@ -78,20 +72,12 @@ export const ToolbarConfigPopover: FC<{
         title: { dir: config.groups.title.dir },
         subtitle: { dir: config.groups.subtitle.dir },
       });
-      updateAllArrows({
-        title: { dir: config.covers.title.dir },
-      });
+      updateAllArrows({ title: { dir: config.covers.title.dir } });
       flushSync(() =>
         updateConfigs({
           ...config,
-          title: {
-            ...config.title,
-            text: config.title.text.trim(),
-          },
-          layout: {
-            ...config.layout,
-            scale: config.layout.scale * 100,
-          },
+          title: { ...config.title, text: config.title.text.trim() },
+          layout: { ...config.layout, scale: config.layout.scale * 100 },
         }),
       );
       onClose();

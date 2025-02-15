@@ -60,39 +60,33 @@ export const bulkUpdateCoverSchema = z.object({
       ),
   }),
   title: z.object({
-    dir: z
-      .nativeEnum(PosTypes, {
-        errorMap: () => {
-          return {
-            message: `covers:dir must be ${Object.values(PosTypes).join(' | ')}`,
-          };
-        },
-      })
-      .or(z.literal('none')),
+    dir: z.nativeEnum(PosTypes, {
+      errorMap: () => {
+        return {
+          message: `covers:dir must be ${Object.values(PosTypes).join(' | ')}`,
+        };
+      },
+    }),
   }),
   subtitle: z.object({
-    dir: z
-      .nativeEnum(PosTypes, {
-        errorMap: () => {
-          return {
-            message: `covers:dir must be ${Object.values(PosTypes).join(' | ')}`,
-          };
-        },
-      })
-      .or(z.literal('none')),
+    dir: z.nativeEnum(PosTypes, {
+      errorMap: () => {
+        return {
+          message: `covers:dir must be ${Object.values(PosTypes).join(' | ')}`,
+        };
+      },
+    }),
   }),
   star: z.object({
-    dir: z
-      .nativeEnum(PosTypes, {
-        errorMap: () => {
-          return {
-            message: `covers:star:dir must be ${Object.values(PosTypes).join(
-              ' | ',
-            )}`,
-          };
-        },
-      })
-      .or(z.literal('none')),
+    dir: z.nativeEnum(PosTypes, {
+      errorMap: () => {
+        return {
+          message: `covers:star:dir must be ${Object.values(PosTypes).join(
+            ' | ',
+          )}`,
+        };
+      },
+    }),
     count: z.coerce
       .number({
         invalid_type_error: 'covers:star:count must be a number',
@@ -102,10 +96,6 @@ export const bulkUpdateCoverSchema = z.object({
       .max(5, 'covers:star:count  must be less than 5'),
   }),
 });
-export type BulkUpdateCoverSchema = z.input<typeof bulkUpdateCoverSchema>;
-export type BulkUpdateCoverSchemaOutput = z.output<
-  typeof bulkUpdateCoverSchema
->;
 
 export const bulkUpdateCoversSchema = z
   .array(bulkUpdateCoverSchema, {
@@ -113,4 +103,3 @@ export const bulkUpdateCoversSchema = z
     required_error: 'covers is required',
   })
   .max(25, 'Only 25 covers are allowed');
-export type BulkUpdateCoversSchema = z.input<typeof bulkUpdateCoversSchema>;

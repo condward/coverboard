@@ -10,14 +10,7 @@ import {
 } from '@mui/icons-material';
 import { useAtomValue } from 'jotai';
 
-import {
-  CoverSchema,
-  Media,
-  SPACING_GAP,
-  mediaMap,
-  CoverSchemaOutput,
-  coverSchema,
-} from 'types';
+import { CoverSchema, Media, SPACING_GAP, mediaMap, coverSchema } from 'types';
 
 import {
   CommonDialog,
@@ -146,11 +139,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
 
   const [conn, setOpenConn] = useState(false);
 
-  const { control, handleSubmit, getValues } = useForm<
-    CoverSchema,
-    unknown,
-    CoverSchemaOutput
-  >({
+  const { control, handleSubmit, getValues } = useForm({
     resolver: zodResolver(coverSchema),
     defaultValues: cover,
   });
@@ -158,22 +147,13 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
   const onSubmit = handleSubmit(
     (values) => {
       updateCover(cover.id, {
-        title: {
-          text: values.title.text.trim(),
-          dir: values.title.dir,
-        },
+        title: { text: values.title.text.trim(), dir: values.title.dir },
         subtitle: {
           text: values.subtitle.text.trim(),
           dir: values.subtitle.dir,
         },
-        star: {
-          count: values.star.count,
-          dir: values.star.dir,
-        },
-        pos: {
-          x: values.pos.x,
-          y: values.pos.y,
-        },
+        star: { count: values.star.count, dir: values.star.dir },
+        pos: { x: values.pos.x, y: values.pos.y },
       });
       onClose();
     },
@@ -205,10 +185,7 @@ export const CoverPopover: FC<CoverPopoverProps> = ({
 
     try {
       await searchValue.mutateAsync([
-        {
-          title: values.title.text,
-          subtitle: values.subtitle.text,
-        },
+        { title: values.title.text, subtitle: values.subtitle.text },
       ]);
       onClose();
       showSuccessMessage('Cover was updated with success');

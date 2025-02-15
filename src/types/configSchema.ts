@@ -264,4 +264,3 @@ export const configSchema = z.object(
   },
 );
 export type ConfigSchema = z.input<typeof configSchema>;
-export type ConfigSchemaOutput = z.output<typeof configSchema>;

@@ -10,12 +10,7 @@ import {
 } from '@mui/icons-material';
 import { useAtomValue } from 'jotai';
 
-import {
-  GroupSchema,
-  groupSchema,
-  SPACING_GAP,
-  GroupSchemaOutput,
-} from 'types';
+import { GroupSchema, groupSchema, SPACING_GAP } from 'types';
 import {
   CommonDialog,
   SliderInput,
@@ -74,11 +69,7 @@ export const GroupPopover: FC<GroupPopoverProps> = ({
     onClose();
   };
 
-  const { control, handleSubmit, watch } = useForm<
-    GroupSchema,
-    unknown,
-    GroupSchemaOutput
-  >({
+  const { control, handleSubmit, watch } = useForm({
     resolver: zodResolver(groupSchema),
     defaultValues: group,
   });
@@ -86,22 +77,10 @@ export const GroupPopover: FC<GroupPopoverProps> = ({
   const onSubmit = handleSubmit(
     (values) => {
       updateGroup(group.id, {
-        title: {
-          text: values.title.text,
-          dir: values.title.dir,
-        },
-        subtitle: {
-          text: values.subtitle.text,
-          dir: values.subtitle.dir,
-        },
-        scale: {
-          x: values.scale.x,
-          y: values.scale.y,
-        },
-        pos: {
-          x: values.pos.x,
-          y: values.pos.y,
-        },
+        title: { text: values.title.text, dir: values.title.dir },
+        subtitle: { text: values.subtitle.text, dir: values.subtitle.dir },
+        scale: { x: values.scale.x, y: values.scale.y },
+        pos: { x: values.pos.x, y: values.pos.y },
       });
       onClose();
     },

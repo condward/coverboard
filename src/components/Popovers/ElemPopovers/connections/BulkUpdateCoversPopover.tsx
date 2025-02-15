@@ -9,9 +9,8 @@ import {
 } from '@mui/icons-material';
 
 import {
-  BulkUpdateCoverSchema,
-  BulkUpdateCoverSchemaOutput,
   CoversSchema,
+  PosTypes,
   SPACING_GAP,
   bulkUpdateCoverSchema,
   mediaMap,
@@ -32,12 +31,7 @@ import { useGetSizesContext } from 'providers';
 interface BulkUpdateCoversPopoverProps {
   onClose: () => void;
   covers: CoversSchema;
-  maxBounds: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+  maxBounds: { x: number; y: number; width: number; height: number };
 }
 
 export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
@@ -74,32 +68,15 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
     return [];
   });
 
-  const { control, getValues, handleSubmit, watch } = useForm<
-    BulkUpdateCoverSchema,
-    unknown,
-    BulkUpdateCoverSchemaOutput
-  >({
+  const { control, getValues, handleSubmit, watch } = useForm({
     resolver: zodResolver(bulkUpdateCoverSchema),
     defaultValues: {
       ids: covers.map((cov) => cov.id),
-      title: {
-        dir: 'none',
-      },
-      subtitle: {
-        dir: 'none',
-      },
-      star: {
-        count: -1,
-        dir: 'none',
-      },
-      pos: {
-        x: -1,
-        y: -1,
-      },
-      pace: {
-        x: 0,
-        y: 0,
-      },
+      title: { dir: PosTypes.BOTTOM },
+      subtitle: { dir: PosTypes.BOTTOM },
+      star: { count: -1, dir: PosTypes.BOTTOM },
+      pos: { x: -1, y: -1 },
+      pace: { x: 0, y: 0 },
     },
   });
 
@@ -110,16 +87,11 @@ export const BulkUpdateCoversPopover: FC<BulkUpdateCoversPopoverProps> = ({
 
       values.ids.forEach((id, index) =>
         updateCover(id, {
-          title: {
-            dir: values.title.dir !== 'none' ? values.title.dir : undefined,
-          },
-          subtitle: {
-            dir:
-              values.subtitle.dir !== 'none' ? values.subtitle.dir : undefined,
-          },
+          title: { dir: values.title.dir },
+          subtitle: { dir: values.subtitle.dir },
           star: {
             count: values.star.count > -1 ? values.star.count : undefined,
-            dir: values.star.dir !== 'none' ? values.star.dir : undefined,
+            dir: values.star.dir,
           },
           pos: {
             x:

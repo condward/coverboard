@@ -15,7 +15,6 @@ import {
   CoverLabelValue,
   mediaMap,
   SearchSchema,
-  SearchSchemaOutput,
   ToolConfigIDs,
   searchSchema,
   SPACING_GAP,
@@ -37,9 +36,9 @@ const getInitialState = (): SearchSchema['search'] => [
   { title: '', subtitle: '' },
 ];
 
-export const ToolbarSearchPopover: FC<{
-  onClose: () => void;
-}> = ({ onClose }) => {
+export const ToolbarSearchPopover: FC<{ onClose: () => void }> = ({
+  onClose,
+}) => {
   const initialState = getInitialState();
   const addEmptyCover = useAddEmptyCover();
 
@@ -62,7 +61,7 @@ export const ToolbarSearchPopover: FC<{
     reset,
     getValues,
     formState: { isDirty, isValid },
-  } = useForm<SearchSchema, unknown, SearchSchemaOutput>({
+  } = useForm({
     resolver: zodResolver(searchSchema({ titleLabel, subTitleLabel })),
     defaultValues: { search: initialState },
   });

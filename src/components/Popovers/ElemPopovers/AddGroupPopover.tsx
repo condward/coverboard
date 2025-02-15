@@ -5,12 +5,7 @@ import { Controller } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { AddOutlined } from '@mui/icons-material';
 
-import {
-  GroupSchema,
-  groupSchema,
-  SPACING_GAP,
-  GroupSchemaOutput,
-} from 'types';
+import { groupSchema, SPACING_GAP } from 'types';
 import {
   CommonDialog,
   SliderInput,
@@ -40,30 +35,14 @@ export const AddGroupPopover: FC<AddGroupPopoverProps> = ({ onClose }) => {
     }),
   );
 
-  const { control, handleSubmit, watch } = useForm<
-    GroupSchema,
-    unknown,
-    GroupSchemaOutput
-  >({
+  const { control, handleSubmit, watch } = useForm({
     resolver: zodResolver(groupSchema),
     defaultValues: {
       id: uuidv4(),
-      pos: {
-        x: 0,
-        y: 0,
-      },
-      title: {
-        text: '',
-        dir: groupTitleDir,
-      },
-      subtitle: {
-        text: '',
-        dir: groupSubTitleDir,
-      },
-      scale: {
-        x: 3,
-        y: 3,
-      },
+      pos: { x: 0, y: 0 },
+      title: { text: '', dir: groupTitleDir },
+      subtitle: { text: '', dir: groupSubTitleDir },
+      scale: { x: 3, y: 3 },
     },
   });
 
