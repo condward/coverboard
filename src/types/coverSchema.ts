@@ -1,5 +1,6 @@
 import { validate } from 'uuid';
 import { z } from 'zod';
+import { LabelTypes } from 'types';
 
 import { PosTypes } from './generalTypes';
 import { MAX_BOUNDARY } from './constants';
@@ -105,3 +106,10 @@ export interface CoverLabelValue {
   subtitle: string;
 }
 export type CoverLabelValues = Array<CoverLabelValue>;
+
+export const Offsets = {
+  TITLE: LabelTypes.TITLE,
+  SUBTITLE: LabelTypes.SUBTITLE,
+  STAR: 'star',
+} as const;
+export type Offsets = (typeof Offsets)[keyof typeof Offsets];

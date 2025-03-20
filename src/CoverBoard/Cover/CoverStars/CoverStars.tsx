@@ -1,17 +1,10 @@
 import { FC } from 'react';
 
 import { useShallowMainStore } from 'store';
-import { LabelTypes } from 'types';
+import { Offsets } from 'types';
 import { useGetElementSizes } from 'utils';
 
 import { CoverStar, CoverStarDraggable } from '.';
-
-export const Offsets = {
-  TITLE: LabelTypes.TITLE,
-  SUBTITLE: LabelTypes.SUBTITLE,
-  STAR: 'star',
-} as const;
-export type Offsets = (typeof Offsets)[keyof typeof Offsets];
 
 export const CoverStars: FC<{
   index: number;

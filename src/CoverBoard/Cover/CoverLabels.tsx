@@ -2,16 +2,9 @@ import { FC } from 'react';
 
 import { useShallowMainStore } from 'store';
 import { CommonLabelDraggable, CommonLabel } from 'CoverBoard/Common';
-import { LabelTypes } from 'types';
+import { LabelTypes, Offsets } from 'types';
 import { useGetSizesContext } from 'providers';
 import { useGetElementSizes } from 'utils';
-
-export const Offsets = {
-  TITLE: LabelTypes.TITLE,
-  SUBTITLE: LabelTypes.SUBTITLE,
-  STAR: 'star',
-} as const;
-export type Offsets = (typeof Offsets)[keyof typeof Offsets];
 
 export const CoverLabels: FC<{
   index: number;
