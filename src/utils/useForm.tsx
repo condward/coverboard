@@ -4,8 +4,8 @@ import { useForm as useReactHookForm } from 'react-hook-form';
 export function useForm<
   TFieldValues extends FieldValues = FieldValues,
   TContext = unknown,
-  TTransformedValues extends FieldValues | undefined = undefined,
->(props?: UseFormProps<TFieldValues, TContext>) {
+  TTransformedValues = TFieldValues,
+>(props?: UseFormProps<TFieldValues, TContext, TTransformedValues>) {
   return useReactHookForm<TFieldValues, TContext, TTransformedValues>({
     mode: 'onChange',
     ...props,
