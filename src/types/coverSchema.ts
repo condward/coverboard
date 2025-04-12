@@ -1,5 +1,6 @@
 import { validate } from 'uuid';
 import { z } from 'zod';
+
 import { LabelTypes } from 'types';
 
 import { PosTypes } from './generalTypes';
